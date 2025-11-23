@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load API Key
+# Load API key
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
@@ -32,18 +32,27 @@ def listen_page():
 
 @app.route("/interview_listen", methods=["POST"])
 def interview_listen():
+    print("==== /interview_listen START ====")
+
+    # 1. Check audio
     if "audio" not in request.files:
+        print("❌ No audio file found")
         return jsonify({"question": "(no audio)", "answer": "Please try again."}), 400
 
     audio_file = request.files["audio"]
+    print("📌 Received audio:", audio_file.filename)
 
-    # Save temp .webm file
+    # 2. Save audio file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_in:
         audio_file.save(temp_in.name)
         webm_path = temp_in.name
 
-    # Convert .webm → .wav
+    print("📌 Saved WEBM:", webm_path)
+
+    # 3. Convert to WAV
     wav_path = webm_path.replace(".webm", ".wav")
+    print("📌 Converting to WAV:", wav_path)
+
     try:
         subprocess.run(
             ["ffmpeg", "-y", "-i", webm_path, wav_path],
@@ -52,11 +61,10 @@ def interview_listen():
             check=True
         )
     except Exception as e:
+        print("❌ FFmpeg error:", e)
         return jsonify({"question": "(error)", "answer": f"ffmpeg error: {e}"}), 500
 
-    # ============================
-    # TRUE SILENCE DETECTION
-    # ============================
+    # 4. Silence detection
     silence_check = subprocess.run(
         ["ffmpeg", "-i", wav_path,
          "-af", "silencedetect=noise=-35dB:d=0.4",
@@ -66,15 +74,19 @@ def interview_listen():
         text=True
     )
 
+    print("📌 Silence detection log:")
+    print(silence_check.stderr)
+
     if "silence_start" in silence_check.stderr and "silence_end" not in silence_check.stderr:
+        print("❌ Entire audio was silence")
         return jsonify({
             "question": "(silence)",
-            "answer": "I didn’t hear anything — try speaking closer to the mic."
+            "answer": "I didn’t hear anything — try again."
         })
 
-    # ============================
-    # TRANSCRIBE WITH WHISPER
-    # ============================
+    # 5. Whisper Transcription
+    print("📌 Transcribing with Whisper...")
+
     try:
         with open(wav_path, "rb") as f:
             transcript = client.audio.transcriptions.create(
@@ -83,62 +95,55 @@ def interview_listen():
                 language="en"
             )
         text = transcript.text.strip()
+        print("📌 Whisper text:", text)
     except Exception as e:
+        print("❌ Whisper error:", e)
         return jsonify({"question": "(error)", "answer": f"whisper error: {e}"}), 500
 
     lower_text = text.lower()
 
-    # ============================
-    # BLOCK STREAMER / VIDEO HALLUCINATIONS
-    # ============================
+    # 6. Noise / streamer hallucination filters
     streamer_phrases = [
-        "thanks for watching",
-        "thank you for watching",
-        "thanks everyone",
-        "thank you so much",
-        "subscribe",
-        "video",
-        "watching",
-        "hello guys",
-        "welcome back"
+        "thanks for watching", "thank you for watching", "thanks everyone",
+        "thank you so much", "subscribe", "video", "watching",
+        "hello guys", "welcome back"
     ]
 
     if any(h in lower_text for h in streamer_phrases):
+        print("❌ Blocked streamer hallucination")
         return jsonify({
-            "question": "(noise detected)",
-            "answer": "I heard background noise but no clear speech. Try again."
+            "question": "(noise)",
+            "answer": "I heard noise but no real speech."
         })
 
-    # ============================
-    # BLOCK URL / WEBSITE HALLUCINATIONS
-    # ============================
+    # 7. URL hallucinations
     url_patterns = [
         r"www\.", r"http", r"https",
-        r"\.com", r"\.org", r"\.gov", r"\.net", r"\.edu",
-        r"for more information", r"visit"
+        r"\.com", r"\.org", r"\.gov",
+        r"\.net", r"\.edu"
     ]
 
     if any(re.search(p, lower_text) for p in url_patterns):
+        print("❌ Blocked URL hallucination")
         return jsonify({
-            "question": "(background noise)",
-            "answer": "I heard noise but not real speech — try again!"
+            "question": "(noise)",
+            "answer": "I heard background noise. Try again."
         })
 
-    # ============================
-    # BLOCK TOO SHORT OR UNCLEAR SPEECH
-    # ============================
+    # 8. Too short speech
     if len(text) < 5 or len(text.split()) <= 2:
+        print("❌ Speech too short / unclear")
         return jsonify({
-            "question": "(unclear speech)",
-            "answer": "I couldn’t catch that — try speaking more clearly."
+            "question": "(unclear)",
+            "answer": "I couldn’t catch that clearly."
         })
 
-    # ============================
-    # GENERATE AI ANSWER
-    # ============================
+    # 9. Generate AI answer
+    print("📌 Asking GPT for answer...")
+
     prompt = (
         f"The speaker said: '{text}'.\n"
-        f"Give a simple, friendly 1–2 sentence response."
+        f"Give a simple, friendly, 1–2 sentence response."
     )
 
     try:
@@ -148,15 +153,19 @@ def interview_listen():
         )
         answer = response.output_text.strip()
 
+        print("📌 GPT answer:", answer)
+        print("==== /interview_listen END ====")
+
         return jsonify({"question": text, "answer": answer})
 
     except Exception as e:
+        print("❌ AI error:", e)
         return jsonify({"question": text, "answer": f'AI error: {e}'}), 500
 
 
-# ======================================================
-# NEW: INTERVIEW ANSWER ROUTE (FOR TEXT ANSWER WEBPAGE)
-# ======================================================
+# ============================
+# TEXT INTERVIEW ANSWER ROUTE
+# ============================
 
 @app.route("/interview_answer", methods=["POST"])
 def interview_answer():
@@ -175,8 +184,7 @@ The interview question is: "{question}"
 Job role: "{job_role}"
 User background: "{background}"
 
-Write a simple, friendly, 2–3 sentence answer that sounds human,
-easy to understand, and not too professional.
+Write a simple, friendly, 2–3 sentence answer.
 """
 
     try:
@@ -193,7 +201,7 @@ easy to understand, and not too professional.
 
 
 # ============================
-# RUN LOCAL SERVER
+# LOCAL DEV SERVER
 # ============================
 
 if __name__ == "__main__":
