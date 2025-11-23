@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 from openai import OpenAI
 
+# Load API key
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -22,18 +23,26 @@ def listen_page():
 
 @app.route("/interview_listen", methods=["POST"])
 def interview_listen():
+    # ============================
+    # Check audio file exists
+    # ============================
     if "audio" not in request.files:
         return jsonify({"error": "no_audio"}), 400
 
     audio_file = request.files["audio"]
 
-    # Save file
+    # ============================
+    # Save .webm file
+    # ============================
     with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_in:
         audio_file.save(temp_in.name)
         webm_path = temp_in.name
 
-    # Convert to WAV
+    # ============================
+    # Convert .webm → .wav
+    # ============================
     wav_path = webm_path.replace(".webm", ".wav")
+
     try:
         subprocess.run(
             ["ffmpeg", "-y", "-i", webm_path, wav_path],
@@ -44,7 +53,9 @@ def interview_listen():
     except Exception as e:
         return jsonify({"error": f"ffmpeg_error: {e}"}), 500
 
-    # Transcribe: ENGLISH ONLY
+    # ============================
+    # Whisper transcription
+    # ============================
     try:
         with open(wav_path, "rb") as f:
             transcript = client.audio.transcriptions.create(
@@ -56,41 +67,71 @@ def interview_listen():
     except Exception as e:
         return jsonify({"error": f"whisper_error: {e}"}), 500
 
-    # ===== NOISE FILTERS =====
+    # Convert to lowercase for pattern checks
+    lower_text = text.lower()
 
-    # 1. Too short → noise
+    # ============================
+    # Silence / hallucination filter
+    # ============================
+    hallucination_starters = [
+        r"^thanks",
+        r"^okay",
+        r"^ok",
+        r"^well",
+        r"^hello",
+        r"^hi",
+        r"^so",
+        r"^um",
+        r"^hmm",
+        r"^hey",
+        r"^thank"
+    ]
+
+    for pattern in hallucination_starters:
+        if re.match(pattern, lower_text):
+            return jsonify({
+                "question": "(no real speech detected)",
+                "answer": "I didn’t hear anything clearly. Please try speaking again."
+            })
+
+    # ============================
+    # Noise filters
+    # ============================
+
+    # Too short → noise
     if len(text) < 5:
         return jsonify({
             "question": "(no speech detected)",
-            "answer": "I couldn't hear you clearly. Try again."
+            "answer": "I couldn’t hear you. Try again."
         })
 
-    # 2. Remove Korean/Japanese hallucinations
+    # Remove Korean / Japanese hallucination
     if re.search(r'[ㄱ-ㅎㅏ-ㅣ가-힣]', text) or re.search(r'[\u3040-\u30ff]', text):
         return jsonify({
             "question": "(background noise)",
-            "answer": "There was too much noise. Try again."
+            "answer": "There was background noise — try speaking again."
         })
 
-    # 3. URL hallucinations fix
-    if "www." in text.lower() or "http" in text.lower():
+    # URL hallucination
+    if "www." in lower_text or "http" in lower_text:
         return jsonify({
             "question": "(background noise)",
-            "answer": "Too much noise — try speaking again."
+            "answer": "Noise detected — try again."
         })
 
-    # 4. Low word count → noise
+    # Very low word count
     if len(text.split()) <= 2:
         return jsonify({
-            "question": "(background noise)",
-            "answer": "I couldn't hear clear speech. Try again."
+            "question": "(not enough speech)",
+            "answer": "Please speak a full sentence for me to understand."
         })
 
-    # ===== AI ANSWER =====
-
+    # ============================
+    # AI Answer
+    # ============================
     prompt = (
         f"The speaker said: '{text}'.\n"
-        f"Give a simple, helpful 1–2 sentence response."
+        f"Give a simple, friendly 1–2 sentence response."
     )
 
     try:
@@ -99,7 +140,11 @@ def interview_listen():
             input=prompt
         )
         answer = response.output_text.strip()
-        return jsonify({"question": text, "answer": answer})
+
+        return jsonify({
+            "question": text,
+            "answer": answer
+        })
 
     except Exception as e:
         return jsonify({"error": f"gpt_error: {e}"}), 500
