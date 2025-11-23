@@ -36,7 +36,6 @@ async function startListening() {
     mediaRecorder.start();
 }
 
-
 // ===========================
 // STOP LISTENING
 // ===========================
@@ -85,10 +84,10 @@ async function stopListening() {
         // ⭐ ALWAYS SHOW RESPONSE — EVEN SILENCE & NOISE ⭐
         document.getElementById("question").innerText =
             data.question ?? "(no text)";
-
         document.getElementById("answer").innerText =
             data.answer ?? "(no answer)";
 
         status.innerText = "Idle";
     };
 }
+
