@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ReadyBrain AI – Your AI Interview Coach</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- If using Flask, this will correctly load /static/style.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <span class="logo-mark">RB</span>
+                <span class="logo-text">ReadyBrain AI</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it works</a>
+                <a href="#students">For students</a>
+                <a href="#investors">For investors</a>
+                <a href="#waitlist" class="nav-cta">Join waitlist</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <main>
+        <section id="hero" class="hero">
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        Built by a UCSD student for students who hate interviews
+                    </div>
+                    <h1 class="hero-title">
+                        Your AI interview coach<br>
+                        that speaks <span class="accent">simple English</span>.
+                    </h1>
+                    <p class="hero-subtitle">
+                        ReadyBrain AI listens to your answers, then suggests
+                        <strong>short, clear, confident</strong> responses you can
+                        actually remember — perfect for tech, finance, and internship interviews.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="#demo" class="btn btn-primary">
+                            🎙 Try voice coach demo
+                        </a>
+                        <a href="#waitlist" class="btn btn-secondary">
+                            🔔 Join early access list
+                        </a>
+                    </div>
+
+                    <p class="hero-note">
+                        No confusing “perfect answers.” Just real, simple phrases you can use today.
+                    </p>
+
+                    <div class="trust-row">
+                        <div class="trust-pill">Made for UC & CSU students</div>
+                        <div class="trust-pill">Founder: first-gen & self-funded</div>
+                        <div class="trust-pill">Built with OpenAI technology</div>
+                    </div>
+                </div>
+
+                <div class="hero-card">
+                    <div class="hero-card-inner">
+                        <p class="hero-card-label">Live coaching preview</p>
+                        <div class="hero-conversation">
+                            <div class="bubble bubble-interviewer">
+                                “Tell me about yourself.”
+                            </div>
+                            <div class="bubble bubble-user">
+                                “I’m a UCSD Math-CS student, and I’m building my own AI project
+                                while balancing school and work.”
+                            </div>
+                            <div class="bubble bubble-ai">
+                                Suggestion:  
+                                “I’m a Math-CS student at UC San Diego. I’m really focused on
+                                learning software engineering, and I’m currently building my own
+                                AI interview coach called ReadyBrain AI to help students like me
+                                practice simple, confident answers.”
+                            </div>
+                        </div>
+                        <div class="hero-card-footer">
+                            <div class="pill small">Real-time feedback</div>
+                            <div class="pill small">Filler word detection</div>
+                            <div class="pill small">Simple rewrite suggestions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section id="features" class="section">
+            <div class="container">
+                <h2 class="section-title">Why students use ReadyBrain AI</h2>
+                <p class="section-subtitle">
+                    Designed for people who feel nervous, overthink, or struggle with English during interviews.
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🎧 Voice-based practice</h3>
+                        <p>
+                            Speak naturally like in a real interview. ReadyBrain AI listens
+                            and gives clear suggestions — no long essays.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🧠 Simple answer mode</h3>
+                        <p>
+                            Get short, easy-to-remember versions of your answers so you don’t
+                            freeze or forget what to say.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📊 Confidence-building feedback</h3>
+                        <p>
+                            See which parts of your answer are strong and what to improve,
+                            without harsh or robotic feedback.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🌍 Built for international & first-gen students</h3>
+                        <p>
+                            Created by a student who works, studies, and interviews in a
+                            second language — the tool understands your struggle.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section id="how-it-works" class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">How ReadyBrain AI works</h2>
+                <p class="section-subtitle">
+                    From “I’m scared of interviews” to “I know exactly what to say” in three simple steps.
+                </p>
+
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Pick a question</h3>
+                        <p>
+                            Choose a common interview question like “Tell me about yourself”
+                            or “Why do you want this role?”.
+                        </p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Answer out loud</h3>
+                        <p>
+                            Talk the way you normally would. No script, no pressure — just
+                            your real thoughts, in your own words.
+                        </p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Get a cleaner version</h3>
+                        <p>
+                            ReadyBrain AI rewrites your answer into a short, confident
+                            version you can practice and reuse across interviews.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOR STUDENTS / FOR INVESTORS -->
+        <section class="section" id="students">
+            <div class="container two-column">
+                <div class="column-card">
+                    <h2 class="section-title small">For students & job seekers</h2>
+                    <ul class="checklist">
+                        <li>Practice interviews on your own schedule, anytime.</li>
+                        <li>Get answers that sound like *you*, not a robot.</li>
+                        <li>Perfect for internship, transfer, and scholarship interviews.</li>
+                        <li>Especially helpful if English is not your first language.</li>
+                    </ul>
+                </div>
+
+                <div class="column-card" id="investors">
+                    <h2 class="section-title small">For UCSD funds & partners</h2>
+                    <p class="section-subtitle small">
+                        ReadyBrain AI is an early-stage project with a working voice prototype
+                        and a clear mission:
+                    </p>
+                    <ul class="checklist">
+                        <li>
+                            Support under-resourced students who can’t afford private coaching.
+                        </li>
+                        <li>
+                            Start with UC & CSU campuses, then scale to global international students.
+                        </li>
+                        <li>
+                            Future plans: mobile app, campus partnerships, and premium tiers.
+                        </li>
+                    </ul>
+                    <p class="section-subtitle small">
+                        Interested in supporting or piloting ReadyBrain AI?
+                        <a href="#waitlist">Get in touch below.</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOUNDER STORY -->
+        <section class="section section-alt">
+            <div class="container founder-grid">
+                <div>
+                    <h2 class="section-title">Founder story</h2>
+                    <p class="section-subtitle">
+                        ReadyBrain AI is built by a UC San Diego student who balances
+                        classes, work, and building this project from scratch.
+                    </p>
+                </div>
+                <div class="founder-card">
+                    <p>
+                        “Hi, I’m Aung Myo Win. I’m a Math–Computer Science student at UCSD.
+                        I moved to the U.S., study full-time, and support myself while trying
+                        to build a future in software engineering.
+                    </p>
+                    <p>
+                        I created ReadyBrain AI because I know how stressful interviews feel
+                        when English isn’t your first language, or when you don’t have family
+                        or money to pay for coaching. This project is my way to help students
+                        like me feel less alone, more prepared, and more confident.”
+                    </p>
+                    <p class="founder-sign">
+                        — Aung, founder of ReadyBrain AI
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEMO SECTION (you can later link this to your real route) -->
+        <section id="demo" class="section">
+            <div class="container demo-card">
+                <h2 class="section-title">Live demo (prototype)</h2>
+                <p class="section-subtitle">
+                    The current prototype already supports voice input and AI-generated
+                    answer suggestions. In the hosted version, this button will open
+                    the working demo.
+                </p>
+                <a class="btn btn-primary btn-center">
+                    🎙 Launch voice coach prototype
+                </a>
+                <p class="demo-note">
+                    In your Flask app, you can later connect this button to your real route
+                    (for example: <code>/coach</code> or <code>/interview</code>).
+                </p>
+            </div>
+        </section>
+
+        <!-- WAITLIST / CONTACT -->
+        <section id="waitlist" class="section section-alt">
+            <div class="container waitlist-grid">
+                <div>
+                    <h2 class="section-title">Join the early access list</h2>
+                    <p class="section-subtitle">
+                        Be the first to try ReadyBrain AI, get update emails, and hear
+                        about campus launch plans and funding milestones.
+                    </p>
+                    <ul class="checklist">
+                        <li>Perfect if you’re a student preparing for recruiting season.</li>
+                        <li>Great for UCSD / UC / CSU staff who want to support students.</li>
+                        <li>Investors and campus funds welcome.</li>
+                    </ul>
+                </div>
+                <div class="waitlist-card">
+                    <form class="waitlist-form" onsubmit="event.preventDefault(); alert('Thank you! Your interest has been recorded.');">
+                        <label for="name">Name</label>
+                        <input id="name" name="name" type="text" placeholder="Your name">
+
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" placeholder="you@example.com" required>
+
+                        <label for="role">I am a...</label>
+                        <select id="role" name="role">
+                            <option value="student">Student</option>
+                            <option value="founder">Student founder</option>
+                            <option value="staff">University staff / program</option>
+                            <option value="investor">Investor / fund</option>
+                            <option value="other">Other</option>
+                        </select>
+
+                        <button type="submit" class="btn btn-primary full-width">
+                            🔔 Join waitlist
+                        </button>
+
+                        <p class="form-note">
+                            No spam. Just occasional updates as the product and funding
+                            move forward.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <p>© {{ 2025 }} ReadyBrain AI. Built by a UCSD student founder.</p>
+            <p class="footer-sub">
+                Have a question or want to support this project?
+                You can reach out via LinkedIn or campus email.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

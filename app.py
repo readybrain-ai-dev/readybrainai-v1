@@ -17,10 +17,12 @@ app = Flask(__name__)
 # ROUTES
 # ============================
 
+# Landing page (NEW, SAFE)
 @app.route("/")
-def home():
-    return render_template("listen.html")
+def landing():
+    return render_template("index.html")
 
+# Old listen page (still works exactly the same)
 @app.route("/listen")
 def listen_page():
     return render_template("listen.html")
