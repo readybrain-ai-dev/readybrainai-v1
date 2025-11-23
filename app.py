@@ -64,11 +64,10 @@ def interview_listen():
         text=True
     )
 
-    # If silence_start appears but silence_end does NOT → everything was silence
     if "silence_start" in silence_check.stderr and "silence_end" not in silence_check.stderr:
         return jsonify({
             "question": "(silence)",
-            "answer": "I didn’t hear anything. Try speaking closer to the mic."
+            "answer": "I didn’t hear anything — try speaking closer to the mic."
         })
 
     # ============================
@@ -88,9 +87,9 @@ def interview_listen():
     lower_text = text.lower()
 
     # ============================
-    # BLOCK STREAMER HALLUCINATIONS
+    # BLOCK STREAMER / VIDEO HALLUCINATIONS
     # ============================
-    hallucinations = [
+    streamer_phrases = [
         "thanks for watching",
         "thank you for watching",
         "thanks everyone",
@@ -102,10 +101,25 @@ def interview_listen():
         "welcome back"
     ]
 
-    if any(h in lower_text for h in hallucinations):
+    if any(h in lower_text for h in streamer_phrases):
         return jsonify({
             "question": "(noise detected)",
             "answer": "I heard background noise but no clear speech. Try again."
+        })
+
+    # ============================
+    # BLOCK URL / WEBSITE HALLUCINATIONS
+    # ============================
+    url_patterns = [
+        r"www\.", r"http", r"https",
+        r"\.com", r"\.org", r"\.gov", r"\.net", r"\.edu",
+        r"for more information", r"visit"
+    ]
+
+    if any(re.search(p, lower_text) for p in url_patterns):
+        return jsonify({
+            "question": "(background noise)",
+            "answer": "I heard noise but not real speech — try again!"
         })
 
     # ============================
@@ -114,7 +128,7 @@ def interview_listen():
     if len(text) < 5 or len(text.split()) <= 2:
         return jsonify({
             "question": "(unclear speech)",
-            "answer": "I couldn’t catch that. Please speak a bit more clearly."
+            "answer": "I couldn’t catch that — try speaking more clearly."
         })
 
     # ============================
@@ -139,7 +153,7 @@ def interview_listen():
 
 
 # ============================
-# RUN LOCAL SERVER
+    # RUN LOCAL SERVER
 # ============================
 
 if __name__ == "__main__":
