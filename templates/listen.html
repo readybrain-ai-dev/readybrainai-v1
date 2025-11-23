@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ReadyBrainAI Interview Listener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: #28a745;
+            padding: 12px 25px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+        #stopBtn {
+            display: none;
+            background: red;
+        }
+        .box {
+            background: #eee;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 60px;
+        }
+        #status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>🎤 ReadyBrainAI Listener</h2>
+    <p>Press start, let the speaker talk, and your AI coach will write it down and respond simply.</p>
+
+    <button id="startBtn" class="btn" onclick="startListening()">Start Recording</button>
+    <button id="stopBtn" class="btn" onclick="stopListening()">Stop Recording</button>
+
+    <p id="status">Idle</p>
+
+    <h3>Speaker Said:</h3>
+    <div id="question" class="box"></div>
+
+    <h3>ReadyBrainAI Answer:</h3>
+    <div id="answer" class="box"></div>
+</div>
+
+<script src="/static/interview.js"></script>
+</body>
+</html>

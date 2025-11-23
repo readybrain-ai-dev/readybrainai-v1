@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ReadyBrainAI – Interview Coach</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            font-size: 14px;
+            padding: 8px;
+            margin-top: 4px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+        .box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eee;
+            border-radius: 8px;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>ReadyBrainAI – Interview Coach</h2>
+
+    <label>What did the interviewer just ask?</label>
+    <textarea id="question" rows="2" placeholder="Paste or type the interview question..."></textarea>
+
+    <label>Job Role (optional)</label>
+    <textarea id="jobRole" rows="1" placeholder="Software Engineer Intern, Cashier, Tutor, etc."></textarea>
+
+    <label>Your Background (optional)</label>
+    <textarea id="background" rows="2" placeholder="Example: I am a second-year student with some Java and Python experience."></textarea>
+
+    <button id="askBtn">Get Simple Answer</button>
+
+    <h3>Suggested Answer:</h3>
+    <div class="box" id="answerBox">Answer will appear here...</div>
+</div>
+
+<script>
+document.getElementById("askBtn").onclick = async () => {
+    const question = document.getElementById("question").value;
+    const jobRole = document.getElementById("jobRole").value;
+    const background = document.getElementById("background").value;
+    const box = document.getElementById("answerBox");
+    box.innerText = "Thinking...";
+
+    try {
+        const response = await fetch("/interview_answer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                question: question,
+                job_role: jobRole,
+                background: background
+            })
+        });
+
+        const data = await response.json();
+        box.innerText = data.answer || "(no answer)";
+    } catch (err) {
+        console.error(err);
+        box.innerText = "Error talking to server.";
+    }
+};
+</script>
+
+</body>
+</html>
+
