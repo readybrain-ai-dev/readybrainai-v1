@@ -6,12 +6,16 @@ from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load API key
+# Load API Key
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
-
 client = OpenAI(api_key=API_KEY)
+
 app = Flask(__name__)
+
+# ============================
+# ROUTES
+# ============================
 
 @app.route("/")
 def home():
@@ -21,28 +25,25 @@ def home():
 def listen_page():
     return render_template("listen.html")
 
+
+# ============================
+# MAIN INTERVIEW LISTEN ROUTE
+# ============================
+
 @app.route("/interview_listen", methods=["POST"])
 def interview_listen():
-    # ============================
-    # Check audio file exists
-    # ============================
     if "audio" not in request.files:
-        return jsonify({"error": "no_audio"}), 400
+        return jsonify({"question": "(no audio)", "answer": "Please try again."}), 400
 
     audio_file = request.files["audio"]
 
-    # ============================
-    # Save .webm file
-    # ============================
+    # Save temp .webm file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_in:
         audio_file.save(temp_in.name)
         webm_path = temp_in.name
 
-    # ============================
     # Convert .webm → .wav
-    # ============================
     wav_path = webm_path.replace(".webm", ".wav")
-
     try:
         subprocess.run(
             ["ffmpeg", "-y", "-i", webm_path, wav_path],
@@ -51,10 +52,27 @@ def interview_listen():
             check=True
         )
     except Exception as e:
-        return jsonify({"error": f"ffmpeg_error: {e}"}), 500
+        return jsonify({"question": "(error)", "answer": f"ffmpeg error: {e}"}), 500
 
     # ============================
-    # Whisper transcription
+    # TRUE SILENCE DETECTION
+    # ============================
+    silence_check = subprocess.run(
+        ["ffmpeg", "-i", wav_path, "-af", "silencedetect=noise=-35dB:d=0.4", "-f", "null", "-"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    # If silence_start appears but silence_end does NOT → everything was silence
+    if "silence_start" in silence_check.stderr and "silence_end" not in silence_check.stderr:
+        return jsonify({
+            "question": "(silence)",
+            "answer": "I didn’t hear anything. Try speaking closer to the mic."
+        })
+
+    # ============================
+    # TRANSCRIBE WITH WHISPER
     # ============================
     try:
         with open(wav_path, "rb") as f:
@@ -65,69 +83,42 @@ def interview_listen():
             )
         text = transcript.text.strip()
     except Exception as e:
-        return jsonify({"error": f"whisper_error: {e}"}), 500
+        return jsonify({"question": "(error)", "answer": f"whisper error: {e}"}), 500
 
-    # Convert to lowercase for pattern checks
     lower_text = text.lower()
 
     # ============================
-    # Silence / hallucination filter
+    # BLOCK STREAMER HALLUCINATIONS
     # ============================
-    hallucination_starters = [
-        r"^thanks",
-        r"^okay",
-        r"^ok",
-        r"^well",
-        r"^hello",
-        r"^hi",
-        r"^so",
-        r"^um",
-        r"^hmm",
-        r"^hey",
-        r"^thank"
+    hallucinations = [
+        "thanks for watching",
+        "thank you for watching",
+        "thanks everyone",
+        "thank you so much",
+        "subscribe",
+        "video",
+        "watching",
+        "hello guys",
+        "welcome back"
     ]
 
-    for pattern in hallucination_starters:
-        if re.match(pattern, lower_text):
-            return jsonify({
-                "question": "(no real speech detected)",
-                "answer": "I didn’t hear anything clearly. Please try speaking again."
-            })
-
-    # ============================
-    # Noise filters
-    # ============================
-
-    # Too short → noise
-    if len(text) < 5:
+    if any(h in lower_text for h in hallucinations):
         return jsonify({
-            "question": "(no speech detected)",
-            "answer": "I couldn’t hear you. Try again."
-        })
-
-    # Remove Korean / Japanese hallucination
-    if re.search(r'[ㄱ-ㅎㅏ-ㅣ가-힣]', text) or re.search(r'[\u3040-\u30ff]', text):
-        return jsonify({
-            "question": "(background noise)",
-            "answer": "There was background noise — try speaking again."
-        })
-
-    # URL hallucination
-    if "www." in lower_text or "http" in lower_text:
-        return jsonify({
-            "question": "(background noise)",
-            "answer": "Noise detected — try again."
-        })
-
-    # Very low word count
-    if len(text.split()) <= 2:
-        return jsonify({
-            "question": "(not enough speech)",
-            "answer": "Please speak a full sentence for me to understand."
+            "question": "(noise detected)",
+            "answer": "I heard background noise but no clear speech. Try again."
         })
 
     # ============================
-    # AI Answer
+    # BLOCK TOO SHORT OR UNCLEAR SPEECH
+    # ============================
+    if len(text) < 5 or len(text.split()) <= 2:
+        return jsonify({
+            "question": "(unclear speech)",
+            "answer": "I couldn’t catch that. Please speak a bit more clearly."
+        })
+
+    # ============================
+    # GENERATE AI ANSWER
     # ============================
     prompt = (
         f"The speaker said: '{text}'.\n"
@@ -141,14 +132,15 @@ def interview_listen():
         )
         answer = response.output_text.strip()
 
-        return jsonify({
-            "question": text,
-            "answer": answer
-        })
+        return jsonify({"question": text, "answer": answer})
 
     except Exception as e:
-        return jsonify({"error": f"gpt_error: {e}"}), 500
+        return jsonify({"question": text, "answer": f'AI error: {e}'}), 500
 
+
+# ============================
+# RUN LOCAL SERVER
+# ============================
 
 if __name__ == "__main__":
     app.run(debug=True)
