@@ -1,5 +1,29 @@
 let mediaRecorder;
 let audioChunks = [];
+let currentMimeType = null;
+
+// ===========================
+// CHOOSE BEST MIME TYPE (GLOBAL SUPPORT)
+// ===========================
+function chooseMimeType() {
+    const mimeTypes = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4",
+        "audio/mpeg",
+        "audio/wav"
+    ];
+
+    for (const type of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(type)) {
+            console.log("Using MIME type:", type);
+            return type;
+        }
+    }
+
+    console.warn("⚠ No supported MIME type found. Using fallback.");
+    return "";
+}
 
 // ===========================
 // START LISTENING
@@ -13,19 +37,29 @@ async function startListening() {
     const status = document.getElementById("status");
     status.innerText = "Listening...";
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-    // Safari FIX: use audio/mp4 instead of webm
-    let options = { mimeType: "audio/webm; codecs=opus" };
-    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-        options = { mimeType: "audio/webm" };
-    }
-    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-        // Final fallback for Safari
-        options = { mimeType: "audio/mp4" };
+    let stream;
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+        status.innerText = "Microphone blocked. Enable microphone.";
+        console.error("Microphone permission error:", err);
+        return;
     }
 
-    mediaRecorder = new MediaRecorder(stream, options);
+    currentMimeType = chooseMimeType();
+    let options = {};
+
+    if (currentMimeType) {
+        options.mimeType = currentMimeType;
+    }
+
+    try {
+        mediaRecorder = new MediaRecorder(stream, options);
+    } catch (err) {
+        console.error("MediaRecorder init error:", err);
+        status.innerText = "Recording not supported on this device.";
+        return;
+    }
 
     mediaRecorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
@@ -46,26 +80,33 @@ async function stopListening() {
     document.getElementById("stopBtn").style.display = "none";
     document.getElementById("startBtn").style.display = "inline-block";
 
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        status.innerText = "Idle";
+        return;
+    }
+
     mediaRecorder.stop();
 
     mediaRecorder.onstop = async () => {
 
-        // ⭐ IMPORTANT FIX: wait for all chunks to finish
-        await new Promise(r => setTimeout(r, 300));
+        // Wait a moment for all chunks to finalize
+        await new Promise(r => setTimeout(r, 250));
 
-        // Safari FIX: detect Blob type
-        const mimeType =
-            MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
+        const blob = new Blob(audioChunks, { type: currentMimeType });
 
-        const blob = new Blob(audioChunks, { type: mimeType });
+        console.log("Recorded blob size:", blob.size, "type:", currentMimeType);
+
+        // Detect empty Android recording
+        if (blob.size < 800) {
+            status.innerText = "No audio detected.";
+            document.getElementById("question").innerText = "(no voice captured)";
+            document.getElementById("answer").innerText = "(no answer)";
+            return;
+        }
+
         const formData = new FormData();
-
-        // Always send filename ending in webm or mp4
-        formData.append(
-            "audio",
-            blob,
-            mimeType === "audio/webm" ? "audio.webm" : "audio.mp4"
-        );
+        const fileExt = currentMimeType.includes("webm") ? "webm" : "mp4";
+        formData.append("audio", blob, "speech." + fileExt);
 
         let data;
         try {
@@ -73,21 +114,23 @@ async function stopListening() {
                 method: "POST",
                 body: formData
             });
+
             data = await response.json();
-        } catch (error) {
-            document.getElementById("question").innerText = "(error)";
-            document.getElementById("answer").innerText = "Could not reach server.";
+        } catch (err) {
+            console.error("Server error:", err);
             status.innerText = "Idle";
+            document.getElementById("question").innerText = "(server error)";
+            document.getElementById("answer").innerText = "Could not connect.";
             return;
         }
 
-        // ⭐ ALWAYS SHOW RESPONSE — EVEN SILENCE & NOISE ⭐
+        // SHOW RESULTS
         document.getElementById("question").innerText =
             data.question ?? "(no text)";
+
         document.getElementById("answer").innerText =
             data.answer ?? "(no answer)";
 
         status.innerText = "Idle";
     };
 }
-
