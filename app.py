@@ -58,7 +58,9 @@ def interview_listen():
     # TRUE SILENCE DETECTION
     # ============================
     silence_check = subprocess.run(
-        ["ffmpeg", "-i", wav_path, "-af", "silencedetect=noise=-35dB:d=0.4", "-f", "null", "-"],
+        ["ffmpeg", "-i", wav_path,
+         "-af", "silencedetect=noise=-35dB:d=0.4",
+         "-f", "null", "-"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
@@ -152,8 +154,46 @@ def interview_listen():
         return jsonify({"question": text, "answer": f'AI error: {e}'}), 500
 
 
+# ======================================================
+# NEW: INTERVIEW ANSWER ROUTE (FOR TEXT ANSWER WEBPAGE)
+# ======================================================
+
+@app.route("/interview_answer", methods=["POST"])
+def interview_answer():
+    data = request.get_json()
+
+    question = data.get("question", "").strip()
+    job_role = data.get("job_role", "").strip()
+    background = data.get("background", "").strip()
+
+    if not question:
+        return jsonify({"answer": "Please enter the question first."})
+
+    prompt = f"""
+The interview question is: "{question}"
+
+Job role: "{job_role}"
+User background: "{background}"
+
+Write a simple, friendly, 2–3 sentence answer that sounds human,
+easy to understand, and not too professional.
+"""
+
+    try:
+        response = client.responses.create(
+            model="gpt-4o-mini",
+            input=prompt
+        )
+        answer = response.output_text.strip()
+
+        return jsonify({"answer": answer})
+
+    except Exception as e:
+        return jsonify({"answer": f"AI error: {e}"})
+
+
 # ============================
-    # RUN LOCAL SERVER
+# RUN LOCAL SERVER
 # ============================
 
 if __name__ == "__main__":
