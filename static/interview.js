@@ -51,7 +51,7 @@ async function stopListening() {
 
     mediaRecorder.onstop = async () => {
 
-        // ⭐ IMPORTANT FIX: wait for all chunks to finish (prevents cut audio)
+        // ⭐ IMPORTANT FIX: wait for all chunks to finish
         await new Promise(r => setTimeout(r, 300));
 
         // Safari FIX: detect Blob type
@@ -68,18 +68,26 @@ async function stopListening() {
             mimeType === "audio/webm" ? "audio.webm" : "audio.mp4"
         );
 
-        const response = await fetch("/interview_listen", {
-            method: "POST",
-            body: formData
-        });
+        let data;
+        try {
+            const response = await fetch("/interview_listen", {
+                method: "POST",
+                body: formData
+            });
+            data = await response.json();
+        } catch (error) {
+            document.getElementById("question").innerText = "(error)";
+            document.getElementById("answer").innerText = "Could not reach server.";
+            status.innerText = "Idle";
+            return;
+        }
 
-        const data = await response.json();
-
+        // ⭐ ALWAYS SHOW RESPONSE — EVEN SILENCE & NOISE ⭐
         document.getElementById("question").innerText =
-            data.question || "(error)";
+            data.question ?? "(no text)";
 
         document.getElementById("answer").innerText =
-            data.answer || "(error)";
+            data.answer ?? "(no answer)";
 
         status.innerText = "Idle";
     };
