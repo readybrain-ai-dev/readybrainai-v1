@@ -9,6 +9,7 @@ function chooseMimeType() {
     const mimeTypes = [
         "audio/webm;codecs=opus",
         "audio/webm",
+        "audio/ogg",           // ⭐ ANDROID FIX
         "audio/mp4",
         "audio/mpeg",
         "audio/wav"
@@ -57,14 +58,31 @@ async function startListening() {
         mediaRecorder = new MediaRecorder(stream, options);
     } catch (err) {
         console.error("MediaRecorder init error:", err);
-        status.innerText = "Recording not supported on this device.";
-        return;
+
+        // ⭐ Emergency fallback for stubborn Android devices
+        try {
+            mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/ogg" });
+            currentMimeType = "audio/ogg";
+            console.warn("Fallback to audio/ogg for Android.");
+        } catch (err2) {
+            status.innerText = "Recording not supported on this device.";
+            return;
+        }
     }
 
     mediaRecorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
             audioChunks.push(e.data);
         }
+    };
+
+    mediaRecorder.onstart = () => {
+        console.log("🎙 Recording started — mime:", currentMimeType);
+    };
+
+    mediaRecorder.onerror = (err) => {
+        console.error("MediaRecorder Error:", err);
+        status.innerText = "Recording error.";
     };
 
     mediaRecorder.start();
@@ -88,15 +106,22 @@ async function stopListening() {
     mediaRecorder.stop();
 
     mediaRecorder.onstop = async () => {
-
-        // Wait a moment for all chunks to finalize
+        // ⭐ Android fix: ensure chunks exist
         await new Promise(r => setTimeout(r, 250));
 
-        const blob = new Blob(audioChunks, { type: currentMimeType });
+        // Final blob assembly
+        let blob;
+        try {
+            blob = new Blob(audioChunks, { type: currentMimeType });
+        } catch {
+            // ⭐ Extra fallback
+            blob = new Blob(audioChunks, { type: "audio/ogg" });
+            currentMimeType = "audio/ogg";
+        }
 
         console.log("Recorded blob size:", blob.size, "type:", currentMimeType);
 
-        // Detect empty Android recording
+        // ⭐ Android empty-recording fix
         if (blob.size < 800) {
             status.innerText = "No audio detected.";
             document.getElementById("question").innerText = "(no voice captured)";
@@ -105,7 +130,11 @@ async function stopListening() {
         }
 
         const formData = new FormData();
-        const fileExt = currentMimeType.includes("webm") ? "webm" : "mp4";
+
+        let fileExt = "webm";
+        if (currentMimeType.includes("ogg")) fileExt = "ogg";
+        if (currentMimeType.includes("mp4")) fileExt = "mp4";
+
         formData.append("audio", blob, "speech." + fileExt);
 
         let data;
