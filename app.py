@@ -17,12 +17,10 @@ app = Flask(__name__)
 # ROUTES
 # ============================
 
-# Landing page (NEW, SAFE)
 @app.route("/")
 def landing():
     return render_template("index.html")
 
-# Old listen page (still works exactly the same)
 @app.route("/listen")
 def listen_page():
     return render_template("listen.html")
@@ -44,20 +42,23 @@ def interview_listen():
     audio_file = request.files["audio"]
     print("📌 Received audio:", audio_file.filename)
 
-    # 2. Save audio file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_in:
+    # ⭐ FIX: detect correct extension (ogg, webm, mp4, wav, etc.)
+    file_ext = audio_file.filename.split(".")[-1].lower()
+
+    # ⭐ Save with correct extension
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as temp_in:
         audio_file.save(temp_in.name)
-        webm_path = temp_in.name
+        input_path = temp_in.name
 
-    print("📌 Saved WEBM:", webm_path)
+    print("📌 Saved input file:", input_path)
 
-    # 3. Convert to WAV
-    wav_path = webm_path.replace(".webm", ".wav")
+    # ⭐ Convert ANY format → WAV
+    wav_path = input_path.replace(f".{file_ext}", ".wav")
     print("📌 Converting to WAV:", wav_path)
 
     try:
         subprocess.run(
-            ["ffmpeg", "-y", "-i", webm_path, wav_path],
+            ["ffmpeg", "-y", "-i", input_path, wav_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=True
