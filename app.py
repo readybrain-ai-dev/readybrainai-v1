@@ -140,13 +140,33 @@ def interview_listen():
             "answer": "I couldn’t catch that clearly."
         })
 
-    # 9. Generate AI answer
+    # 9. Generate AI answer (UPDATED PROMPT ONLY)
     print("📌 Asking GPT for answer...")
 
-    prompt = (
-        f"The speaker said: '{text}'.\n"
-        f"Give a simple, friendly, 1–2 sentence response."
-    )
+    prompt = f"""
+You are ReadyBrain AI, an interview answer improver.
+
+Rewrite the user's spoken answer into a short, confident, simple-English interview response.
+
+Rules:
+- Do NOT sound like a therapist.
+- No emotional tone.
+- No comforting phrases.
+- No explanations.
+- No long sentences.
+- No soft words (“it's okay”, “I understand”, etc.)
+- No extra comments.
+
+Style:
+- Direct and professional.
+- Easy English.
+- 2–3 sentences max.
+- Sounds like a student answering an internship interview.
+
+User said: "{text}"
+
+Output ONLY the improved answer.
+"""
 
     try:
         response = client.responses.create(
