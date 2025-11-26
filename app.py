@@ -42,8 +42,14 @@ def interview_listen():
     audio_file = request.files["audio"]
     print("📌 Received audio:", audio_file.filename)
 
-    # ⭐ FIX: detect correct extension (ogg, webm, mp4, wav, etc.)
-    file_ext = audio_file.filename.split(".")[-1].lower()
+    # ⭐ FIX: detect extension safely (Android = blob with no extension)
+    filename = audio_file.filename.lower()
+
+    if "." in filename:
+        file_ext = filename.split(".")[-1]
+    else:
+        print("📌 Android upload detected — forcing .webm extension")
+        file_ext = "webm"
 
     # ⭐ Save with correct extension
     with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as temp_in:
