@@ -15,7 +15,10 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
         "Segoe UI", sans-serif;
     color: #0f172a;
-    background-color: #f8fafc;
+    background:
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(14, 116, 144, 0.18), transparent 55%),
+        #f8fafc;
 }
 
 /* ===== Layout ===== */
@@ -33,7 +36,8 @@ body {
     position: sticky;
     top: 0;
     z-index: 20;
-    background: rgba(15, 23, 42, 0.9);
+    background: radial-gradient(circle at top left, #111827, #020617);
+    background-color: rgba(15, 23, 42, 0.94);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(148, 163, 184, 0.35);
 }
@@ -62,6 +66,7 @@ body {
     font-size: 0.8rem;
     background: radial-gradient(circle at 0% 0%, #4f46e5, #0f172a);
     color: #e5e7eb;
+    box-shadow: 0 10px 25px rgba(31, 41, 55, 0.6);
 }
 
 .logo-text {
@@ -81,10 +86,27 @@ body {
     color: #cbd5f5;
     text-decoration: none;
     padding: 0.25rem 0.1rem;
+    position: relative;
+}
+
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.2rem;
+    width: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(to right, #4f46e5, #22c55e);
+    transition: width 0.18s ease;
 }
 
 .nav-links a:hover {
     color: #ffffff;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
 }
 
 .nav-cta {
@@ -184,6 +206,7 @@ body {
     padding: 1.4rem;
     border: 1px solid rgba(148, 163, 184, 0.6);
     box-shadow: 0 25px 50px rgba(15, 23, 42, 0.8);
+    animation: floatCard 6s ease-in-out infinite alternate;
 }
 
 .hero-card-label {
@@ -252,7 +275,7 @@ body {
     cursor: pointer;
     text-decoration: none;
     transition: transform 0.12s ease, box-shadow 0.12s ease,
-        background 0.12s ease;
+        background 0.12s ease, opacity 0.12s ease;
     white-space: nowrap;
 }
 
@@ -265,6 +288,12 @@ body {
 .btn-primary:hover {
     transform: translateY(-1px);
     box-shadow: 0 18px 45px rgba(37, 99, 235, 0.55);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+    opacity: 0.9;
 }
 
 .btn-secondary {
@@ -332,12 +361,20 @@ body {
     border: 1px solid #e2e8f0;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
     font-size: 0.92rem;
+    transition: transform 0.16s ease, box-shadow 0.16s ease,
+        border-color 0.16s ease;
 }
 
 .feature-card h3 {
     margin-top: 0;
     margin-bottom: 0.5rem;
     font-size: 1rem;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    border-color: #c4d3ff;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 }
 
 /* ===== Steps ===== */
@@ -355,6 +392,8 @@ body {
     padding: 1.3rem;
     border: 1px solid rgba(148, 163, 184, 0.7);
     font-size: 0.95rem;
+    transition: transform 0.16s ease, box-shadow 0.16s ease,
+        border-color 0.16s ease;
 }
 
 .step-number {
@@ -368,6 +407,12 @@ body {
     color: white;
     font-size: 0.8rem;
     margin-bottom: 0.5rem;
+}
+
+.step:hover {
+    transform: translateY(-3px);
+    border-color: rgba(129, 140, 248, 0.9);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
 }
 
 /* ===== Two Column Cards ===== */
@@ -384,6 +429,14 @@ body {
     padding: 1.4rem 1.5rem;
     border: 1px solid #e2e8f0;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    transition: transform 0.16s ease, box-shadow 0.16s ease,
+        border-color 0.16s ease;
+}
+
+.column-card:hover {
+    transform: translateY(-2px);
+    border-color: #d0e2ff;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
 }
 
 .section-subtitle.small {
@@ -519,6 +572,17 @@ body {
 .footer-sub {
     margin-top: 0.3rem;
     color: #9ca3af;
+}
+
+/* ===== Animations ===== */
+
+@keyframes floatCard {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-6px);
+    }
 }
 
 /* ===== Responsive ===== */
