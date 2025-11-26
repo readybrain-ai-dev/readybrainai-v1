@@ -4,50 +4,114 @@
     <title>ReadyBrainAI Interview Listener</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
+            font-family: "Inter", Arial, sans-serif;
+            background: linear-gradient(to bottom right, #eff3ff, #f8f9ff);
             padding: 40px;
+            margin: 0;
         }
+
         .container {
-            max-width: 700px;
+            max-width: 750px;
             margin: auto;
             background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            animation: fadeIn 0.5s ease-in-out;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 28px;
+            margin-top: 0;
+        }
+
+        p.description {
+            margin-bottom: 25px;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
         .btn {
-            background: #28a745;
-            padding: 12px 25px;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 17px;
+            font-weight: bold;
             border: none;
-            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.25s;
         }
+
+        #startBtn {
+            background: #28a745;
+            color: white;
+        }
+
+        #startBtn:hover {
+            background: #218838;
+        }
+
         #stopBtn {
             display: none;
-            background: red;
+            background: #dc3545;
+            color: white;
         }
-        .box {
-            background: #eee;
-            padding: 15px;
-            border-radius: 10px;
-            min-height: 60px;
+
+        #stopBtn:hover {
+            background: #c82333;
         }
+
         #status {
             font-weight: bold;
-            margin-top: 10px;
+            margin-top: 5px;
+            margin-bottom: 25px;
+            color: #444;
+        }
+
+        h3 {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .box {
+            background: #f3f4f6;
+            padding: 18px;
+            border-radius: 12px;
+            min-height: 70px;
+            border: 1px solid #e1e1e1;
+            font-size: 15px;
+            line-height: 1.4;
         }
     </style>
 </head>
+
 <body>
 <div class="container">
     <h2>🎤 ReadyBrainAI Listener</h2>
-    <p>Press start, let the speaker talk, and your AI coach will write it down and respond simply.</p>
 
-    <button id="startBtn" class="btn" onclick="startListening()">Start Recording</button>
-    <button id="stopBtn" class="btn" onclick="stopListening()">Stop Recording</button>
+    <p class="description">
+        Press start, let the speaker talk, and your AI coach will listen, write it down,
+        and reply with a simple, clear answer.
+    </p>
+
+    <div class="button-row">
+        <button id="startBtn" class="btn" onclick="startListening()">Start Recording</button>
+        <button id="stopBtn" class="btn" onclick="stopListening()">Stop Recording</button>
+    </div>
 
     <p id="status">Idle</p>
 
