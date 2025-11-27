@@ -131,11 +131,16 @@ async function stopListening() {
 
         const formData = new FormData();
 
+        // file extension selection
         let fileExt = "webm";
         if (currentMimeType.includes("ogg")) fileExt = "ogg";
         if (currentMimeType.includes("mp4")) fileExt = "mp4";
 
         formData.append("audio", blob, "speech." + fileExt);
+
+        // ⭐ NEW: add language
+        const lang = document.getElementById("languageSelect")?.value || "en";
+        formData.append("language", lang);
 
         let data;
         try {

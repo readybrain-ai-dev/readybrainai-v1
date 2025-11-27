@@ -78,11 +78,6 @@
             border: 1px solid rgba(148,163,184,0.35);
             color: var(--text-muted);
             text-decoration: none;
-            backdrop-filter: blur(8px);
-        }
-
-        .nav-link:hover {
-            border-color: rgba(99,102,241,0.6);
         }
 
         /* Theme toggle */
@@ -99,10 +94,6 @@
             color: var(--text-muted);
         }
 
-        .theme-toggle span {
-            font-size: 16px;
-        }
-
         .nav-right {
             display: flex;
             align-items: center;
@@ -117,110 +108,33 @@
             align-items: stretch;
         }
 
-        @media (max-width: 880px) {
-            .layout {
-                grid-template-columns: minmax(0, 1fr);
-            }
-        }
-
-        .hero-text {
-            padding: 24px 8px 24px 0;
-        }
-
-        .hero-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(129,140,248,0.4);
-            background: rgba(248,250,252,0.85);
-            color: #4f46e5;
-            margin-bottom: 16px;
-        }
-
-        body.dark-mode .hero-pill {
-            background: rgba(15,23,42,0.85);
-        }
-
-        .hero-title {
-            font-size: 26px;
-            font-weight: 700;
-            margin: 0 0 10px 0;
-        }
-
-        .hero-sub {
-            font-size: 15px;
-            color: var(--text-muted);
-            margin: 0 0 20px 0;
-            line-height: 1.6;
-        }
-
-        .hero-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .badge {
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: rgba(248,250,252,0.9);
-            border: 1px solid rgba(148,163,184,0.35);
-            color: var(--text-muted);
-        }
-
-        body.dark-mode .badge {
-            background: rgba(15,23,42,0.9);
-        }
-
-        /* Card (listener UI) */
+        /* Listener Card */
         .card {
             background: var(--card-bg);
             padding: 32px 30px 30px;
             border-radius: 22px;
             border: 1px solid var(--card-border);
             box-shadow: var(--shadow-main);
-            animation: fadeInCard 0.35s ease;
-        }
-
-        @keyframes fadeInCard {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
             margin-bottom: 20px;
         }
 
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card-title h2 {
-            margin: 0;
-            font-size: 22px;
-        }
-
-        .card-title span {
-            font-size: 18px;
-        }
-
-        .card-sub {
-            margin: 0 0 22px 0;
+        /* Language dropdown */
+        .language-select {
+            padding: 8px 12px;
             font-size: 13px;
-            color: var(--text-muted);
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.4);
+            background: var(--surface);
+            color: var(--text-main);
+            cursor: pointer;
         }
 
-        /* Buttons */
         .button-row {
             display: flex;
             gap: 12px;
@@ -235,69 +149,26 @@
             border: none;
             border-radius: 999px;
             cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
         }
 
         #startBtn {
             background: linear-gradient(92deg, #22c55e, #16a34a);
-            color: #f9fafb;
-            box-shadow: 0 7px 18px rgba(34,197,94,0.40);
-        }
-
-        #startBtn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(34,197,94,0.55);
+            color: #fff;
         }
 
         #stopBtn {
             display: none;
             background: linear-gradient(92deg, #ef4444, #dc2626);
-            color: #fee2e2;
-            box-shadow: 0 7px 18px rgba(239,68,68,0.40);
-        }
-
-        #stopBtn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(239,68,68,0.55);
-        }
-
-        #status {
-            margin: 0 0 18px 2px;
-            font-weight: 600;
-            font-size: 13px;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-        }
-
-        /* Section headings */
-        h3 {
-            margin-top: 18px;
-            margin-bottom: 8px;
-            color: var(--text-main);
-            font-size: 14px;
+            color: #fff;
         }
 
         .output-box {
             background: var(--surface);
-            padding: 16px 16px 18px;
+            padding: 16px;
             border-radius: 14px;
-            min-height: 70px;
             border: 1px solid rgba(148,163,184,0.55);
             font-size: 14px;
-            line-height: 1.45;
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 26px;
-            font-size: 11px;
-            color: var(--text-muted);
-            text-align: right;
-        }
-
-        .footer span {
-            opacity: 0.9;
+            min-height: 75px;
         }
     </style>
 </head>
@@ -305,7 +176,7 @@
 <body>
 <div class="page">
 
-    <!-- Top navigation -->
+    <!-- Navigation -->
     <header class="nav">
         <div class="brand">
             <div class="brand-logo">RB</div>
@@ -319,39 +190,41 @@
         </div>
     </header>
 
-    <!-- Main content -->
+    <!-- Main -->
     <main class="layout">
-        <!-- Left: explanation text -->
+
+        <!-- Left side text -->
         <section class="hero-text">
-            <div class="hero-pill">
-                🔴 Live prototype · Voice interview coach
-            </div>
+            <div class="hero-pill">🔴 Live prototype · Voice interview coach</div>
             <h1 class="hero-title">Practice real answers, not perfect sentences.</h1>
             <p class="hero-sub">
-                Press <strong>Start Recording</strong>, answer an interview question out loud,
-                and ReadyBrainAI will rewrite your answer into a short, confident version
-                you can actually remember.
+                Press <strong>Start Recording</strong> and answer out loud.
+                ReadyBrainAI rewrites your answer into a short, confident version you can remember.
             </p>
-
-            <div class="hero-badges">
-                <div class="badge">🎧 Listens in real-time</div>
-                <div class="badge">✏️ Simple English rewrites</div>
-                <div class="badge">👩‍🎓 Built for students & job seekers</div>
-            </div>
         </section>
 
-        <!-- Right: listener app card -->
+        <!-- Listener Card -->
         <section class="card">
+
             <div class="card-header">
                 <div class="card-title">
                     <span>🎤</span>
                     <h2>ReadyBrainAI Listener</h2>
                 </div>
+
+                <!-- NEW multilingual dropdown -->
+                <select id="languageSelect" class="language-select">
+                    <option value="en">English (Default)</option>
+                    <option value="my">မြန်မာ (Burmese)</option>
+                    <option value="ja">日本語 (Japanese)</option>
+                    <option value="es">Español (Spanish)</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="zh">中文 (Chinese)</option>
+                </select>
             </div>
 
             <p class="card-sub">
-                Speak naturally. ReadyBrainAI listens, transcribes, and rewrites your answer
-                into a simple, confident version you can use instantly.
+                Speak naturally. ReadyBrainAI listens, transcribes, and rewrites your answer.
             </p>
 
             <div class="button-row">
@@ -367,30 +240,19 @@
             <h3>ReadyBrainAI Answer:</h3>
             <div id="answer" class="output-box"></div>
 
-            <div class="footer">
-                <span>Prototype • Built with ReadyBrainAI</span>
-            </div>
         </section>
     </main>
 </div>
 
-<!-- Existing interview logic -->
+<!-- Script -->
 <script src="/static/interview.js"></script>
 
-<!-- Theme toggle logic (only handles dark/light) -->
 <script>
-    (function () {
-        const toggle = document.getElementById('themeToggle');
-        if (!toggle) return;
-
-        toggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            toggle.innerHTML = isDark
-                ? '<span>☀︎</span> Light mode'
-                : '<span>🌙</span> Dark mode';
-        });
-    })();
+    // theme toggle
+    document.getElementById("themeToggle").addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+    });
 </script>
+
 </body>
 </html>

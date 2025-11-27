@@ -34,7 +34,11 @@ def listen_page():
 def interview_listen():
     print("==== /interview_listen START ====")
 
-    # 1. Check audio
+    # 1. Get selected language (DEFAULT = English)
+    lang = request.form.get("language", "en")
+    print("🌍 Selected language:", lang)
+
+    # 2. Check audio
     if "audio" not in request.files:
         print("❌ No audio file found")
         return jsonify({"question": "(no audio)", "answer": "Please try again."}), 400
@@ -42,23 +46,21 @@ def interview_listen():
     audio_file = request.files["audio"]
     print("📌 Received audio:", audio_file.filename)
 
-    # ⭐ FIX: detect extension safely (Android = blob with no extension)
     filename = audio_file.filename.lower()
-
     if "." in filename:
         file_ext = filename.split(".")[-1]
     else:
         print("📌 Android upload detected — forcing .webm extension")
         file_ext = "webm"
 
-    # ⭐ Save with correct extension
+    # Save file
     with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as temp_in:
         audio_file.save(temp_in.name)
         input_path = temp_in.name
 
     print("📌 Saved input file:", input_path)
 
-    # ⭐ Convert ANY format → WAV
+    # Convert ANY → WAV
     wav_path = input_path.replace(f".{file_ext}", ".wav")
     print("📌 Converting to WAV:", wav_path)
 
@@ -73,7 +75,7 @@ def interview_listen():
         print("❌ FFmpeg error:", e)
         return jsonify({"question": "(error)", "answer": f"ffmpeg error: {e}"}), 500
 
-    # 4. Silence detection
+    # Silence detection
     silence_check = subprocess.run(
         ["ffmpeg", "-i", wav_path,
          "-af", "silencedetect=noise=-35dB:d=0.4",
@@ -83,9 +85,6 @@ def interview_listen():
         text=True
     )
 
-    print("📌 Silence detection log:")
-    print(silence_check.stderr)
-
     if "silence_start" in silence_check.stderr and "silence_end" not in silence_check.stderr:
         print("❌ Entire audio was silence")
         return jsonify({
@@ -93,7 +92,9 @@ def interview_listen():
             "answer": "I didn’t hear anything — try again."
         })
 
-    # 5. Whisper Transcription
+    # ============================
+    # Whisper Transcription (auto-detect)
+    # ============================
     print("📌 Transcribing with Whisper...")
 
     try:
@@ -101,17 +102,19 @@ def interview_listen():
             transcript = client.audio.transcriptions.create(
                 model="whisper-1",
                 file=f,
-                language="en"
+                # Let Whisper auto-detect language
             )
+
         text = transcript.text.strip()
         print("📌 Whisper text:", text)
+
     except Exception as e:
         print("❌ Whisper error:", e)
         return jsonify({"question": "(error)", "answer": f"whisper error: {e}"}), 500
 
     lower_text = text.lower()
 
-    # 6. Noise / streamer hallucination filters
+    # Noise / streamer filters
     streamer_phrases = [
         "thanks for watching", "thank you for watching", "thanks everyone",
         "thank you so much", "subscribe", "video", "watching",
@@ -125,7 +128,7 @@ def interview_listen():
             "answer": "I heard noise but no real speech."
         })
 
-    # 7. URL hallucinations
+    # URL hallucination filters
     url_patterns = [
         r"www\.", r"http", r"https",
         r"\.com", r"\.org", r"\.gov",
@@ -139,7 +142,7 @@ def interview_listen():
             "answer": "I heard background noise. Try again."
         })
 
-    # 8. Too short speech
+    # Too short
     if len(text) < 5 or len(text.split()) <= 2:
         print("❌ Speech too short / unclear")
         return jsonify({
@@ -147,49 +150,80 @@ def interview_listen():
             "answer": "I couldn’t catch that clearly."
         })
 
-    # 9. Generate AI answer (UPDATED PROMPT ONLY)
-    print("📌 Asking GPT for answer...")
+    # ============================
+    # Generate interview answer (ENGLISH BASE)
+    # ============================
 
-    prompt = f"""
+    print("📌 Asking GPT for improved ENGLISH answer...")
+
+    base_prompt = f"""
 You are ReadyBrain AI, an interview answer improver.
 
 Rewrite the user's spoken answer into a short, confident, simple-English interview response.
 
 Rules:
-- Do NOT sound like a therapist.
-- No emotional tone.
-- No comforting phrases.
+- No therapy style.
+- No emotions.
+- No comfort phrases.
 - No explanations.
 - No long sentences.
-- No soft words (“it's okay”, “I understand”, etc.)
+- No soft words.
 - No extra comments.
 
 Style:
 - Direct and professional.
 - Easy English.
 - 2–3 sentences max.
-- Sounds like a student answering an internship interview.
+- Suitable for internship interviews.
 
 User said: "{text}"
 
-Output ONLY the improved answer.
+Output ONLY the improved answer in English.
 """
 
     try:
         response = client.responses.create(
             model="gpt-4o-mini",
-            input=prompt
+            input=base_prompt
         )
-        answer = response.output_text.strip()
+        english_answer = response.output_text.strip()
 
-        print("📌 GPT answer:", answer)
-        print("==== /interview_listen END ====")
-
-        return jsonify({"question": text, "answer": answer})
+        print("📌 English Answer (before translation):", english_answer)
 
     except Exception as e:
         print("❌ AI error:", e)
         return jsonify({"question": text, "answer": f'AI error: {e}'}), 500
+
+    # ============================
+    # Translate if needed
+    # ============================
+
+    final_answer = english_answer  # default
+
+    if lang != "en":
+        print(f"🌍 Translating to: {lang}")
+
+        translate_prompt = f"""
+Translate the following interview answer into "{lang}".
+Keep the meaning, tone, and simplicity.
+
+Text: "{english_answer}"
+"""
+
+        try:
+            t = client.responses.create(
+                model="gpt-4o-mini",
+                input=translate_prompt
+            )
+            final_answer = t.output_text.strip()
+
+        except:
+            print("⚠ Translation failed, using English fallback.")
+
+    print("📌 Final answer:", final_answer)
+    print("==== /interview_listen END ====")
+
+    return jsonify({"question": text, "answer": final_answer})
 
 
 # ============================
@@ -202,8 +236,8 @@ def interview_answer():
 
     question = data.get("question", "").strip()
     job_role = data.get("job_role", "").strip()
-    background = data.get("background", "").strip()
-
+    background = data.get("background", "")
+    
     if not question:
         return jsonify({"answer": "Please enter the question first."})
 
