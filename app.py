@@ -59,8 +59,8 @@ def health():
 def interview_listen():
     print("\n===== 🎤 /interview_listen START =====")
 
-    input_lang = request.form.get("language", "auto")          # from dropdown
-    output_lang_choice = request.form.get("output_language", "same")  # "same" or lang code
+    input_lang = request.form.get("language", "auto")
+    output_lang_choice = request.form.get("output_language", "same")
 
     print("🌍 Input language selected:", input_lang)
     print("🌐 Output language selected:", output_lang_choice)
@@ -83,53 +83,87 @@ def interview_listen():
     wav_path = None
 
     try:
-        # Save input to temp
+        # -------------------------
+        # SAVE INPUT TO TEMP FILE
+        # -------------------------
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp_file:
             audio_file.save(temp_file.name)
             input_path = temp_file.name
 
         # -------------------------
-        # 2. CONVERT TO WAV (16k mono)
+        # 2. CONVERT → CLEAN WAV 16kHz, mono, PCM
         # -------------------------
         wav_path = input_path.replace(f".{ext}", ".wav")
 
         try:
-            ffmpeg_proc = subprocess.run(
-                ["ffmpeg", "-y", "-i", input_path, "-ar", "16000", "-ac", "1", wav_path],
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", input_path,
+                 "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le",
+                 wav_path],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 check=True
             )
-            print("🎛 FFmpeg conversion OK")
+            print("🎛 FFmpeg OK")
         except Exception as e:
             print("❌ FFmpeg error:", e)
             return jsonify({"question": "(ffmpeg error)", "answer": "Audio conversion failed."}), 500
 
         # -------------------------
-        # 3. TRANSCRIBE WITH GPT-4O-TRANSCRIBE
+        # 3. TRANSCRIPTION FUNCTION (supports retry)
         # -------------------------
-        try:
-            print("🔊 Transcribing with gpt-4o-transcribe...")
-
+        def transcribe(lang_code):
+            print(f"🔊 Trying transcription (lang={lang_code})")
             with open(wav_path, "rb") as f:
-                whisper_result = client.audio.transcriptions.create(
+                return client.audio.transcriptions.create(
                     model="gpt-4o-transcribe",
                     file=f,
-                    # If user chose auto, let model detect; otherwise force language
-                    language=None if input_lang == "auto" else input_lang
+                    language=None if lang_code == "auto" else lang_code,
+                    response_format="json",
+                    temperature=0
                 )
 
+        # -------------------------
+        # 4. MAIN TRY
+        # -------------------------
+        try:
+            whisper_result = transcribe(input_lang)
             spoken_text = (whisper_result.text or "").strip()
-            detected_lang = getattr(whisper_result, "language", None) or "unknown"
+            detected_lang = whisper_result.language or "unknown"
 
-            print("🗣️ Transcript:", spoken_text)
-            print("🌐 Detected Language:", detected_lang)
+            print("🗣 Transcript:", spoken_text)
+            print("🌐 Detected:", detected_lang)
+
+            if len(spoken_text) < 1:
+                raise Exception("Empty output")
 
         except Exception as e:
-            print("❌ Transcription error:", e)
-            return jsonify({"question": "(whisper error)", "answer": "Transcription failed."}), 500
+            print("❌ Primary transcription failed:", e)
+            print("Retrying Burmese forced mode...")
 
-        # Empty / unclear speech
+            # -------------------------
+            # 5. BURMESE FORCED RETRY
+            # -------------------------
+            try:
+                whisper_result = transcribe("my")
+                spoken_text = (whisper_result.text or "").strip()
+                detected_lang = whisper_result.language or "my"
+
+                print("🗣 Burmese retry output:", spoken_text)
+
+                if len(spoken_text) < 1:
+                    raise Exception("Empty Burmese output")
+
+            except Exception:
+                return jsonify({
+                    "question": "(whisper error)",
+                    "answer": "Transcription failed.",
+                    "detected_language": None
+                })
+
+        # -------------------------
+        # 6. HANDLE UNCLEAR SPEECH
+        # -------------------------
         if len(spoken_text) < 3:
             return jsonify({
                 "question": "(unclear)",
@@ -138,45 +172,36 @@ def interview_listen():
             })
 
         # -------------------------
-        # 4. DETERMINE OUTPUT LANGUAGE CODE
+        # 7. DETERMINE OUTPUT LANGUAGE
         # -------------------------
-        # Source language code from model (preferred), else input setting
-        source_lang_code = detected_lang if detected_lang != "unknown" else (
-            input_lang if input_lang != "auto" else "en"
+        source_lang_code = (
+            detected_lang if detected_lang != "unknown"
+            else (input_lang if input_lang != "auto" else "en")
         )
 
-        if output_lang_choice == "same":
-            final_lang_code = source_lang_code
-        else:
-            final_lang_code = output_lang_choice
-
+        final_lang_code = source_lang_code if output_lang_choice == "same" else output_lang_choice
         final_lang_name = lang_name_from_code(final_lang_code)
 
-        print("🎯 Final answer language code:", final_lang_code)
-        print("📝 Final answer language name:", final_lang_name)
+        print("🎯 Output code:", final_lang_code)
+        print("📌 Output language:", final_lang_name)
 
         # -------------------------
-        # 5. REWRITE INTO SHORT, CONFIDENT ANSWER
+        # 8. GENERATE CLEAN, CONFIDENT ANSWER
         # -------------------------
         rewrite_prompt = f"""
 You are ReadyBrain AI.
 
-The user just spoke their interview answer.
-
-Your job:
-1. Understand the meaning.
-2. Rewrite it into a short, confident answer (2–3 short sentences).
-3. Write the final answer in {final_lang_name}.
+Rewrite this into a short, confident interview answer (2–3 short sentences).
+Write the final answer in {final_lang_name}.
 
 Original text:
 \"\"\"{spoken_text}\"\"\"
 
 Rules:
-- Keep the original meaning.
-- Make it clear and confident.
-- Simple language.
-- Do NOT add new ideas.
-- Do NOT give explanations, only the final answer.
+- Keep original meaning
+- Simple, clear, confident
+- Do NOT add new ideas
+- Output ONLY the final answer
 """
 
         try:
@@ -185,7 +210,6 @@ Rules:
                 input=rewrite_prompt
             )
             improved_text = ai_output.output_text.strip()
-            print("✨ Final Answer:", improved_text)
 
         except Exception as e:
             print("❌ AI rewrite error:", e)
@@ -196,7 +220,7 @@ Rules:
             }), 500
 
         # -------------------------
-        # 6. RETURN JSON RESPONSE
+        # 9. RETURN RESPONSE
         # -------------------------
         return jsonify({
             "question": spoken_text,
@@ -206,12 +230,12 @@ Rules:
         })
 
     finally:
-        # Clean up temp files
+        # Clean temp files
         for path in (input_path, wav_path):
             if path and os.path.exists(path):
                 try:
                     os.remove(path)
-                except Exception:
+                except:
                     pass
 
 
@@ -239,11 +263,10 @@ Job role: "{job_role}"
 User background: "{background}"
 
 Rules:
-- Simple.
-- Confident.
-- Clear.
-- No long explanations.
-Just output the final answer.
+- Simple
+- Confident
+- Clear
+- Output only the answer
 """
 
     try:
@@ -252,8 +275,8 @@ Just output the final answer.
             input=prompt
         )
         return jsonify({"answer": response.output_text.strip()})
-    except Exception as e:
-        print("❌ Text mode error:", e)
+
+    except Exception:
         return jsonify({"answer": "There was an error generating the answer."})
 
 
@@ -273,11 +296,9 @@ You are ReadyBrain AI.
 
 Rewrite this answer into 2–3 confident, simple sentences.
 Keep the same meaning.
-
-Text:
-\"\"\"{text}\"\"\"
-
 Output only the improved answer.
+
+\"\"\"{text}\"\"\"
 """
 
     try:
@@ -286,8 +307,8 @@ Output only the improved answer.
             input=regen_prompt
         )
         return jsonify({"answer": response.output_text.strip()})
-    except Exception as e:
-        print("❌ Regen error:", e)
+
+    except Exception:
         return jsonify({"answer": "There was an error regenerating the answer."})
 
 
