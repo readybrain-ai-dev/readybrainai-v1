@@ -28,6 +28,14 @@ def landing():
 def listen_page():
     return render_template("listen.html")
 
+# ============================
+# HEALTH CHECK (REQUIRED FOR RENDER)
+# ============================
+
+@app.route("/health")
+def health():
+    return "ok", 200
+
 
 # ============================
 # MAIN INTERVIEW LISTEN ROUTE
@@ -100,7 +108,6 @@ def interview_listen():
     # Noise filters
     check_lower = spoken_text.lower()
 
-    # Background streamer garbage
     banned = ["thanks for watching", "subscribe", "video", "welcome back", "hello guys"]
     if any(x in check_lower for x in banned):
         return jsonify({"question": "(noise)", "answer": "I heard noise instead of speech."})
@@ -181,7 +188,6 @@ Output ONLY the improved answer.
 
     final_answer = improved
 
-    # Auto detect = return improved English
     if lang != "auto" and lang != "en":
         target = LANG_MAP.get(lang, "English")
 
