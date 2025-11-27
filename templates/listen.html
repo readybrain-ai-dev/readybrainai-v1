@@ -242,46 +242,6 @@
             color: white;
         }
 
-        .regen-btn {
-            background: linear-gradient(92deg, #0284c7, #0369a1);
-            color: white;
-        }
-
-        /* TEXT MODE */
-        .text-mode {
-            margin-top: 18px;
-            padding-top: 14px;
-            border-top: 1px dashed rgba(148,163,184,0.6);
-            font-size: 13px;
-        }
-
-        .text-input,
-        .text-textarea {
-            width: 100%;
-            border-radius: 10px;
-            border: 1px solid rgba(148,163,184,0.7);
-            padding: 10px;
-            font-size: 13px;
-            margin-bottom: 8px;
-            background: var(--surface);
-            color: var(--text-main);
-        }
-
-        .text-textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
-
-        .text-button {
-            padding: 11px 14px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 999px;
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: white;
-            width: 100%;
-            cursor: pointer;
-        }
     </style>
 </head>
 
@@ -323,7 +283,6 @@
                 <select id="languageSelect" class="select-box">
                     <option value="auto">🌍 Auto Detect</option>
                     <option value="en">🇺🇸 English</option>
-                    <option value="my">🇲🇲 Burmese</option>
                     <option value="ja">🇯🇵 Japanese</option>
                     <option value="ko">🇰🇷 Korean</option>
                     <option value="zh">🇨🇳 Chinese</option>
@@ -358,7 +317,6 @@
 
             <div class="action-buttons">
                 <button class="copy-btn" onclick="copyAnswer()">Copy</button>
-                <button class="regen-btn" onclick="regenerateAnswer()">Regenerate</button>
             </div>
 
             <!-- TEXT MODE -->
@@ -383,16 +341,12 @@
 <script src="/static/interview.js"></script>
 
 <script>
-    // Dark mode save
     const saved = localStorage.getItem("rb-dark");
     if (saved === "true") document.body.classList.add("dark-mode");
 
     document.getElementById("themeToggle").addEventListener("click", () => {
         document.body.classList.toggle("dark-mode");
-        localStorage.setItem(
-            "rb-dark", 
-            document.body.classList.contains("dark-mode")
-        );
+        localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
     });
 </script>
 

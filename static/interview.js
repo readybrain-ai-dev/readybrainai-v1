@@ -65,7 +65,6 @@ async function startListening() {
     let options = {};
     if (currentMimeType) options.mimeType = currentMimeType;
 
-    // Try to create MediaRecorder
     try {
         mediaRecorder = new MediaRecorder(stream, options);
     } catch (err) {
@@ -110,7 +109,7 @@ async function stopListening() {
     mediaRecorder.stop();
 
     mediaRecorder.onstop = async () => {
-        await new Promise(r => setTimeout(r, 200)); // gather chunks
+        await new Promise(r => setTimeout(r, 200));
 
         let blob;
         try {
@@ -127,7 +126,6 @@ async function stopListening() {
             return;
         }
 
-        // Determine extension
         let ext = "webm";
         if (currentMimeType.includes("ogg")) ext = "ogg";
         if (currentMimeType.includes("mp4")) ext = "mp4";
@@ -136,14 +134,12 @@ async function stopListening() {
         const formData = new FormData();
         formData.append("audio", blob, "speech." + ext);
 
-        // Language settings
         const inputLang  = document.getElementById("languageSelect")?.value || "auto";
         const outputLang = document.getElementById("outputLanguage")?.value || "same";
 
         formData.append("language", inputLang);
         formData.append("output_language", outputLang);
 
-        // Fetch backend result
         let data;
         try {
             const res = await fetch("/interview_listen", {
@@ -158,12 +154,10 @@ async function stopListening() {
             return;
         }
 
-        // Show results
         qBox.innerText = data.question ?? "(no text)";
         aBox.innerText = data.answer ?? "(no answer)";
         status.innerText = "Idle";
 
-        // Detected language tag
         if (data.detected_language) {
             const tag = document.createElement("div");
             tag.id = "detectedLang";
@@ -183,33 +177,6 @@ function copyAnswer() {
     const ans = document.getElementById("answer").innerText.trim();
     if (!ans) return;
     navigator.clipboard.writeText(ans);
-}
-
-// =====================================================
-// REGENERATE ANSWER
-// =====================================================
-async function regenerateAnswer() {
-    const spoken = document.getElementById("question").innerText.trim();
-    const aBox = document.getElementById("answer");
-
-    if (!spoken) {
-        aBox.innerText = "(no text to regenerate)";
-        return;
-    }
-
-    aBox.innerText = "⏳ Regenerating…";
-
-    try {
-        const res = await fetch("/interview_regen", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ text: spoken })
-        });
-        const data = await res.json();
-        aBox.innerText = data.answer || "(no answer)";
-    } catch {
-        aBox.innerText = "(server error)";
-    }
 }
 
 // =====================================================
