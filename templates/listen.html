@@ -16,17 +16,19 @@
             --card-bg: #ffffff;
             --card-border: #e2e8f0;
             --surface: #f1f5f9;
-            --shadow-main: 0 15px 40px rgba(15,23,42,0.08);
+            --shadow-main: 0 12px 36px rgba(15,23,42,0.05);
+            --accent: #4f46e5;
         }
 
         body.dark-mode {
-            --bg-main: radial-gradient(circle at top right, #020617, #020617 60%);
-            --text-main: #e5e7eb;
+            --bg-main: radial-gradient(circle at top right, #020617, #0f172a 60%);
+            --text-main: #e2e8f0;
             --text-muted: #94a3b8;
-            --card-bg: #020617;
-            --card-border: #1f2937;
-            --surface: #020617;
-            --shadow-main: 0 18px 50px rgba(0,0,0,0.75);
+            --card-bg: #0f172a;
+            --card-border: #1e293b;
+            --surface: #1e293b;
+            --shadow-main: 0 18px 50px rgba(0,0,0,0.55);
+            --accent: #818cf8;
         }
 
         body {
@@ -35,18 +37,20 @@
             font-family: "Inter", sans-serif;
             background: var(--bg-main);
             color: var(--text-main);
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .page {
-            max-width: 1000px;
+            max-width: 1080px;
             margin: 0 auto;
         }
 
+        /* NAV */
         .nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .brand {
@@ -54,11 +58,12 @@
             align-items: center;
             gap: 10px;
             font-weight: 600;
+            font-size: 18px;
         }
 
         .brand-logo {
-            width: 30px;
-            height: 30px;
+            width: 34px;
+            height: 34px;
             border-radius: 999px;
             background: linear-gradient(135deg, #4f46e5, #6366f1);
             display: flex;
@@ -66,74 +71,125 @@
             justify-content: center;
             color: white;
             font-size: 15px;
-            box-shadow: 0 8px 20px rgba(79,70,229,0.45);
+            box-shadow: 0 8px 22px rgba(79,70,229,0.4);
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.45);
+            background: rgba(255,255,255,0.3);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(0,0,0,0.05);
         }
 
         .theme-toggle {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.4);
+            border: 1px solid rgba(148,163,184,0.45);
             cursor: pointer;
             font-size: 13px;
-            background: rgba(15,23,42,0.02);
+            background: rgba(255,255,255,0.4);
             color: var(--text-muted);
+            transition: 0.2s ease;
         }
 
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.6);
+        }
+
+        /* LAYOUT */
         .layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-            gap: 28px;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 36px;
+            align-items: start;
         }
 
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* HERO TEXT */
         .hero-title {
-            font-size: 34px;
-            margin-top: 6px;
-            margin-bottom: 12px;
+            font-size: 32px;
             font-weight: 700;
+            margin: 0 0 6px 0;
+        }
+
+        .hero-pill {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #dc2626;
         }
 
         .hero-sub {
             font-size: 15px;
             color: var(--text-muted);
+            line-height: 1.5;
         }
 
+        /* CARD */
         .card {
             background: var(--card-bg);
-            padding: 32px 30px 30px;
-            border-radius: 22px;
+            padding: 26px;
+            border-radius: 24px;
             border: 1px solid var(--card-border);
             box-shadow: var(--shadow-main);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(8px);}
+            to {opacity: 1; transform: translateY(0);}
         }
 
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
 
-        .language-select {
-            padding: 8px 12px;
+        .select-box {
+            padding: 9px 13px;
             font-size: 13px;
-            border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.4);
             background: var(--surface);
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.45);
             cursor: pointer;
         }
 
+        /* BUTTONS */
         .button-row {
             display: flex;
-            gap: 12px;
-            margin-bottom: 18px;
+            gap: 10px;
+            margin: 16px 0 10px 0;
         }
 
         button {
-            flex: 1;
-            padding: 14px;
-            font-size: 15px;
+            width: 100%;
+            padding: 13px;
+            font-size: 14px;
             font-weight: 600;
             border: none;
             border-radius: 999px;
@@ -151,20 +207,34 @@
             color: white;
         }
 
+        .status-line {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 4px 0 10px 0;
+        }
+
+        /* OUTPUT */
+        h3 {
+            margin: 12px 0 6px 0;
+            font-size: 14px;
+        }
+
         .output-box {
             background: var(--surface);
             padding: 16px;
             border-radius: 14px;
-            border: 1px solid rgba(148,163,184,0.55);
-            min-height: 75px;
+            border: 1px solid rgba(148,163,184,0.45);
+            min-height: 70px;
             font-size: 14px;
             white-space: pre-line;
+            margin-bottom: 8px;
         }
 
+        /* ACTION BUTTONS */
         .action-buttons {
             display: flex;
-            gap: 10px;
-            margin-top: 12px;
+            gap: 8px;
+            margin-bottom: 4px;
         }
 
         .copy-btn {
@@ -173,47 +243,44 @@
         }
 
         .regen-btn {
-            background: linear-gradient(92deg, #0ea5e9, #0284c7);
+            background: linear-gradient(92deg, #0284c7, #0369a1);
             color: white;
         }
 
         /* TEXT MODE */
         .text-mode {
-            margin-top: 22px;
-            padding-top: 18px;
+            margin-top: 18px;
+            padding-top: 14px;
             border-top: 1px dashed rgba(148,163,184,0.6);
+            font-size: 13px;
         }
 
         .text-input,
         .text-textarea {
             width: 100%;
-            box-sizing: border-box;
             border-radius: 10px;
             border: 1px solid rgba(148,163,184,0.7);
-            padding: 10px 11px;
+            padding: 10px;
             font-size: 13px;
             margin-bottom: 8px;
             background: var(--surface);
             color: var(--text-main);
         }
 
-        .text-button {
-            margin-top: 6px;
-            padding: 10px 12px;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 999px;
-            border: none;
-            cursor: pointer;
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: #f9fafb;
-            width: 100%;
+        .text-textarea {
+            min-height: 70px;
+            resize: vertical;
         }
 
-        @media (max-width: 790px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
+        .text-button {
+            padding: 11px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 999px;
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: white;
+            width: 100%;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -221,50 +288,67 @@
 <body>
 <div class="page">
 
-    <!-- Nav -->
+    <!-- NAV -->
     <header class="nav">
         <div class="brand">
             <div class="brand-logo">RB</div>
             <div>ReadyBrainAI</div>
         </div>
 
-        <button id="themeToggle" class="theme-toggle">🌙 Dark mode</button>
+        <div class="nav-buttons">
+            <a href="/" class="back-btn">← Back to main site</a>
+            <button id="themeToggle" class="theme-toggle">🌙</button>
+        </div>
     </header>
 
     <main class="layout">
 
         <section class="hero-text">
             <div class="hero-pill">🔴 Live prototype · Voice interview coach</div>
-            <h1 class="hero-title">Practice real answers, not perfect sentences.</h1>
+            <h1 class="hero-title">Practice better answers — in any language.</h1>
             <p class="hero-sub">
-                Press <strong>Start Recording</strong> and answer out loud.
-                ReadyBrainAI rewrites your answer into a short, confident version you can remember.
+                Press <strong>Start Recording</strong> and speak your answer.
+                ReadyBrainAI turns it into a clear, confident version you can remember — 
+                and outputs it in any language you want.
             </p>
         </section>
 
-        <!-- Listening Card -->
+        <!-- LISTENER CARD -->
         <section class="card">
 
             <div class="card-header">
-                <h2>🎤 ReadyBrainAI Listener</h2>
+                <h2>🎤 Listener</h2>
 
-                <select id="languageSelect" class="language-select">
-                    <option value="auto">🌍 Auto Detect (Recommended)</option>
-                    <option value="en">English</option>
-                    <option value="my">မြန်မာ (Burmese)</option>
-                    <option value="ja">日本語 (Japanese)</option>
-                    <option value="es">Español (Spanish)</option>
-                    <option value="hi">हिन्दी (Hindi)</option>
-                    <option value="zh">中文 (Chinese)</option>
+                <!-- INPUT LANGUAGE -->
+                <select id="languageSelect" class="select-box">
+                    <option value="auto">🌍 Auto Detect</option>
+                    <option value="en">🇺🇸 English</option>
+                    <option value="my">🇲🇲 Burmese</option>
+                    <option value="ja">🇯🇵 Japanese</option>
+                    <option value="ko">🇰🇷 Korean</option>
+                    <option value="zh">🇨🇳 Chinese</option>
+                    <option value="es">🇪🇸 Spanish</option>
                 </select>
             </div>
+
+            <!-- OUTPUT LANGUAGE -->
+            <label class="label-inline">Answer output language</label>
+            <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
+                <option value="same">🟦 Same as spoken</option>
+                <option value="en">🇺🇸 English</option>
+                <option value="my">🇲🇲 Burmese</option>
+                <option value="ja">🇯🇵 Japanese</option>
+                <option value="ko">🇰🇷 Korean</option>
+                <option value="zh">🇨🇳 Chinese</option>
+                <option value="es">🇪🇸 Spanish</option>
+            </select>
 
             <div class="button-row">
                 <button id="startBtn" onclick="startListening()">Start Recording</button>
                 <button id="stopBtn" onclick="stopListening()">Stop Recording</button>
             </div>
 
-            <p id="status">Idle</p>
+            <p id="status" class="status-line">Idle</p>
 
             <h3>Speaker Said:</h3>
             <div id="question" class="output-box"></div>
@@ -272,62 +356,44 @@
             <h3>ReadyBrainAI Answer:</h3>
             <div id="answer" class="output-box"></div>
 
-            <!-- Action Buttons -->
             <div class="action-buttons">
-                <button class="copy-btn" onclick="copyAnswer()">Copy Answer</button>
+                <button class="copy-btn" onclick="copyAnswer()">Copy</button>
                 <button class="regen-btn" onclick="regenerateAnswer()">Regenerate</button>
             </div>
 
             <!-- TEXT MODE -->
             <div class="text-mode">
-                <div class="text-mode-label">💬 Text Mode (beta)</div>
+                <div>💬 Text Mode (beta)</div>
 
                 <textarea id="textQuestion" class="text-textarea" placeholder="Type the interview question here..."></textarea>
 
-                <div class="text-mode-row">
-                    <input id="textJobRole" class="text-input" placeholder="Job role (optional)" />
-                    <input id="textBackground" class="text-input" placeholder="Your background (optional)" />
-                </div>
+                <input id="textJobRole" class="text-input" placeholder="Job role (optional)" />
+                <input id="textBackground" class="text-input" placeholder="Your background (optional)" />
 
                 <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Text Answer</button>
 
-                <div id="textStatus" class="text-status"></div>
+                <div id="textStatus"></div>
             </div>
 
         </section>
     </main>
 </div>
 
-<!-- Scripts -->
+<!-- JS -->
 <script src="/static/interview.js"></script>
 
 <script>
-    // Theme toggle
+    // Dark mode save
+    const saved = localStorage.getItem("rb-dark");
+    if (saved === "true") document.body.classList.add("dark-mode");
+
     document.getElementById("themeToggle").addEventListener("click", () => {
         document.body.classList.toggle("dark-mode");
+        localStorage.setItem(
+            "rb-dark", 
+            document.body.classList.contains("dark-mode")
+        );
     });
-
-    // Copy button
-    function copyAnswer() {
-        const answer = document.getElementById("answer").innerText;
-        navigator.clipboard.writeText(answer);
-    }
-
-    // Regenerate button
-    async function regenerateAnswer() {
-        const spoken = document.getElementById("question").innerText;
-
-        if (!spoken.trim()) return;
-
-        const res = await fetch("/interview_regen", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: spoken })
-        });
-
-        const data = await res.json();
-        document.getElementById("answer").innerText = data.answer || "(no answer)";
-    }
 </script>
 
 </body>

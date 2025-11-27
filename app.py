@@ -1,7 +1,6 @@
 import os
 import tempfile
 import subprocess
-import re
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -9,28 +8,44 @@ from openai import OpenAI
 # ============================
 # INIT
 # ============================
-
 load_dotenv()
+
 API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 
 app = Flask(__name__)
 
+# Simple language map for nicer control
+LANG_MAP = {
+    "en": "English",
+    "my": "Burmese",
+    "ja": "Japanese",
+    "ko": "Korean",
+    "zh": "Chinese",
+    "es": "Spanish",
+    "hi": "Hindi",
+}
+
+
+def lang_name_from_code(code: str) -> str:
+    """Map language code to human-readable name, with a safe fallback."""
+    if not code:
+        return "the same language as this text"
+    return LANG_MAP.get(code, "the same language as this text")
+
+
 # ============================
 # ROUTES
 # ============================
-
 @app.route("/")
 def landing():
     return render_template("index.html")
+
 
 @app.route("/listen")
 def listen_page():
     return render_template("listen.html")
 
-# ============================
-# HEALTH CHECK (REQUIRED FOR RENDER)
-# ============================
 
 @app.route("/health")
 def health():
@@ -38,251 +53,246 @@ def health():
 
 
 # ============================
-# MAIN INTERVIEW LISTEN ROUTE
+# MAIN INTERVIEW LISTEN (GLOBAL)
 # ============================
-
 @app.route("/interview_listen", methods=["POST"])
 def interview_listen():
     print("\n===== 🎤 /interview_listen START =====")
 
-    # 1. Language selection
-    lang = request.form.get("language", "auto")
-    print("🌍 User selected:", lang)
+    input_lang = request.form.get("language", "auto")          # from dropdown
+    output_lang_choice = request.form.get("output_language", "same")  # "same" or lang code
 
-    # 2. Check audio file
+    print("🌍 Input language selected:", input_lang)
+    print("🌐 Output language selected:", output_lang_choice)
+
+    # -------------------------
+    # 1. CHECK AUDIO
+    # -------------------------
     if "audio" not in request.files:
-        return jsonify({"question": "(no audio)", "answer": "Try again."}), 400
+        return jsonify({
+            "question": "(no audio)",
+            "answer": "No audio detected.",
+            "detected_language": None
+        }), 400
 
     audio_file = request.files["audio"]
-    filename = audio_file.filename.lower()
+    filename = (audio_file.filename or "").lower()
+    ext = filename.split(".")[-1] if "." in filename else "webm"
 
-    # Extension detection
-    file_ext = filename.split(".")[-1] if "." in filename else "webm"
-
-    # Save input file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as temp_in:
-        audio_file.save(temp_in.name)
-        input_path = temp_in.name
-
-    # Convert → WAV
-    wav_path = input_path.replace(f".{file_ext}", ".wav")
+    input_path = None
+    wav_path = None
 
     try:
-        subprocess.run(
-            ["ffmpeg", "-y", "-i", input_path, wav_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True
-        )
-    except Exception as e:
-        return jsonify({"question": "(ffmpeg error)", "answer": str(e)}), 500
+        # Save input to temp
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp_file:
+            audio_file.save(temp_file.name)
+            input_path = temp_file.name
 
-    # Silence detection
-    silence_result = subprocess.run(
-        ["ffmpeg", "-i", wav_path,
-         "-af", "silencedetect=noise=-35dB:d=0.4",
-         "-f", "null", "-"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+        # -------------------------
+        # 2. CONVERT TO WAV (16k mono)
+        # -------------------------
+        wav_path = input_path.replace(f".{ext}", ".wav")
 
-    if "silence_start" in silence_result.stderr and "silence_end" not in silence_result.stderr:
-        return jsonify({"question": "(silence)", "answer": "I didn't hear anything."})
-
-    # ============================
-    # WHISPER TRANSCRIPTION
-    # ============================
-    try:
-        with open(wav_path, "rb") as f:
-            whisper_data = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=f
+        try:
+            ffmpeg_proc = subprocess.run(
+                ["ffmpeg", "-y", "-i", input_path, "-ar", "16000", "-ac", "1", wav_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True
             )
-        spoken_text = whisper_data.text.strip()
-        print("📝 Whisper text:", spoken_text)
+            print("🎛 FFmpeg conversion OK")
+        except Exception as e:
+            print("❌ FFmpeg error:", e)
+            return jsonify({"question": "(ffmpeg error)", "answer": "Audio conversion failed."}), 500
 
-    except Exception as e:
-        return jsonify({"question": "(whisper error)", "answer": str(e)}), 500
+        # -------------------------
+        # 3. TRANSCRIBE WITH GPT-4O-TRANSCRIBE
+        # -------------------------
+        try:
+            print("🔊 Transcribing with gpt-4o-transcribe...")
 
-    # Noise filters
-    check_lower = spoken_text.lower()
+            with open(wav_path, "rb") as f:
+                whisper_result = client.audio.transcriptions.create(
+                    model="gpt-4o-transcribe",
+                    file=f,
+                    # If user chose auto, let model detect; otherwise force language
+                    language=None if input_lang == "auto" else input_lang
+                )
 
-    banned = ["thanks for watching", "subscribe", "video", "welcome back", "hello guys"]
-    if any(x in check_lower for x in banned):
-        return jsonify({"question": "(noise)", "answer": "I heard noise instead of speech."})
+            spoken_text = (whisper_result.text or "").strip()
+            detected_lang = getattr(whisper_result, "language", None) or "unknown"
 
-    url_filters = [r"http", r"www\.", r"\.com", r"\.net", r"\.edu"]
-    if any(re.search(p, check_lower) for p in url_filters):
-        return jsonify({"question": "(noise)", "answer": "Background noise detected."})
+            print("🗣️ Transcript:", spoken_text)
+            print("🌐 Detected Language:", detected_lang)
 
-    if len(spoken_text) < 5:
-        return jsonify({"question": "(unclear)", "answer": "I couldn’t catch that."})
+        except Exception as e:
+            print("❌ Transcription error:", e)
+            return jsonify({"question": "(whisper error)", "answer": "Transcription failed."}), 500
 
-    # ============================
-    # TRANSLATE SPEECH → ENGLISH
-    # ============================
-    print("🌍 Translating speech → English...")
+        # Empty / unclear speech
+        if len(spoken_text) < 3:
+            return jsonify({
+                "question": "(unclear)",
+                "answer": "I couldn't hear anything clearly.",
+                "detected_language": detected_lang
+            })
 
-    translate_prompt = f"""
-The user said: "{spoken_text}"
+        # -------------------------
+        # 4. DETERMINE OUTPUT LANGUAGE CODE
+        # -------------------------
+        # Source language code from model (preferred), else input setting
+        source_lang_code = detected_lang if detected_lang != "unknown" else (
+            input_lang if input_lang != "auto" else "en"
+        )
 
-Translate this into clear English.
-Do not add new ideas.
-Just the meaning.
-"""
+        if output_lang_choice == "same":
+            final_lang_code = source_lang_code
+        else:
+            final_lang_code = output_lang_choice
 
-    try:
-        english_version = client.responses.create(
-            model="gpt-4o-mini",
-            input=translate_prompt
-        ).output_text.strip()
+        final_lang_name = lang_name_from_code(final_lang_code)
 
-        print("🔤 English version:", english_version)
+        print("🎯 Final answer language code:", final_lang_code)
+        print("📝 Final answer language name:", final_lang_name)
 
-    except Exception as e:
-        return jsonify({"question": spoken_text, "answer": f"translation error: {e}"}), 500
-
-    # ============================
-    # IMPROVE ENGLISH ANSWER
-    # ============================
-    improve_prompt = f"""
+        # -------------------------
+        # 5. REWRITE INTO SHORT, CONFIDENT ANSWER
+        # -------------------------
+        rewrite_prompt = f"""
 You are ReadyBrain AI.
 
-Rewrite the user's answer into a short, confident, simple-English interview answer.
+The user just spoke their interview answer.
+
+Your job:
+1. Understand the meaning.
+2. Rewrite it into a short, confident answer (2–3 short sentences).
+3. Write the final answer in {final_lang_name}.
+
+Original text:
+\"\"\"{spoken_text}\"\"\"
 
 Rules:
-- Only 2–3 short sentences.
-- No long explanations.
-- No filler.
-- Clear and professional.
-
-User: "{english_version}"
-
-Output ONLY the improved answer.
-"""
-
-    try:
-        improved = client.responses.create(
-            model="gpt-4o-mini",
-            input=improve_prompt
-        ).output_text.strip()
-
-        print("⚡ Improved English:", improved)
-
-    except Exception as e:
-        return jsonify({"question": spoken_text, "answer": f"improve error: {e}"}), 500
-
-    # ============================
-    # TRANSLATE → SELECTED LANGUAGE
-    # ============================
-
-    LANG_MAP = {
-        "en": "English",
-        "my": "Burmese",
-        "ja": "Japanese",
-        "es": "Spanish",
-        "hi": "Hindi",
-        "zh": "Chinese"
-    }
-
-    final_answer = improved
-
-    if lang != "auto" and lang != "en":
-        target = LANG_MAP.get(lang, "English")
-
-        out_prompt = f"""
-Translate the following interview answer into {target}.
-Keep it simple and confident.
-
-Text: "{improved}"
+- Keep the original meaning.
+- Make it clear and confident.
+- Simple language.
+- Do NOT add new ideas.
+- Do NOT give explanations, only the final answer.
 """
 
         try:
-            final_answer = client.responses.create(
+            ai_output = client.responses.create(
                 model="gpt-4o-mini",
-                input=out_prompt
-            ).output_text.strip()
+                input=rewrite_prompt
+            )
+            improved_text = ai_output.output_text.strip()
+            print("✨ Final Answer:", improved_text)
 
-        except Exception:
-            print("⚠ Translation failed — using English.")
+        except Exception as e:
+            print("❌ AI rewrite error:", e)
+            return jsonify({
+                "question": spoken_text,
+                "answer": "There was an error generating the answer.",
+                "detected_language": detected_lang
+            }), 500
 
-    return jsonify({
-        "question": spoken_text,
-        "answer": final_answer
-    })
+        # -------------------------
+        # 6. RETURN JSON RESPONSE
+        # -------------------------
+        return jsonify({
+            "question": spoken_text,
+            "answer": improved_text,
+            "detected_language": detected_lang,
+            "output_language": final_lang_code
+        })
+
+    finally:
+        # Clean up temp files
+        for path in (input_path, wav_path):
+            if path and os.path.exists(path):
+                try:
+                    os.remove(path)
+                except Exception:
+                    pass
 
 
 # ============================
 # TEXT MODE
 # ============================
-
 @app.route("/interview_answer", methods=["POST"])
 def interview_answer():
-    data = request.get_json()
+    data = request.get_json() or {}
 
     question = data.get("question", "").strip()
-    job_role = data.get("job_role", "")
-    background = data.get("background", "")
+    job_role = data.get("job_role", "").strip()
+    background = data.get("background", "").strip()
 
     if not question:
         return jsonify({"answer": "Please type the question."})
 
     prompt = f"""
-Interview question: "{question}"
+You are ReadyBrain AI.
+
+Write a short interview answer (2–3 sentences) for:
+
+Question: "{question}"
 Job role: "{job_role}"
 User background: "{background}"
 
-Write a short 2–3 sentence answer. Simple English. Confident.
+Rules:
+- Simple.
+- Confident.
+- Clear.
+- No long explanations.
+Just output the final answer.
 """
 
     try:
-        resp = client.responses.create(
+        response = client.responses.create(
             model="gpt-4o-mini",
             input=prompt
-        ).output_text.strip()
-
-        return jsonify({"answer": resp})
-
+        )
+        return jsonify({"answer": response.output_text.strip()})
     except Exception as e:
-        return jsonify({"answer": f"error: {e}"})
+        print("❌ Text mode error:", e)
+        return jsonify({"answer": "There was an error generating the answer."})
 
 
 # ============================
 # REGENERATE ANSWER
 # ============================
-
 @app.route("/interview_regen", methods=["POST"])
 def interview_regen():
-    data = request.get_json()
+    data = request.get_json() or {}
     text = data.get("text", "").strip()
 
     if not text:
         return jsonify({"answer": "(no text)"}), 400
 
-    prompt = f"""
-Rewrite this interview answer into 2–3 short, confident, simple-English sentences.
+    regen_prompt = f"""
+You are ReadyBrain AI.
 
-Text: "{text}"
+Rewrite this answer into 2–3 confident, simple sentences.
+Keep the same meaning.
+
+Text:
+\"\"\"{text}\"\"\"
 
 Output only the improved answer.
 """
 
     try:
-        resp = client.responses.create(
+        response = client.responses.create(
             model="gpt-4o-mini",
-            input=prompt
-        ).output_text.strip()
-
-        return jsonify({"answer": resp})
-
+            input=regen_prompt
+        )
+        return jsonify({"answer": response.output_text.strip()})
     except Exception as e:
-        return jsonify({"answer": f"regen error: {e}"})
+        print("❌ Regen error:", e)
+        return jsonify({"answer": "There was an error regenerating the answer."})
 
 
 # ============================
 # LOCAL DEV
 # ============================
-
 if __name__ == "__main__":
     app.run(debug=True)
