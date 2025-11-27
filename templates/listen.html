@@ -242,8 +242,6 @@
             color: white;
         }
 
-        /* Regenerate button removed */
-        
         /* TEXT MODE */
         .text-mode {
             margin-top: 18px;
@@ -301,12 +299,14 @@
     <main class="layout">
 
         <section class="hero-text">
-            <div class="hero-pill">🔴 Live prototype · Voice interview coach</div>
-            <h1 class="hero-title">Practice better answers — in any language.</h1>
+            <div class="hero-pill">🔴 Live prototype · Voice Interview Coach</div>
+
+            <h1 class="hero-title">Speak naturally. Get a stronger interview answer.</h1>
+
             <p class="hero-sub">
-                Press <strong>Start Recording</strong> and speak your answer.
-                ReadyBrainAI turns it into a clear, confident version you can remember — 
-                and outputs it in any language you want.
+                Record your response, just like in a real interview.
+                ReadyBrainAI instantly rewrites it into a clear, confident, and professional answer —  
+                in the language you choose.
             </p>
         </section>
 
@@ -314,13 +314,12 @@
         <section class="card">
 
             <div class="card-header">
-                <h2>🎤 Listener</h2>
+                <h2>🎤 Answer Refinement</h2>
 
                 <!-- INPUT LANGUAGE -->
                 <select id="languageSelect" class="select-box">
                     <option value="auto">🌍 Auto Detect</option>
                     <option value="en">🇺🇸 English</option>
-                    <!-- Burmese removed -->
                     <option value="ja">🇯🇵 Japanese</option>
                     <option value="ko">🇰🇷 Korean</option>
                     <option value="zh">🇨🇳 Chinese</option>
@@ -347,27 +346,26 @@
 
             <p id="status" class="status-line">Idle</p>
 
-            <h3>Speaker Said:</h3>
+            <h3>Your Response:</h3>
             <div id="question" class="output-box"></div>
 
-            <h3>ReadyBrainAI Answer:</h3>
+            <h3>Improved Answer:</h3>
             <div id="answer" class="output-box"></div>
 
             <div class="action-buttons">
                 <button class="copy-btn" onclick="copyAnswer()">Copy</button>
-                <!-- Regenerate button removed -->
             </div>
 
             <!-- TEXT MODE -->
             <div class="text-mode">
-                <div>💬 Text Mode (beta)</div>
+                <div>💬 Text Mode (Beta)</div>
 
-                <textarea id="textQuestion" class="text-textarea" placeholder="Type the interview question here..."></textarea>
+                <textarea id="textQuestion" class="text-textarea" placeholder="Type your interview question here..."></textarea>
 
-                <input id="textJobRole" class="text-input" placeholder="Job role (optional)" />
+                <input id="textJobRole" class="text-input" placeholder="Target role (optional)" />
                 <input id="textBackground" class="text-input" placeholder="Your background (optional)" />
 
-                <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Text Answer</button>
+                <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Answer</button>
 
                 <div id="textStatus"></div>
             </div>
