@@ -2,9 +2,9 @@ let mediaRecorder;
 let audioChunks = [];
 let currentMimeType = null;
 
-// ======================================
-// CHOOSE BEST MIME TYPE (GLOBAL SUPPORT)
-// ======================================
+// =====================================================
+// CHOOSE THE BEST MIME TYPE (CROSS-PLATFORM SUPPORT)
+// =====================================================
 function chooseMimeType() {
     const mimeTypes = [
         "audio/webm;codecs=opus",
@@ -15,59 +15,62 @@ function chooseMimeType() {
         "audio/wav"
     ];
 
-    for (const type of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(type)) {
-            console.log("Using MIME type:", type);
-            return type;
+    for (const t of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(t)) {
+            console.log("Using MIME:", t);
+            return t;
         }
     }
 
-    console.warn("⚠ No supported MIME type found. Using fallback.");
+    console.warn("⚠ No supported MIME type found. Using empty fallback.");
     return "";
 }
 
-// ======================================
-// CLEAN UI BEFORE NEW RECORDING
-// ======================================
+// =====================================================
+// RESET UI BEFORE NEW RECORDING
+// =====================================================
 function resetUI() {
     document.getElementById("question").innerText = "";
     document.getElementById("answer").innerText = "";
 
-    const old = document.getElementById("detectedLang");
-    if (old) old.remove();
+    const oldTag = document.getElementById("detectedLang");
+    if (oldTag) oldTag.remove();
 }
 
-// ======================================
+// =====================================================
 // START LISTENING
-// ======================================
+// =====================================================
 async function startListening() {
     resetUI();
     audioChunks = [];
 
     const startBtn = document.getElementById("startBtn");
-    const stopBtn = document.getElementById("stopBtn");
-    const status = document.getElementById("status");
+    const stopBtn  = document.getElementById("stopBtn");
+    const status   = document.getElementById("status");
 
     startBtn.style.display = "none";
-    stopBtn.style.display = "inline-block";
+    stopBtn.style.display  = "inline-block";
     status.innerText = "🎙 Listening… Speak clearly";
 
     let stream;
     try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
-        status.innerText = "❌ Microphone blocked. Enable permission.";
+        status.innerText = "❌ Microphone blocked.";
         return;
     }
 
     currentMimeType = chooseMimeType();
+
     let options = {};
     if (currentMimeType) options.mimeType = currentMimeType;
 
+    // Try to create MediaRecorder
     try {
         mediaRecorder = new MediaRecorder(stream, options);
     } catch (err) {
-        // Android webm → ogg fallback
+        console.warn("Main MIME failed. Trying ogg…");
+
         try {
             mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/ogg" });
             currentMimeType = "audio/ogg";
@@ -81,21 +84,21 @@ async function startListening() {
         if (e.data && e.data.size > 0) audioChunks.push(e.data);
     };
 
-    mediaRecorder.onstart = () => console.log("🎧 Recording started");
     mediaRecorder.start();
+    console.log("🎧 Recording started");
 }
 
-// ======================================
+// =====================================================
 // STOP LISTENING
-// ======================================
+// =====================================================
 async function stopListening() {
     const startBtn = document.getElementById("startBtn");
-    const stopBtn = document.getElementById("stopBtn");
-    const status = document.getElementById("status");
-    const questionBox = document.getElementById("question");
-    const answerBox = document.getElementById("answer");
+    const stopBtn  = document.getElementById("stopBtn");
+    const status   = document.getElementById("status");
+    const qBox     = document.getElementById("question");
+    const aBox     = document.getElementById("answer");
 
-    stopBtn.style.display = "none";
+    stopBtn.style.display  = "none";
     startBtn.style.display = "inline-block";
     status.innerText = "⏳ Processing… Please wait";
 
@@ -107,60 +110,60 @@ async function stopListening() {
     mediaRecorder.stop();
 
     mediaRecorder.onstop = async () => {
-        // Wait for audio chunks
-        await new Promise(r => setTimeout(r, 250));
+        await new Promise(r => setTimeout(r, 200)); // gather chunks
 
         let blob;
         try {
             blob = new Blob(audioChunks, { type: currentMimeType });
-        } catch {
+        } catch (err) {
             blob = new Blob(audioChunks, { type: "audio/ogg" });
             currentMimeType = "audio/ogg";
         }
 
         if (blob.size < 800) {
             status.innerText = "❌ No audio detected.";
-            questionBox.innerText = "(no voice captured)";
-            answerBox.innerText = "(no answer)";
+            qBox.innerText = "(no voice captured)";
+            aBox.innerText = "(no answer)";
             return;
         }
 
-        const formData = new FormData();
+        // Determine extension
         let ext = "webm";
         if (currentMimeType.includes("ogg")) ext = "ogg";
         if (currentMimeType.includes("mp4")) ext = "mp4";
+        if (currentMimeType.includes("mpeg")) ext = "mp3";
 
+        const formData = new FormData();
         formData.append("audio", blob, "speech." + ext);
 
-        // INPUT LANG
-        const lang = document.getElementById("languageSelect")?.value || "auto";
-        formData.append("language", lang);
+        // Language settings
+        const inputLang  = document.getElementById("languageSelect")?.value || "auto";
+        const outputLang = document.getElementById("outputLanguage")?.value || "same";
 
-        // OUTPUT LANG
-        const outLang = document.getElementById("outputLanguage")?.value || "same";
-        formData.append("output_language", outLang);
+        formData.append("language", inputLang);
+        formData.append("output_language", outputLang);
 
-        // Send to backend
+        // Fetch backend result
         let data;
         try {
-            const response = await fetch("/interview_listen", {
+            const res = await fetch("/interview_listen", {
                 method: "POST",
                 body: formData
             });
-            data = await response.json();
-        } catch {
+            data = await res.json();
+        } catch (err) {
             status.innerText = "Idle";
-            questionBox.innerText = "(server error)";
-            answerBox.innerText = "Could not connect.";
+            qBox.innerText = "(server error)";
+            aBox.innerText = "Could not connect to server.";
             return;
         }
 
-        // Write results
-        questionBox.innerText = data.question ?? "(no text)";
-        answerBox.innerText = data.answer ?? "(no answer)";
+        // Show results
+        qBox.innerText = data.question ?? "(no text)";
+        aBox.innerText = data.answer ?? "(no answer)";
         status.innerText = "Idle";
 
-        // Show detected language
+        // Detected language tag
         if (data.detected_language) {
             const tag = document.createElement("div");
             tag.id = "detectedLang";
@@ -168,33 +171,33 @@ async function stopListening() {
             tag.style.color = "#64748b";
             tag.style.marginTop = "4px";
             tag.innerText = "Detected language: " + data.detected_language;
-            questionBox.parentNode.insertBefore(tag, questionBox);
+            qBox.parentNode.insertBefore(tag, qBox);
         }
     };
 }
 
-// ===============================================
-// COPY ANSWER BUTTON
-// ===============================================
+// =====================================================
+// COPY ANSWER
+// =====================================================
 function copyAnswer() {
-    const answer = document.getElementById("answer").innerText.trim();
-    if (!answer) return;
-    navigator.clipboard.writeText(answer);
+    const ans = document.getElementById("answer").innerText.trim();
+    if (!ans) return;
+    navigator.clipboard.writeText(ans);
 }
 
-// ===============================================
+// =====================================================
 // REGENERATE ANSWER
-// ===============================================
+// =====================================================
 async function regenerateAnswer() {
     const spoken = document.getElementById("question").innerText.trim();
-    const answerBox = document.getElementById("answer");
+    const aBox = document.getElementById("answer");
 
     if (!spoken) {
-        answerBox.innerText = "(no text to regenerate)";
+        aBox.innerText = "(no text to regenerate)";
         return;
     }
 
-    answerBox.innerText = "⏳ Regenerating…";
+    aBox.innerText = "⏳ Regenerating…";
 
     try {
         const res = await fetch("/interview_regen", {
@@ -202,23 +205,22 @@ async function regenerateAnswer() {
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ text: spoken })
         });
-
         const data = await res.json();
-        answerBox.innerText = data.answer || "(no answer)";
+        aBox.innerText = data.answer || "(no answer)";
     } catch {
-        answerBox.innerText = "(server error)";
+        aBox.innerText = "(server error)";
     }
 }
 
-// ===============================================
-// TEXT MODE
-// ===============================================
+// =====================================================
+// TEXT MODE GENERATION
+// =====================================================
 async function generateTextAnswer() {
     const question = document.getElementById("textQuestion").value.trim();
-    const jobRole = document.getElementById("textJobRole").value.trim();
-    const background = document.getElementById("textBackground").value.trim();
+    const jobRole  = document.getElementById("textJobRole").value.trim();
+    const bg       = document.getElementById("textBackground").value.trim();
     const statusEl = document.getElementById("textStatus");
-    const answerBox = document.getElementById("answer");
+    const aBox     = document.getElementById("answer");
 
     if (!question) {
         statusEl.innerText = "Please type the interview question first.";
@@ -231,13 +233,13 @@ async function generateTextAnswer() {
         const res = await fetch("/interview_answer", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ question, job_role: jobRole, background })
+            body: JSON.stringify({ question, job_role: jobRole, background: bg })
         });
 
         const data = await res.json();
-        answerBox.innerText = data.answer || "(no answer)";
+        aBox.innerText = data.answer || "(no answer)";
         statusEl.innerText = "Done.";
-    } catch {
+    } catch (err) {
         statusEl.innerText = "Error: could not generate answer.";
     }
 }
