@@ -42,7 +42,6 @@
             margin: 0 auto;
         }
 
-        /* Top nav */
         .nav {
             display: flex;
             align-items: center;
@@ -55,7 +54,6 @@
             align-items: center;
             gap: 10px;
             font-weight: 600;
-            letter-spacing: 0.02em;
         }
 
         .brand-logo {
@@ -66,21 +64,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #e5e7eb;
+            color: white;
             font-size: 15px;
             box-shadow: 0 8px 20px rgba(79,70,229,0.45);
         }
 
-        .nav-link {
-            font-size: 14px;
-            padding: 8px 14px;
-            border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.35);
-            color: var(--text-muted);
-            text-decoration: none;
-        }
-
-        /* Theme toggle */
         .theme-toggle {
             display: inline-flex;
             align-items: center;
@@ -88,27 +76,30 @@
             padding: 8px 14px;
             border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.4);
-            background: rgba(15,23,42,0.02);
             cursor: pointer;
             font-size: 13px;
+            background: rgba(15,23,42,0.02);
             color: var(--text-muted);
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Main layout */
         .layout {
             display: grid;
             grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
             gap: 28px;
-            align-items: stretch;
         }
 
-        /* Listener Card */
+        .hero-title {
+            font-size: 34px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .hero-sub {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
         .card {
             background: var(--card-bg);
             padding: 32px 30px 30px;
@@ -124,14 +115,12 @@
             margin-bottom: 20px;
         }
 
-        /* Language dropdown */
         .language-select {
             padding: 8px 12px;
             font-size: 13px;
             border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.4);
             background: var(--surface);
-            color: var(--text-main);
             cursor: pointer;
         }
 
@@ -153,13 +142,13 @@
 
         #startBtn {
             background: linear-gradient(92deg, #22c55e, #16a34a);
-            color: #fff;
+            color: white;
         }
 
         #stopBtn {
             display: none;
             background: linear-gradient(92deg, #ef4444, #dc2626);
-            color: #fff;
+            color: white;
         }
 
         .output-box {
@@ -167,8 +156,64 @@
             padding: 16px;
             border-radius: 14px;
             border: 1px solid rgba(148,163,184,0.55);
-            font-size: 14px;
             min-height: 75px;
+            font-size: 14px;
+            white-space: pre-line;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: white;
+        }
+
+        .regen-btn {
+            background: linear-gradient(92deg, #0ea5e9, #0284c7);
+            color: white;
+        }
+
+        /* TEXT MODE */
+        .text-mode {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px dashed rgba(148,163,184,0.6);
+        }
+
+        .text-input,
+        .text-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(148,163,184,0.7);
+            padding: 10px 11px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            background: var(--surface);
+            color: var(--text-main);
+        }
+
+        .text-button {
+            margin-top: 6px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: #f9fafb;
+            width: 100%;
+        }
+
+        @media (max-width: 790px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -176,24 +221,18 @@
 <body>
 <div class="page">
 
-    <!-- Navigation -->
+    <!-- Nav -->
     <header class="nav">
         <div class="brand">
             <div class="brand-logo">RB</div>
             <div>ReadyBrainAI</div>
         </div>
-        <div class="nav-right">
-            <button id="themeToggle" class="theme-toggle">
-                <span>🌙</span> Dark mode
-            </button>
-            <a href="/" class="nav-link">← Back to main site</a>
-        </div>
+
+        <button id="themeToggle" class="theme-toggle">🌙 Dark mode</button>
     </header>
 
-    <!-- Main -->
     <main class="layout">
 
-        <!-- Left side text -->
         <section class="hero-text">
             <div class="hero-pill">🔴 Live prototype · Voice interview coach</div>
             <h1 class="hero-title">Practice real answers, not perfect sentences.</h1>
@@ -203,18 +242,15 @@
             </p>
         </section>
 
-        <!-- Listener Card -->
+        <!-- Listening Card -->
         <section class="card">
 
             <div class="card-header">
-                <div class="card-title">
-                    <span>🎤</span>
-                    <h2>ReadyBrainAI Listener</h2>
-                </div>
+                <h2>🎤 ReadyBrainAI Listener</h2>
 
-                <!-- NEW multilingual dropdown -->
                 <select id="languageSelect" class="language-select">
-                    <option value="en">English (Default)</option>
+                    <option value="auto">🌍 Auto Detect (Recommended)</option>
+                    <option value="en">English</option>
                     <option value="my">မြန်မာ (Burmese)</option>
                     <option value="ja">日本語 (Japanese)</option>
                     <option value="es">Español (Spanish)</option>
@@ -222,10 +258,6 @@
                     <option value="zh">中文 (Chinese)</option>
                 </select>
             </div>
-
-            <p class="card-sub">
-                Speak naturally. ReadyBrainAI listens, transcribes, and rewrites your answer.
-            </p>
 
             <div class="button-row">
                 <button id="startBtn" onclick="startListening()">Start Recording</button>
@@ -240,18 +272,62 @@
             <h3>ReadyBrainAI Answer:</h3>
             <div id="answer" class="output-box"></div>
 
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="copy-btn" onclick="copyAnswer()">Copy Answer</button>
+                <button class="regen-btn" onclick="regenerateAnswer()">Regenerate</button>
+            </div>
+
+            <!-- TEXT MODE -->
+            <div class="text-mode">
+                <div class="text-mode-label">💬 Text Mode (beta)</div>
+
+                <textarea id="textQuestion" class="text-textarea" placeholder="Type the interview question here..."></textarea>
+
+                <div class="text-mode-row">
+                    <input id="textJobRole" class="text-input" placeholder="Job role (optional)" />
+                    <input id="textBackground" class="text-input" placeholder="Your background (optional)" />
+                </div>
+
+                <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Text Answer</button>
+
+                <div id="textStatus" class="text-status"></div>
+            </div>
+
         </section>
     </main>
 </div>
 
-<!-- Script -->
+<!-- Scripts -->
 <script src="/static/interview.js"></script>
 
 <script>
-    // theme toggle
+    // Theme toggle
     document.getElementById("themeToggle").addEventListener("click", () => {
         document.body.classList.toggle("dark-mode");
     });
+
+    // Copy button
+    function copyAnswer() {
+        const answer = document.getElementById("answer").innerText;
+        navigator.clipboard.writeText(answer);
+    }
+
+    // Regenerate button
+    async function regenerateAnswer() {
+        const spoken = document.getElementById("question").innerText;
+
+        if (!spoken.trim()) return;
+
+        const res = await fetch("/interview_regen", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: spoken })
+        });
+
+        const data = await res.json();
+        document.getElementById("answer").innerText = data.answer || "(no answer)";
+    }
 </script>
 
 </body>
