@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: "Inter", Arial, sans-serif;
-            background: linear-gradient(135deg, #e8edff, #fdfcff);
+            background: linear-gradient(135deg, #eef2ff, #fafaff);
             padding: 40px;
             margin: 0;
         }
@@ -20,12 +20,12 @@
             background: white;
             padding: 45px;
             border-radius: 22px;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.10);
+            box-shadow: 0 12px 45px rgba(0,0,0,0.12);
             animation: fadeIn 0.5s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -33,8 +33,8 @@
         h2 {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 30px;
+            gap: 12px;
+            font-size: 32px;
             margin-top: 0;
             color: #0f172a;
         }
@@ -43,7 +43,7 @@
         .description {
             margin-bottom: 25px;
             color: #475569;
-            font-size: 15.5px;
+            font-size: 16px;
         }
 
         /* BUTTON ROW */
@@ -59,10 +59,10 @@
             font-size: 17px;
             font-weight: 600;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             cursor: pointer;
             transition: 0.2s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
         }
 
         #startBtn {
@@ -71,8 +71,8 @@
         }
 
         #startBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(34,197,94,0.45);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(34,197,94,0.45);
         }
 
         #stopBtn {
@@ -82,8 +82,8 @@
         }
 
         #stopBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(239,68,68,0.45);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(239,68,68,0.45);
         }
 
         /* STATUS TEXT */
@@ -99,7 +99,7 @@
         h3 {
             margin-bottom: 10px;
             color: #1e293b;
-            font-size: 19px;
+            font-size: 20px;
         }
 
         /* OUTPUT BOXES */
@@ -110,15 +110,29 @@
             min-height: 75px;
             border: 1px solid #e2e8f0;
             font-size: 15.5px;
-            line-height: 1.4;
+            line-height: 1.45;
             animation: fadeLight 0.3s ease;
+            white-space: pre-line;
         }
 
         @keyframes fadeLight {
-            from { opacity: 0.2; }
+            from { opacity: 0.3; }
             to { opacity: 1; }
         }
 
+        /* LOADING ANIMATION */
+        .loading-dots::after {
+            content: "";
+            animation: dots 1.4s infinite steps(4);
+        }
+
+        @keyframes dots {
+            0% { content: ""; }
+            25% { content: "."; }
+            50% { content: ".."; }
+            75% { content: "..."; }
+            100% { content: ""; }
+        }
     </style>
 </head>
 
