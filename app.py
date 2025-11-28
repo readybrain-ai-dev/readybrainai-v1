@@ -161,14 +161,36 @@ def interview_listen():
             })
 
         # -------------------------
-        # SIMPLE UNCLEAR AUDIO CHECK (FIXED)
+        # UNCLEAR / NOISE CHECK
         # -------------------------
-        if not spoken_text or spoken_text.strip() == "" or len(spoken_text.strip()) < 4:
+        clean_text = spoken_text.strip()
+
+        # 1) Empty or tiny text → unclear
+        if not clean_text or len(clean_text) < 4:
             return jsonify({
                 "question": "(unclear)",
                 "answer": "Unclear. Please try again.",
                 "detected_language": detected_lang
             })
+
+        # 2) High no-speech probability in segments → mostly noise
+        segments = getattr(result, "segments", None)
+        if segments:
+            max_no_speech = 0.0
+            for seg in segments:
+                if isinstance(seg, dict):
+                    prob = seg.get("no_speech_prob", 0.0)
+                else:
+                    prob = getattr(seg, "no_speech_prob", 0.0)
+                if prob > max_no_speech:
+                    max_no_speech = prob
+
+            if max_no_speech > 0.8:
+                return jsonify({
+                    "question": "(unclear)",
+                    "answer": "Unclear. Please try again.",
+                    "detected_language": detected_lang
+                })
 
         # -------------------------
         # OUTPUT LANGUAGE DECISION
