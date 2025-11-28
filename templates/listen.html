@@ -230,6 +230,18 @@
             margin-bottom: 8px;
         }
 
+        /* AD BOX */
+        .ad-box {
+            background: var(--surface);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 14px;
+            border: 1px dashed rgba(148,163,184,0.5);
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
         /* ACTION BUTTONS */
         .action-buttons {
             display: flex;
@@ -332,7 +344,6 @@
             <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
                 <option value="same">🟦 Same as spoken</option>
                 <option value="en">🇺🇸 English</option>
-                <!-- Removed Burmese -->
                 <option value="ja">🇯🇵 Japanese</option>
                 <option value="ko">🇰🇷 Korean</option>
                 <option value="zh">🇨🇳 Chinese</option>
@@ -351,6 +362,11 @@
 
             <h3>Improved Answer:</h3>
             <div id="answer" class="output-box"></div>
+
+            <!-- ⭐ AD PLACEHOLDER -->
+            <div class="ad-box">
+                📢 Advertisement (coming soon)
+            </div>
 
             <div class="action-buttons">
                 <button class="copy-btn" onclick="copyAnswer()">Copy</button>
