@@ -120,23 +120,19 @@ def interview_listen():
             }), 500
 
         # -------------------------
-        # 🔊 TRANSCRIBE (with language hint)
+        # 🔊 TRANSCRIBE
         # -------------------------
         def transcribe(language_hint=None):
-            """Helper to call Whisper with optional language hint."""
             with open(wav_path, "rb") as f:
                 return client.audio.transcriptions.create(
                     model="whisper-1",
                     file=f,
                     response_format="verbose_json",
                     temperature=0,
-                    # If language_hint is None, Whisper will auto-detect
                     language=language_hint
                 )
 
         try:
-            # If user chose auto → let Whisper detect
-            # If user chose a code (en, my, etc.) → pass that as hint
             lang_hint = None if input_lang == "auto" else input_lang
             print(f"🔊 Transcribing with whisper-1 (lang_hint={lang_hint})")
 
@@ -147,9 +143,9 @@ def interview_listen():
             print("🗣 Speech:", spoken_text)
             print("🌐 Detected:", detected_lang)
 
-            # If almost empty and user explicitly chose Burmese, retry
+            # If very short + Burmese hint requested
             if len(spoken_text) < 2 and input_lang == "my":
-                print("⚠ Very short transcript, retrying with Burmese hint...")
+                print("⚠ Short transcript, retrying with Burmese hint...")
                 result = transcribe("my")
                 spoken_text = (result.text or "").strip()
                 detected_lang = getattr(result, "language", None) or "my"
@@ -165,20 +161,18 @@ def interview_listen():
             })
 
         # -------------------------
-        # CHECK IF CLEAR SPEECH
+        # SIMPLE UNCLEAR AUDIO CHECK (FIXED)
         # -------------------------
-        if len(spoken_text) < 2:
+        if not spoken_text or spoken_text.strip() == "" or len(spoken_text.strip()) < 4:
             return jsonify({
                 "question": "(unclear)",
-                "answer": "I couldn't hear anything clearly.",
+                "answer": "Unclear. Please try again.",
                 "detected_language": detected_lang
             })
 
         # -------------------------
         # OUTPUT LANGUAGE DECISION
         # -------------------------
-        # If user wants "same", use detected_lang if we have it,
-        # else fall back to input_lang or English.
         if output_lang == "same":
             if detected_lang and detected_lang != "unknown":
                 final_lang = detected_lang
@@ -239,7 +233,6 @@ Rules:
         })
 
     finally:
-        # Clean temp files
         for p in (input_path, wav_path):
             if p and os.path.exists(p):
                 try:
