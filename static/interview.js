@@ -3,7 +3,7 @@ let audioChunks = [];
 let currentMimeType = null;
 
 // =====================================================
-// PICK BEST MIME TYPE (CROSS-PLATFORM)
+// CHOOSE THE BEST MIME TYPE (CROSS-PLATFORM SUPPORT)
 // =====================================================
 function chooseMimeType() {
     const mimeTypes = [
@@ -17,17 +17,17 @@ function chooseMimeType() {
 
     for (const t of mimeTypes) {
         if (MediaRecorder.isTypeSupported(t)) {
-            console.log("✓ Using MIME:", t);
+            console.log("Using MIME:", t);
             return t;
         }
     }
 
-    console.warn("⚠ No supported MIME type found — using fallback.");
+    console.warn("⚠ No supported MIME type found. Using empty fallback.");
     return "";
 }
 
 // =====================================================
-// RESET UI FOR NEW RECORDING
+// RESET UI BEFORE NEW RECORDING
 // =====================================================
 function resetUI() {
     document.getElementById("question").innerText = "";
@@ -50,44 +50,46 @@ async function startListening() {
 
     startBtn.style.display = "none";
     stopBtn.style.display  = "inline-block";
-    status.innerText = "🎙 Listening… please speak clearly.";
+    status.innerText = "🎙 Listening… Speak clearly";
 
     let stream;
     try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
-        status.innerText = "❌ Microphone access blocked.";
+        status.innerText = "❌ Microphone blocked.";
         return;
     }
 
     currentMimeType = chooseMimeType();
+
     let options = {};
     if (currentMimeType) options.mimeType = currentMimeType;
 
+    // Try to create MediaRecorder
     try {
         mediaRecorder = new MediaRecorder(stream, options);
     } catch (err) {
-        console.warn("Primary MIME failed — trying OGG fallback…");
+        console.warn("Main MIME failed. Trying ogg…");
 
         try {
             mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/ogg" });
             currentMimeType = "audio/ogg";
         } catch (err2) {
-            status.innerText = "❌ Your device does not support recording.";
+            status.innerText = "❌ Recording not supported on this device.";
             return;
         }
     }
 
-    mediaRecorder.ondataavailable = (e) => {
+    mediaRecorder.ondataavailable = e => {
         if (e.data && e.data.size > 0) audioChunks.push(e.data);
     };
 
     mediaRecorder.start();
-    console.log("🎧 Recording started.");
+    console.log("🎧 Recording started");
 }
 
 // =====================================================
-// STOP LISTENING & PROCESS
+// STOP LISTENING
 // =====================================================
 async function stopListening() {
     const startBtn = document.getElementById("startBtn");
@@ -98,7 +100,7 @@ async function stopListening() {
 
     stopBtn.style.display  = "none";
     startBtn.style.display = "inline-block";
-    status.innerText = "⏳ Processing audio… please wait.";
+    status.innerText = "⏳ Processing… Please wait";
 
     if (!mediaRecorder || mediaRecorder.state === "inactive") {
         status.innerText = "Idle";
@@ -108,40 +110,40 @@ async function stopListening() {
     mediaRecorder.stop();
 
     mediaRecorder.onstop = async () => {
-        await new Promise(r => setTimeout(r, 200)); // gather final chunks
+        await new Promise(r => setTimeout(r, 200)); // gather chunks
 
         let blob;
         try {
             blob = new Blob(audioChunks, { type: currentMimeType });
-        } catch {
+        } catch (err) {
             blob = new Blob(audioChunks, { type: "audio/ogg" });
             currentMimeType = "audio/ogg";
         }
 
         if (blob.size < 800) {
-            status.innerText = "❌ No voice detected.";
-            qBox.innerText = "(No speech detected)";
-            aBox.innerText = "(No output)";
+            status.innerText = "❌ No audio detected.";
+            qBox.innerText = "(no voice captured)";
+            aBox.innerText = "(no answer)";
             return;
         }
 
-        // Determine file extension
+        // Determine extension
         let ext = "webm";
-        if (currentMimeType.includes("ogg"))  ext = "ogg";
-        if (currentMimeType.includes("mp4"))  ext = "mp4";
+        if (currentMimeType.includes("ogg")) ext = "ogg";
+        if (currentMimeType.includes("mp4")) ext = "mp4";
         if (currentMimeType.includes("mpeg")) ext = "mp3";
 
         const formData = new FormData();
         formData.append("audio", blob, "speech." + ext);
 
-        // language settings
+        // Language settings
         const inputLang  = document.getElementById("languageSelect")?.value || "auto";
         const outputLang = document.getElementById("outputLanguage")?.value || "same";
 
         formData.append("language", inputLang);
         formData.append("output_language", outputLang);
 
-        // fetch backend
+        // Fetch backend result
         let data;
         try {
             const res = await fetch("/interview_listen", {
@@ -151,17 +153,17 @@ async function stopListening() {
             data = await res.json();
         } catch (err) {
             status.innerText = "Idle";
-            qBox.innerText = "(Server error)";
-            aBox.innerText = "Could not reach server.";
+            qBox.innerText = "(server error)";
+            aBox.innerText = "Could not connect to server.";
             return;
         }
 
-        // display result
-        qBox.innerText = data.question ?? "(No transcript)";
-        aBox.innerText = data.answer ?? "(No improved answer)";
+        // Show results
+        qBox.innerText = data.question ?? "(no text)";
+        aBox.innerText = data.answer ?? "(no answer)";
         status.innerText = "Idle";
 
-        // detected language tag
+        // Detected language tag
         if (data.detected_language) {
             const tag = document.createElement("div");
             tag.id = "detectedLang";
@@ -191,11 +193,11 @@ async function regenerateAnswer() {
     const aBox = document.getElementById("answer");
 
     if (!spoken) {
-        aBox.innerText = "(No text to regenerate)";
+        aBox.innerText = "(no text to regenerate)";
         return;
     }
 
-    aBox.innerText = "⏳ Regenerating answer…";
+    aBox.innerText = "⏳ Regenerating…";
 
     try {
         const res = await fetch("/interview_regen", {
@@ -203,11 +205,10 @@ async function regenerateAnswer() {
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ text: spoken })
         });
-
         const data = await res.json();
-        aBox.innerText = data.answer || "(No answer)";
+        aBox.innerText = data.answer || "(no answer)";
     } catch {
-        aBox.innerText = "(Server error)";
+        aBox.innerText = "(server error)";
     }
 }
 
@@ -222,11 +223,11 @@ async function generateTextAnswer() {
     const aBox     = document.getElementById("answer");
 
     if (!question) {
-        statusEl.innerText = "Please enter your question first.";
+        statusEl.innerText = "Please type the interview question first.";
         return;
     }
 
-    statusEl.innerText = "⏳ Generating answer…";
+    statusEl.innerText = "⏳ Generating…";
 
     try {
         const res = await fetch("/interview_answer", {
@@ -236,9 +237,9 @@ async function generateTextAnswer() {
         });
 
         const data = await res.json();
-        aBox.innerText = data.answer || "(No answer)";
+        aBox.innerText = data.answer || "(no answer)";
         statusEl.innerText = "Done.";
-    } catch {
-        statusEl.innerText = "Error: Could not generate answer.";
+    } catch (err) {
+        statusEl.innerText = "Error: could not generate answer.";
     }
 }
