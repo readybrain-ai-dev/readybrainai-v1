@@ -332,7 +332,7 @@
             <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
                 <option value="same">🟦 Same as spoken</option>
                 <option value="en">🇺🇸 English</option>
-                <option value="my">🇲🇲 Burmese</option>
+                <!-- Removed Burmese -->
                 <option value="ja">🇯🇵 Japanese</option>
                 <option value="ko">🇰🇷 Korean</option>
                 <option value="zh">🇨🇳 Chinese</option>
@@ -383,12 +383,9 @@
 
     document.getElementById("themeToggle").addEventListener("click", () => {
         document.body.classList.toggle("dark-mode");
-        localStorage.setItem(
-            "rb-dark", 
-            document.body.classList.contains("dark-mode")
-        );
+        localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
     });
 </script>
 
 </body>
-</html>" 
+</html>
