@@ -1,4 +1,6 @@
-/* ===== Global Styles ===== */
+/* =======================================================
+   GLOBAL – Clean, modern, premium SaaS quality
+======================================================= */
 
 *,
 *::before,
@@ -12,16 +14,15 @@ html {
 
 body {
     margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Segoe UI", sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "SF Pro Text", "Segoe UI", sans-serif;
     color: #0f172a;
     background:
-        radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(14, 116, 144, 0.18), transparent 55%),
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.12), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(14, 116, 144, 0.15), transparent 55%),
         #f8fafc;
+    transition: background 0.3s ease, color 0.3s ease;
 }
-
-/* ===== Layout ===== */
 
 .container {
     width: 100%;
@@ -30,29 +31,36 @@ body {
     padding: 0 1.25rem;
 }
 
-/* ===== Navbar ===== */
+/* =======================================================
+   NAVBAR – glass premium
+======================================================= */
 
 .navbar {
     position: sticky;
     top: 0;
-    z-index: 20;
-    background: radial-gradient(circle at top left, #111827, #020617);
-    background-color: rgba(15, 23, 42, 0.94);
+    z-index: 50;
+    background: rgba(2, 6, 23, 0.80);
     backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    transition: backdrop-filter 0.3s ease, background 0.3s ease;
 }
 
 .nav-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.8rem 0;
+    padding: 0.85rem 0;
 }
 
 .logo {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    transition: opacity 0.2s ease;
+}
+
+.logo:hover {
+    opacity: 0.85;
 }
 
 .logo-mark {
@@ -63,10 +71,10 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     background: radial-gradient(circle at 0% 0%, #4f46e5, #0f172a);
     color: #e5e7eb;
-    box-shadow: 0 10px 25px rgba(31, 41, 55, 0.6);
+    box-shadow: 0 10px 28px rgba(31, 41, 55, 0.55);
 }
 
 .logo-text {
@@ -78,7 +86,7 @@ body {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1.25rem;
     font-size: 0.9rem;
 }
 
@@ -87,6 +95,7 @@ body {
     text-decoration: none;
     padding: 0.25rem 0.1rem;
     position: relative;
+    transition: color 0.2s ease;
 }
 
 .nav-links a::after {
@@ -102,7 +111,7 @@ body {
 }
 
 .nav-links a:hover {
-    color: #ffffff;
+    color: white;
 }
 
 .nav-links a:hover::after {
@@ -113,45 +122,53 @@ body {
     padding: 0.45rem 0.9rem;
     border-radius: 999px;
     border: 1px solid rgba(191, 219, 254, 0.8);
-    background: rgba(15, 23, 42, 0.1);
+    background: rgba(15, 23, 42, 0.15);
+    transition: background 0.2s ease, transform 0.15s ease;
 }
 
-/* ===== Hero ===== */
+.nav-cta:hover {
+    background: rgba(15, 23, 42, 0.35);
+    transform: translateY(-1px);
+}
+
+/* =======================================================
+   HERO – premium gradient + floating card
+======================================================= */
 
 .hero {
     background: radial-gradient(circle at top left, #4f46e5, #1d4ed8, #020617);
     color: #e5e7eb;
-    padding: 4.5rem 0 4rem;
+    padding: 4.8rem 0 4.5rem;
 }
 
 .hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: 2.5rem;
+    gap: 3rem;
     align-items: center;
 }
 
 .hero-content {
-    max-width: 640px;
+    max-width: 660px;
 }
 
 .hero-badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.3rem 0.9rem;
+    padding: 0.35rem 0.9rem;
     border-radius: 999px;
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(165, 180, 252, 0.6);
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(165, 180, 252, 0.55);
     font-size: 0.75rem;
-    text-transform: uppercase;
     letter-spacing: 0.09em;
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
 }
 
 .hero-title {
-    font-size: 2.6rem;
-    line-height: 1.12;
-    margin: 0 0 1rem;
+    font-size: 2.75rem;
+    line-height: 1.15;
+    margin: 0 0 1.2rem;
 }
 
 .hero-title .accent {
@@ -161,21 +178,21 @@ body {
 }
 
 .hero-subtitle {
-    font-size: 1.05rem;
-    line-height: 1.6;
+    font-size: 1.08rem;
+    line-height: 1.65;
     color: #e2e8f0;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.7rem;
 }
 
 .hero-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.85rem;
+    margin-bottom: 0.9rem;
 }
 
 .hero-note {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     color: #cbd5f5;
 }
 
@@ -183,36 +200,44 @@ body {
     display: flex;
     flex-wrap: wrap;
     margin-top: 1rem;
-    gap: 0.5rem;
+    gap: 0.55rem;
 }
 
 .trust-pill {
-    padding: 0.3rem 0.8rem;
+    padding: 0.32rem 0.8rem;
     border-radius: 999px;
     border: 1px solid rgba(191, 219, 254, 0.6);
+    background: rgba(15, 23, 42, 0.55);
     font-size: 0.75rem;
-    background: rgba(15, 23, 42, 0.5);
 }
 
-/* Hero right card */
+/* -------------------------------------------------------
+   Hero Right Card (AI preview)
+------------------------------------------------------- */
 
 .hero-card {
-    max-width: 420px;
+    max-width: 410px;
 }
 
 .hero-card-inner {
-    background: rgba(15, 23, 42, 0.9);
-    border-radius: 1.5rem;
-    padding: 1.4rem;
-    border: 1px solid rgba(148, 163, 184, 0.6);
-    box-shadow: 0 25px 50px rgba(15, 23, 42, 0.8);
-    animation: floatCard 6s ease-in-out infinite alternate;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(3px);
+    border-radius: 1.45rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.7);
+    animation: floatCard 6.5s ease-in-out infinite alternate;
+    transition: transform 0.25s ease;
+}
+
+.hero-card-inner:hover {
+    transform: translateY(-4px);
 }
 
 .hero-card-label {
     font-size: 0.8rem;
     color: #cbd5f5;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.8rem;
 }
 
 .hero-conversation {
@@ -224,7 +249,7 @@ body {
 
 .bubble {
     border-radius: 0.9rem;
-    padding: 0.6rem 0.75rem;
+    padding: 0.65rem 0.75rem;
     font-size: 0.85rem;
     line-height: 1.5;
 }
@@ -250,61 +275,65 @@ body {
 .hero-card-footer {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.45rem;
 }
 
 .pill.small {
     font-size: 0.7rem;
-    padding: 0.25rem 0.55rem;
+    padding: 0.26rem 0.56rem;
     border-radius: 999px;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(148, 163, 184, 0.65);
 }
 
-/* ===== Buttons ===== */
+/* =======================================================
+   BUTTONS – premium micro-interactions
+======================================================= */
 
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.7rem 1.3rem;
+    padding: 0.7rem 1.35rem;
     border-radius: 999px;
     border: none;
-    font-size: 0.95rem;
+    font-size: 0.96rem;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
-    transition: transform 0.12s ease, box-shadow 0.12s ease,
-        background 0.12s ease, opacity 0.12s ease;
+    transition:
+        transform 0.12s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease,
+        opacity 0.1s ease;
     white-space: nowrap;
 }
 
 .btn-primary {
     background: linear-gradient(to right, #4f46e5, #3b82f6);
     color: white;
-    box-shadow: 0 14px 35px rgba(37, 99, 235, 0.45);
+    box-shadow: 0 14px 38px rgba(37, 99, 235, 0.45);
 }
 
 .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 18px 45px rgba(37, 99, 235, 0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 48px rgba(37, 99, 235, 0.55);
 }
 
 .btn-primary:active {
     transform: translateY(0);
-    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
     opacity: 0.9;
 }
 
 .btn-secondary {
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15, 23, 42, 0.82);
     color: #e5e7eb;
     border: 1px solid rgba(148, 163, 184, 0.8);
 }
 
 .btn-secondary:hover {
-    transform: translateY(-1px);
-    background: rgba(15, 23, 42, 1);
+    transform: translateY(-2px);
+    background: rgba(15, 23, 42, 0.96);
 }
 
 .btn-center {
@@ -315,10 +344,12 @@ body {
     width: 100%;
 }
 
-/* ===== Sections ===== */
+/* =======================================================
+   SECTIONS – spacing + less cramped + more premium
+======================================================= */
 
 .section {
-    padding: 3.8rem 0;
+    padding: 4.2rem 0;
 }
 
 .section-alt {
@@ -331,69 +362,75 @@ body {
 }
 
 .section-title {
-    font-size: 1.9rem;
-    margin-bottom: 0.75rem;
+    font-size: 1.95rem;
+    margin-bottom: 0.85rem;
 }
 
 .section-title.small {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
 }
 
 .section-subtitle {
-    font-size: 0.98rem;
+    font-size: 1rem;
     max-width: 640px;
     color: #64748b;
 }
 
-/* ===== Feature Grid ===== */
+/* =======================================================
+   FEATURE CARDS – cleaner hover + better spacing
+======================================================= */
 
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.3rem;
-    margin-top: 2rem;
+    gap: 1.4rem;
+    margin-top: 2.2rem;
 }
 
 .feature-card {
     background: white;
-    border-radius: 1rem;
-    padding: 1.3rem;
+    border-radius: 1.05rem;
+    padding: 1.4rem;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
     font-size: 0.92rem;
-    transition: transform 0.16s ease, box-shadow 0.16s ease,
-        border-color 0.16s ease;
+    transition: transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
 }
 
 .feature-card h3 {
     margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
+    margin-bottom: 0.6rem;
+    font-size: 1.05rem;
 }
 
 .feature-card:hover {
     transform: translateY(-3px);
-    border-color: #c4d3ff;
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    border-color: #c7d7ff;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
 }
 
-/* ===== Steps ===== */
+/* =======================================================
+   STEPS
+======================================================= */
 
 .steps-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.3rem;
-    margin-top: 2rem;
+    gap: 1.35rem;
+    margin-top: 2.2rem;
 }
 
 .step {
     background: rgba(15, 23, 42, 0.95);
     border-radius: 1rem;
-    padding: 1.3rem;
-    border: 1px solid rgba(148, 163, 184, 0.7);
-    font-size: 0.95rem;
-    transition: transform 0.16s ease, box-shadow 0.16s ease,
-        border-color 0.16s ease;
+    padding: 1.4rem;
+    border: 1px solid rgba(148, 163, 184, 0.65);
+    font-size: 0.96rem;
+    transition: transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
 }
 
 .step-number {
@@ -411,11 +448,13 @@ body {
 
 .step:hover {
     transform: translateY(-3px);
-    border-color: rgba(129, 140, 248, 0.9);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
+    border-color: rgba(129, 140, 248, 0.95);
+    box-shadow: 0 22px 48px rgba(15, 23, 42, 0.55);
 }
 
-/* ===== Two Column Cards ===== */
+/* =======================================================
+   TWO COLUMN CARDS
+======================================================= */
 
 .two-column {
     display: grid;
@@ -425,37 +464,36 @@ body {
 
 .column-card {
     background: white;
-    border-radius: 1.2rem;
-    padding: 1.4rem 1.5rem;
+    border-radius: 1.15rem;
+    padding: 1.5rem;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
-    transition: transform 0.16s ease, box-shadow 0.16s ease,
-        border-color 0.16s ease;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+    transition: transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .column-card:hover {
     transform: translateY(-2px);
     border-color: #d0e2ff;
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.07);
 }
 
-.section-subtitle.small {
-    font-size: 0.9rem;
-}
-
-/* ===== Checklist ===== */
+/* =======================================================
+   CHECKLIST
+======================================================= */
 
 .checklist {
     list-style: none;
+    margin-top: 1.1rem;
     padding: 0;
-    margin: 1rem 0 0;
     font-size: 0.95rem;
 }
 
 .checklist li {
     position: relative;
     padding-left: 1.4rem;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.42rem;
 }
 
 .checklist li::before {
@@ -467,22 +505,24 @@ body {
     font-weight: 700;
 }
 
-/* ===== Founder ===== */
+/* =======================================================
+   FOUNDER CARD
+======================================================= */
 
 .founder-grid {
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 1.8rem;
+    gap: 1.85rem;
     align-items: flex-start;
 }
 
 .founder-card {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.82);
     border-radius: 1.3rem;
-    padding: 1.4rem 1.6rem;
-    border: 1px solid rgba(148, 163, 184, 0.8);
-    font-size: 0.96rem;
-    line-height: 1.6;
+    padding: 1.5rem 1.6rem;
+    border: 1px solid rgba(148, 163, 184, 0.75);
+    font-size: 0.97rem;
+    line-height: 1.62;
 }
 
 .founder-sign {
@@ -491,43 +531,47 @@ body {
     color: #e5e7eb;
 }
 
-/* ===== Demo ===== */
+/* =======================================================
+   DEMO CARD
+======================================================= */
 
 .demo-card {
     background: white;
     border-radius: 1.3rem;
-    padding: 1.8rem 1.6rem;
+    padding: 1.9rem 1.6rem;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.06);
     text-align: center;
 }
 
 .demo-note {
-    margin-top: 0.9rem;
+    margin-top: 1rem;
     font-size: 0.88rem;
     color: #64748b;
 }
 
-/* ===== Waitlist ===== */
+/* =======================================================
+   WAITLIST
+======================================================= */
 
 .waitlist-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: 1.7rem;
+    gap: 1.85rem;
     align-items: flex-start;
 }
 
 .waitlist-card {
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.92);
     border-radius: 1.2rem;
-    padding: 1.5rem 1.6rem;
+    padding: 1.55rem 1.6rem;
     border: 1px solid rgba(148, 163, 184, 0.9);
 }
 
 .waitlist-form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
     font-size: 0.9rem;
 }
 
@@ -537,12 +581,18 @@ body {
 
 .waitlist-form input,
 .waitlist-form select {
-    border-radius: 0.7rem;
-    border: 1px solid rgba(148, 163, 184, 0.9);
-    padding: 0.5rem 0.6rem;
-    font-size: 0.9rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.95);
+    padding: 0.55rem 0.7rem;
+    font-size: 0.92rem;
     background: rgba(15, 23, 42, 0.95);
     color: #e5e7eb;
+    transition: border-color 0.15s ease;
+}
+
+.waitlist-form input:hover,
+.waitlist-form select:hover {
+    border-color: rgba(129, 140, 248, 0.9);
 }
 
 .waitlist-form input::placeholder {
@@ -550,18 +600,20 @@ body {
 }
 
 .form-note {
-    margin-top: 0.4rem;
+    margin-top: 0.45rem;
     font-size: 0.78rem;
     color: #cbd5f5;
 }
 
-/* ===== Footer ===== */
+/* =======================================================
+   FOOTER
+======================================================= */
 
 .footer {
-    padding: 1.8rem 0 2.2rem;
+    padding: 2rem 0 2.4rem;
     background: #020617;
     color: #e5e7eb;
-    border-top: 1px solid rgba(30, 64, 175, 0.8);
+    border-top: 1px solid rgba(30, 64, 175, 0.85);
 }
 
 .footer-content {
@@ -574,7 +626,9 @@ body {
     color: #9ca3af;
 }
 
-/* ===== Animations ===== */
+/* =======================================================
+   ANIMATIONS
+======================================================= */
 
 @keyframes floatCard {
     from {
@@ -585,7 +639,9 @@ body {
     }
 }
 
-/* ===== Responsive ===== */
+/* =======================================================
+   RESPONSIVE
+======================================================= */
 
 @media (max-width: 900px) {
     .hero-grid,
@@ -594,36 +650,28 @@ body {
     .two-column,
     .founder-grid,
     .waitlist-grid {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: 1fr;
     }
 
     .hero {
-        padding-top: 3.5rem;
+        padding-top: 3.3rem;
     }
 
     .nav-links {
-        display: none; /* mobile: keep it simple for now */
+        display: none;
     }
 
     .hero-card {
         order: -1;
     }
-
-    .feature-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .steps-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
 }
 
 @media (max-width: 600px) {
     .hero-title {
-        font-size: 2.1rem;
+        font-size: 2.2rem;
     }
 
     .section {
-        padding: 3rem 0;
+        padding: 3.2rem 0;
     }
 }

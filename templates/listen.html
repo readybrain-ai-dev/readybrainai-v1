@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ReadyBrainAI Listener</title>
+    <title>ReadyBrain AI – Voice Interview Coach</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -287,11 +287,11 @@
     <header class="nav">
         <div class="brand">
             <div class="brand-logo">RB</div>
-            <div>ReadyBrainAI</div>
+            <div>ReadyBrain AI</div>
         </div>
 
         <div class="nav-buttons">
-            <a href="/" class="back-btn">← Back to main site</a>
+            <a href="/" class="back-btn">← Back to Home</a>
             <button id="themeToggle" class="theme-toggle">🌙</button>
         </div>
     </header>
@@ -301,11 +301,11 @@
         <section class="hero-text">
             <div class="hero-pill">🔴 Live prototype · Voice Interview Coach</div>
 
-            <h1 class="hero-title">Speak naturally. Get a stronger interview answer.</h1>
+            <h1 class="hero-title">Speak naturally. Get a clearer and stronger answer.</h1>
 
             <p class="hero-sub">
-                Record your response, just like in a real interview.
-                ReadyBrainAI instantly rewrites it into a clear, confident, and professional answer —  
+                Record your answer just like a real interview.
+                ReadyBrain AI listens and instantly rewrites it into a clear, confident, and professional response —
                 in the language you choose.
             </p>
         </section>
@@ -314,7 +314,7 @@
         <section class="card">
 
             <div class="card-header">
-                <h2>🎤 Answer Refinement</h2>
+                <h2>🎤 AI Answer Refinement</h2>
 
                 <!-- INPUT LANGUAGE -->
                 <select id="languageSelect" class="select-box">
@@ -328,11 +328,10 @@
             </div>
 
             <!-- OUTPUT LANGUAGE -->
-            <label class="label-inline">Answer output language</label>
+            <label class="label-inline">Output language</label>
             <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
                 <option value="same">🟦 Same as spoken</option>
                 <option value="en">🇺🇸 English</option>
-                <option value="my">🇲🇲 Burmese</option>
                 <option value="ja">🇯🇵 Japanese</option>
                 <option value="ko">🇰🇷 Korean</option>
                 <option value="zh">🇨🇳 Chinese</option>
@@ -344,9 +343,9 @@
                 <button id="stopBtn" onclick="stopListening()">Stop Recording</button>
             </div>
 
-            <p id="status" class="status-line">Idle</p>
+            <p id="status" class="status-line">Idle – waiting for input</p>
 
-            <h3>Your Response:</h3>
+            <h3>Your Answer:</h3>
             <div id="question" class="output-box"></div>
 
             <h3>Improved Answer:</h3>
@@ -360,12 +359,12 @@
             <div class="text-mode">
                 <div>💬 Text Mode (Beta)</div>
 
-                <textarea id="textQuestion" class="text-textarea" placeholder="Type your interview question here..."></textarea>
+                <textarea id="textQuestion" class="text-textarea" placeholder="Type your interview question or short answer here..."></textarea>
 
                 <input id="textJobRole" class="text-input" placeholder="Target role (optional)" />
                 <input id="textBackground" class="text-input" placeholder="Your background (optional)" />
 
-                <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Answer</button>
+                <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Improved Answer</button>
 
                 <div id="textStatus"></div>
             </div>
