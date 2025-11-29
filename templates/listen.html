@@ -37,7 +37,7 @@
             font-family: "Inter", sans-serif;
             background: var(--bg-main);
             color: var(--text-main);
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: 0.3s ease;
         }
 
         .page {
@@ -104,6 +104,17 @@
             color: var(--text-muted);
         }
 
+        /* FOUNDER BADGE */
+        #founderBadge {
+            background: linear-gradient(90deg, #4f46e5, #6366f1);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 10px;
+            display: none; 
+        }
+
         /* LAYOUT */
         .layout {
             display: grid;
@@ -117,7 +128,6 @@
             }
         }
 
-        /* HERO TEXT */
         .hero-title {
             font-size: 32px;
             font-weight: 700;
@@ -136,7 +146,6 @@
             line-height: 1.5;
         }
 
-        /* CARD */
         .card {
             background: var(--card-bg);
             padding: 26px;
@@ -160,7 +169,6 @@
             border: 1px solid rgba(148,163,184,0.45);
         }
 
-        /* BUTTONS */
         .button-row {
             display: flex;
             gap: 10px;
@@ -259,23 +267,17 @@
             cursor: pointer;
         }
 
-        /* BEAUTIFUL POPUP (RESTORED) */
+        /* POPUP */
         #premiumPopup {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(4px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            animation: fadeBackdrop 0.25s ease;
-        }
-
-        @keyframes fadeBackdrop {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            backdrop-filter: blur(4px);
         }
 
         .popup-box {
@@ -284,14 +286,8 @@
             width: 92%;
             max-width: 440px;
             border-radius: 22px;
-            box-shadow: 0 18px 40px rgba(0,0,0,0.25);
             text-align: center;
-            animation: fadePopup 0.25s ease;
-        }
-
-        @keyframes fadePopup {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
+            box-shadow: 0 18px 40px rgba(0,0,0,0.25);
         }
 
         .popup-title {
@@ -311,12 +307,13 @@
             padding: 14px;
             width: 100%;
             border-radius: 999px;
-            background: linear-gradient(92deg, #4f46e5, #636
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: white;
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 14px;
             cursor: pointer;
             border: none;
+            margin-bottom: 12px;
         }
 
         .popup-cancel {
@@ -330,6 +327,18 @@
             cursor: pointer;
             border: none;
         }
+
+        /* ADMIN BUTTON FOR FOUNDER */
+        #adminBtn {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(90deg, #4f46e5, #6366f1);
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+        }
     </style>
 </head>
 
@@ -341,34 +350,30 @@
         <div class="brand">
             <div class="brand-logo">RB</div>
             <div>ReadyBrainAI</div>
+            <div id="founderBadge">FOUNDER</div>
         </div>
 
         <div class="nav-buttons">
-            <a href="/" class="back-btn">← Back to main site</a>
+            <a href="/" class="back-btn">← Back</a>
+            <button id="adminBtn" onclick="window.location='/admin'">Admin Panel</button>
             <button id="themeToggle" class="theme-toggle">🌙</button>
         </div>
     </header>
 
     <main class="layout">
 
-        <section class="hero-text">
+        <section>
             <div class="hero-pill">🔴 Live prototype · Voice Interview Coach</div>
-
             <h1 class="hero-title">Speak naturally. Get a stronger interview answer.</h1>
-
             <p class="hero-sub">
-                Record your response, just like in a real interview.
-                ReadyBrainAI instantly rewrites it into a clear, confident, and professional answer —
-                in the language you choose.
+                Record your answer. ReadyBrainAI rewrites it into a clear, confident,
+                professional reply — instantly, in the language you choose.
             </p>
         </section>
 
-        <!-- LISTENER CARD -->
         <section class="card">
-
             <div class="card-header">
                 <h2>🎤 Answer Refinement</h2>
-
                 <select id="languageSelect" class="select-box">
                     <option value="auto">🌍 Auto Detect</option>
                     <option value="en">🇺🇸 English</option>
@@ -380,13 +385,13 @@
             </div>
 
             <label>Answer output language</label>
-            <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
-                <option value="same">🟦 Same as spoken</option>
-                <option value="en">🇺🇸 English</option>
-                <option value="ja">🇯🇵 Japanese</option>
-                <option value="ko">🇰🇷 Korean</option>
-                <option value="zh">🇨🇳 Chinese</option>
-                <option value="es">🇪🇸 Spanish</option>
+            <select id="outputLanguage" class="select-box">
+                <option value="same">Same</option>
+                <option value="en">English</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+                <option value="zh">Chinese</option>
+                <option value="es">Spanish</option>
             </select>
 
             <div class="button-row">
@@ -403,7 +408,7 @@
             <div id="answer" class="output-box"></div>
 
             <div class="ad-box">
-                📢 Advertisement (coming soon)
+                📢 Advertisement placeholder
             </div>
 
             <div class="action-buttons">
@@ -411,106 +416,77 @@
             </div>
 
             <div class="text-mode">
-                <div>💬 Text Mode (Beta)</div>
-
-                <textarea id="textQuestion" class="text-textarea" placeholder="Type your interview question here..."></textarea>
-
-                <input id="textJobRole" class="text-input" placeholder="Target role (optional)" />
-                <input id="textBackground" class="text-input" placeholder="Your background (optional)" />
-
-                <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Answer</button>
-
+                <div>💬 Text Mode</div>
+                <textarea id="textQuestion" class="text-textarea" placeholder="Type your question..."></textarea>
+                <input id="textJobRole" class="text-input" placeholder="Target role (optional)">
+                <input id="textBackground" class="text-input" placeholder="Your background (optional)">
+                <button class="text-button" onclick="generateTextAnswer()">Generate Answer</button>
                 <div id="textStatus"></div>
             </div>
         </section>
     </main>
 </div>
 
-<!-- PREMIUM POPUP -->
+<!-- POPUP -->
 <div id="premiumPopup">
     <div class="popup-box">
         <div class="popup-title">Daily Limit Reached</div>
-        <div class="popup-msg">
-            You’ve used your free 3 responses for today.<br>
-            Upgrade to Premium for unlimited voice answers.
-        </div>
-        <button class="popup-btn" onclick="window.location='/premium'">Upgrade to Premium</button>
+        <div class="popup-msg">You used your 3 free daily responses.</div>
+        <button class="popup-btn" onclick="window.location='/premium'">Upgrade</button>
         <button class="popup-cancel" onclick="closePopup()">Cancel</button>
     </div>
 </div>
 
-<!-- JS -->
 <script src="/static/interview.js"></script>
 
 <script>
-/* =============================
-   DARK MODE
-============================= */
+/* Dark Mode */
 const saved = localStorage.getItem("rb-dark");
 if (saved === "true") document.body.classList.add("dark-mode");
-
-document.getElementById("themeToggle").addEventListener("click", () => {
+document.getElementById("themeToggle").onclick = () => {
     document.body.classList.toggle("dark-mode");
     localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
-});
+};
 
-/* =============================
-   🔥 FOUNDER MODE (NEW)
-============================= */
-
-// Check if founder mode active
+/* Founder Mode */
 function isFounder() {
     return localStorage.getItem("rb_founder_mode") === "1";
 }
 
-// Enable founder mode from URL
-(function enableFounderMode() {
+(function() {
     const params = new URLSearchParams(window.location.search);
     const key = params.get("founderKey");
 
     if (key === "READYBRAIN-UCSD-A18565216") {
         localStorage.setItem("rb_founder_mode", "1");
-        console.log("🔥 Founder Mode Enabled");
-        // alert("Founder Mode ON");
+    }
+
+    if (isFounder()) {
+        document.getElementById("founderBadge").style.display = "inline-flex";
+        document.getElementById("adminBtn").style.display = "inline-flex";
     }
 })();
 
-/* =============================
-   FREE LIMIT SYSTEM (your original code)
-============================= */
-
+/* Free Limit */
 const DAILY_LIMIT = 3;
-
 function getTodayKey() {
     const d = new Date();
     return `rb-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 }
-
 function getUses() {
-    const key = getTodayKey();
-    return Number(localStorage.getItem(key) || 0);
+    return Number(localStorage.getItem(getTodayKey()) || 0);
 }
-
 function addUse() {
-    const key = getTodayKey();
-    const current = getUses();
-    localStorage.setItem(key, current + 1);
+    localStorage.setItem(getTodayKey(), getUses() + 1);
 }
 
-/* 
-🔥 UPDATED:
-Founder bypasses limit completely 
-*/
 function limitedStart() {
-
     if (isFounder()) {
-        console.log("Founder unlimited mode");
         startListening();
         return;
     }
 
-    const used = getUses();
-    if (used >= DAILY_LIMIT) {
+    if (getUses() >= DAILY_LIMIT) {
         openPopup();
         return;
     }
@@ -519,9 +495,6 @@ function limitedStart() {
     startListening();
 }
 
-/* =============================
-   POPUP
-============================= */
 function openPopup() {
     document.getElementById("premiumPopup").style.display = "flex";
 }
