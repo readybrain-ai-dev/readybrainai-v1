@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReadyBrainAI Premium</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -41,7 +40,7 @@
         }
 
         .page {
-            max-width: 1080px;
+            max-width: 1120px;
             margin: 0 auto;
         }
 
@@ -126,22 +125,37 @@
             color: #f97316;
         }
 
-        /* CARD */
+        /* PRICING GRID */
+        .pricing-grid {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
         .pricing-card {
             background: var(--card-bg);
-            padding: 34px;
-            margin-top: 36px;
+            padding: 30px;
             border-radius: 24px;
             border: 1px solid var(--card-border);
             box-shadow: var(--shadow-main);
-            max-width: 680px;
-            margin-left: auto;
-            margin-right: auto;
+            text-align: center;
+            transition: 0.2s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.08);
+        }
+
+        .best {
+            border: 2px solid #4f46e5;
         }
 
         .card-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
+            margin-bottom: 6px;
         }
 
         .price {
@@ -161,49 +175,29 @@
 
         .feature {
             font-size: 15px;
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin: 6px 0;
             color: var(--text-main);
         }
 
         .upgrade-btn {
             width: 100%;
-            padding: 16px;
-            margin-top: 24px;
+            padding: 14px;
+            margin-top: 18px;
             border: none;
             border-radius: 999px;
             background: linear-gradient(92deg, #4f46e5, #3b82f6);
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
         }
 
         .bottom-note {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 26px;
             color: var(--text-muted);
             font-size: 13px;
         }
-
-        .trust-row {
-            margin-top: 18px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .trust-pill {
-            background: rgba(15,23,42,0.08);
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            border: 1px solid rgba(148,163,184,0.4);
-        }
-
     </style>
 </head>
 
@@ -225,38 +219,61 @@
     </header>
 
     <!-- HERO -->
-    <h1 class="hero-title">Upgrade to Lifetime Premium</h1>
+    <h1 class="hero-title">Choose Your Premium Plan</h1>
     <p class="hero-sub">
-        Unlock unlimited rewriting, advanced coaching, faster answers, and lifetime access — all for a one-time payment.
+        Unlock unlimited rewriting, advanced coaching, faster answers, and full access to your AI interview coach.
     </p>
-    <p class="limited-offer">🔥 Limited-time launch price: <strong>$10</strong> (will increase soon)</p>
+    <p class="limited-offer">🔥 Limited-time launch pricing — secure your plan now</p>
 
-    <!-- PRICING CARD -->
-    <section class="pricing-card">
-        <div class="card-title">Lifetime Premium</div>
+    <!-- PRICING GRID -->
+    <section class="pricing-grid">
 
-        <div class="price">$10</div>
-        <div class="price-note">One-time payment — lifetime access</div>
+        <!-- LIFETIME PLAN -->
+        <div class="pricing-card best">
+            <div class="card-title">Lifetime Access</div>
+            <div class="price">$10</div>
+            <div class="price-note">One-time payment • No renewal</div>
 
-        <div class="feature">✔ Unlimited voice answers</div>
-        <div class="feature">✔ Advanced clarity rewriting</div>
-        <div class="feature">✔ Professional tone improvement</div>
-        <div class="feature">✔ Interview coaching tips</div>
-        <div class="feature">✔ Follow-up suggestions</div>
-        <div class="feature">✔ Save & review your answers</div>
-        <div class="feature">✔ Early access to new features</div>
-        <div class="feature">✔ Priority support</div>
+            <div class="feature">✔ Unlimited voice answers</div>
+            <div class="feature">✔ Advanced clarity rewriting</div>
+            <div class="feature">✔ Professional tone improvement</div>
+            <div class="feature">✔ Interview coaching tips</div>
+            <div class="feature">✔ Early access to new features</div>
 
-        <button class="upgrade-btn">Unlock Premium</button>
-
-        <p class="bottom-note">Pay with Apple Pay or PayPal — no subscription required.</p>
-
-        <div class="trust-row">
-            <div class="trust-pill">Secure payment</div>
-            <div class="trust-pill">One-time only</div>
-            <div class="trust-pill">No auto-charge</div>
+            <button class="upgrade-btn">Unlock Lifetime</button>
         </div>
+
+        <!-- 6 MONTHS PLAN -->
+        <div class="pricing-card">
+            <div class="card-title">6 Months</div>
+            <div class="price">$35</div>
+            <div class="price-note">Save 30% • One-time payment</div>
+
+            <div class="feature">✔ Unlimited rewriting</div>
+            <div class="feature">✔ Voice + text answers</div>
+            <div class="feature">✔ AI coaching</div>
+            <div class="feature">✔ Priority support</div>
+
+            <button class="upgrade-btn">Get 6 Months</button>
+        </div>
+
+        <!-- 12 MONTHS PLAN -->
+        <div class="pricing-card">
+            <div class="card-title">12 Months</div>
+            <div class="price">$50</div>
+            <div class="price-note">Best for long-term users</div>
+
+            <div class="feature">✔ Unlimited rewriting</div>
+            <div class="feature">✔ Voice + text answers</div>
+            <div class="feature">✔ Interview prep tools</div>
+            <div class="feature">✔ Priority support</div>
+
+            <button class="upgrade-btn">Get 12 Months</button>
+        </div>
+
     </section>
+
+    <p class="bottom-note">Apple Pay • PayPal — secure, fast checkout</p>
 
 </div>
 
