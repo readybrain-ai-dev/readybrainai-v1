@@ -224,7 +224,6 @@
             color: white;
         }
 
-        /* TEXT MODE */
         .text-mode {
             margin-top: 18px;
             padding-top: 14px;
@@ -312,8 +311,7 @@
             padding: 14px;
             width: 100%;
             border-radius: 999px;
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: white;
+            background: linear-gradient(92deg, #4f46e5, #636
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 14px;
@@ -360,7 +358,7 @@
 
             <p class="hero-sub">
                 Record your response, just like in a real interview.
-                ReadyBrainAI instantly rewrites it into a clear, confident, and professional answer —  
+                ReadyBrainAI instantly rewrites it into a clear, confident, and professional answer —
                 in the language you choose.
             </p>
         </section>
@@ -445,59 +443,92 @@
 <script src="/static/interview.js"></script>
 
 <script>
-    /* =====================
-       DARK MODE
-    ===================== */
-    const saved = localStorage.getItem("rb-dark");
-    if (saved === "true") document.body.classList.add("dark-mode");
+/* =============================
+   DARK MODE
+============================= */
+const saved = localStorage.getItem("rb-dark");
+if (saved === "true") document.body.classList.add("dark-mode");
 
-    document.getElementById("themeToggle").addEventListener("click", () => {
-        document.body.classList.toggle("dark-mode");
-        localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
-    });
+document.getElementById("themeToggle").addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
+});
 
-    /* =====================
-       FREE LIMIT SYSTEM
-    ===================== */
+/* =============================
+   🔥 FOUNDER MODE (NEW)
+============================= */
 
-    const DAILY_LIMIT = 3;
+// Check if founder mode active
+function isFounder() {
+    return localStorage.getItem("rb_founder_mode") === "1";
+}
 
-    function getTodayKey() {
-        const d = new Date();
-        return `rb-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+// Enable founder mode from URL
+(function enableFounderMode() {
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get("founderKey");
+
+    if (key === "READYBRAIN-UCSD-A18565216") {
+        localStorage.setItem("rb_founder_mode", "1");
+        console.log("🔥 Founder Mode Enabled");
+        // alert("Founder Mode ON");
     }
+})();
 
-    function getUses() {
-        const key = getTodayKey();
-        return Number(localStorage.getItem(key) || 0);
-    }
+/* =============================
+   FREE LIMIT SYSTEM (your original code)
+============================= */
 
-    function addUse() {
-        const key = getTodayKey();
-        const current = getUses();
-        localStorage.setItem(key, current + 1);
-    }
+const DAILY_LIMIT = 3;
 
-    function limitedStart() {
-        const used = getUses();
-        if (used >= DAILY_LIMIT) {
-            openPopup();
-            return;
-        }
-        addUse();
+function getTodayKey() {
+    const d = new Date();
+    return `rb-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function getUses() {
+    const key = getTodayKey();
+    return Number(localStorage.getItem(key) || 0);
+}
+
+function addUse() {
+    const key = getTodayKey();
+    const current = getUses();
+    localStorage.setItem(key, current + 1);
+}
+
+/* 
+🔥 UPDATED:
+Founder bypasses limit completely 
+*/
+function limitedStart() {
+
+    if (isFounder()) {
+        console.log("Founder unlimited mode");
         startListening();
+        return;
     }
 
-    /* =====================
-       POPUP HANDLERS
-    ===================== */
-    function openPopup() {
-        document.getElementById("premiumPopup").style.display = "flex";
+    const used = getUses();
+    if (used >= DAILY_LIMIT) {
+        openPopup();
+        return;
     }
 
-    function closePopup() {
-        document.getElementById("premiumPopup").style.display = "none";
-    }
+    addUse();
+    startListening();
+}
+
+/* =============================
+   POPUP
+============================= */
+function openPopup() {
+    document.getElementById("premiumPopup").style.display = "flex";
+}
+
+function closePopup() {
+    document.getElementById("premiumPopup").style.display = "none";
+}
 </script>
 
 </body>

@@ -20,6 +20,21 @@ app.secret_key = "RB_SECRET_KEY_123456"
 
 
 # ============================
+# 🔥 FOUNDER & PREMIUM KEYS
+# ============================
+FOUNDER_KEY = "READYBRAIN-UCSD-A18565216"
+PREMIUM_COOKIE = "rb_premium_mode"
+
+
+def user_is_founder():
+    return session.get("founder_mode") == True
+
+
+def user_is_premium():
+    return session.get("premium_mode") == True
+
+
+# ============================
 # LANGUAGE MAP
 # ============================
 LANGUAGE_NAMES = {
@@ -47,10 +62,15 @@ def landing():
 
 @app.route("/listen")
 def listen_page():
+    # Founder mode via URL
+    founder_key = request.args.get("founderKey")
+    if founder_key == FOUNDER_KEY:
+        session["founder_mode"] = True
+        print("🔥 Founder mode ENABLED")
+
     return render_template("listen.html")
 
 
-# ⭐ NEW PREMIUM PAGE ROUTE
 @app.route("/premium")
 def premium_page():
     return render_template("premium.html")
@@ -62,32 +82,44 @@ def health():
 
 
 # ============================
+# ⭐ PREMIUM ACTIVATION
+# ============================
+@app.route("/activate_premium", methods=["POST"])
+def activate_premium():
+    session["premium_mode"] = True
+    print("🌟 Premium mode activated")
+    return jsonify({"status": "ok"})
+
+
+# ============================
 # 🎤 MAIN INTERVIEW LISTENER
 # ============================
 @app.route("/interview_listen", methods=["POST"])
 def interview_listen():
     print("\n===== 🎤 /interview_listen START =====")
 
-    # ----------------------------------------------------
-    # 🌟 FREE LIMIT SYSTEM (ENABLED NOW)
-    # ----------------------------------------------------
-    uses = session.get("uses", 0)
-    if uses >= 3:
-        return jsonify({
-            "error": "limit_reached",
-            "redirect": "/premium"
-        })
-    session["uses"] = uses + 1
+    # Founder & premium bypass
+    if user_is_founder():
+        print("🔥 Founder detected → unlimited")
+    elif user_is_premium():
+        print("🌟 Premium user → unlimited")
+    else:
+        # Free limit
+        uses = session.get("uses", 0)
+        if uses >= 3:
+            return jsonify({
+                "error": "limit_reached",
+                "redirect": "/premium"
+            })
+        session["uses"] = uses + 1
 
-    input_lang = request.form.get("language", "auto")          # from dropdown
-    output_lang = request.form.get("output_language", "same")  # from dropdown
+    # ============================
+    # Recording logic (unchanged)
+    # ============================
 
-    print("🌍 User selected input:", input_lang)
-    print("🌐 User selected output:", output_lang)
+    input_lang = request.form.get("language", "auto")
+    output_lang = request.form.get("output_language", "same")
 
-    # -------------------------
-    # CHECK AUDIO
-    # -------------------------
     if "audio" not in request.files:
         return jsonify({
             "question": "(no audio)",
@@ -103,45 +135,28 @@ def interview_listen():
     wav_path = None
 
     try:
-        # -------------------------
-        # SAVE TEMP INPUT FILE
-        # -------------------------
+        # Save audio
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp:
             audio.save(temp.name)
             input_path = temp.name
 
-        # -------------------------
-        # CONVERT TO WAV 16kHz MONO
-        # -------------------------
+        # Convert to wav
         wav_path = input_path.replace(f".{ext}", ".wav")
+        subprocess.run(
+            [
+                "ffmpeg", "-y",
+                "-i", input_path,
+                "-ar", "16000",
+                "-ac", "1",
+                "-c:a", "pcm_s16le",
+                wav_path
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True
+        )
 
-        try:
-            subprocess.run(
-                [
-                    "ffmpeg",
-                    "-y",
-                    "-i", input_path,
-                    "-ar", "16000",
-                    "-ac", "1",
-                    "-c:a", "pcm_s16le",
-                    wav_path
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                check=True
-            )
-            print("🎛 FFmpeg conversion OK")
-        except Exception as e:
-            print("❌ FFmpeg failed:", e)
-            return jsonify({
-                "question": "",
-                "answer": "Audio conversion failed.",
-                "detected_language": None
-            }), 500
-
-        # -------------------------
-        # 🔊 TRANSCRIBE
-        # -------------------------
+        # Transcribe
         def transcribe(language_hint=None):
             with open(wav_path, "rb") as f:
                 return client.audio.transcriptions.create(
@@ -152,40 +167,21 @@ def interview_listen():
                     language=language_hint
                 )
 
-        try:
-            lang_hint = None if input_lang == "auto" else input_lang
-            print(f"🔊 Transcribing with whisper-1 (lang_hint={lang_hint})")
+        lang_hint = None if input_lang == "auto" else input_lang
+        result = transcribe(lang_hint)
 
-            result = transcribe(lang_hint)
+        spoken_text = (result.text or "").strip()
+        detected_lang = getattr(result, "language", None) or input_lang or "unknown"
+
+        # Retry Burmese
+        if len(spoken_text) < 2 and input_lang == "my":
+            result = transcribe("my")
             spoken_text = (result.text or "").strip()
-            detected_lang = getattr(result, "language", None) or input_lang or "unknown"
+            detected_lang = getattr(result, "language", None) or "my"
 
-            print("🗣 Speech:", spoken_text)
-            print("🌐 Detected:", detected_lang)
-
-            # If very short + Burmese hint requested
-            if len(spoken_text) < 2 and input_lang == "my":
-                print("⚠ Short transcript, retrying with Burmese hint...")
-                result = transcribe("my")
-                spoken_text = (result.text or "").strip()
-                detected_lang = getattr(result, "language", None) or "my"
-                print("🗣 Burmese retry speech:", spoken_text)
-                print("🌐 Burmese retry detected:", detected_lang)
-
-        except Exception as e:
-            print("❌ Transcription error:", e)
-            return jsonify({
-                "question": "(error)",
-                "answer": "Transcription failed.",
-                "detected_language": None
-            })
-
-        # -------------------------
-        # UNCLEAR / NOISE CHECK
-        # -------------------------
         clean_text = spoken_text.strip()
 
-        # 1) Empty or tiny text → unclear
+        # UNCLEAR detection
         if not clean_text or len(clean_text) < 4:
             return jsonify({
                 "question": "(unclear)",
@@ -193,18 +189,15 @@ def interview_listen():
                 "detected_language": detected_lang
             })
 
-        # 2) High no-speech probability in segments → noise
+        # Noise detection
         segments = getattr(result, "segments", None)
         if segments:
-            max_no_speech = 0.0
-            for seg in segments:
-                if isinstance(seg, dict):
-                    prob = seg.get("no_speech_prob", 0.0)
-                else:
-                    prob = getattr(seg, "no_speech_prob", 0.0)
-                if prob > max_no_speech:
-                    max_no_speech = prob
-
+            max_no_speech = max(
+                seg.get("no_speech_prob", 0.0)
+                if isinstance(seg, dict)
+                else getattr(seg, "no_speech_prob", 0.0)
+                for seg in segments
+            )
             if max_no_speech > 0.8:
                 return jsonify({
                     "question": "(unclear)",
@@ -212,27 +205,18 @@ def interview_listen():
                     "detected_language": detected_lang
                 })
 
-        # -------------------------
-        # OUTPUT LANGUAGE DECISION
-        # -------------------------
+        # Decide output language
         if output_lang == "same":
-            if detected_lang and detected_lang != "unknown":
+            if detected_lang != "unknown":
                 final_lang = detected_lang
-            elif input_lang != "auto":
-                final_lang = input_lang
             else:
-                final_lang = "en"
+                final_lang = input_lang if input_lang != "auto" else "en"
         else:
             final_lang = output_lang
 
         final_lang_name = lang_to_name(final_lang)
 
-        print("🎯 Final output language code:", final_lang)
-        print("📝 Final output language name:", final_lang_name)
-
-        # -------------------------
-        # GENERATE ANSWER
-        # -------------------------
+        # Rewrite prompt
         rewrite_prompt = f"""
 You are ReadyBrain AI.
 
@@ -244,29 +228,17 @@ Original text:
 
 Rules:
 - Keep original meaning
-- Simple and confident
 - No new ideas
+- Simple and confident
 - Output ONLY the final answer
 """
 
-        try:
-            ai = client.responses.create(
-                model="gpt-4o-mini",
-                input=rewrite_prompt
-            )
-            ai_output = ai.output_text.strip()
+        ai = client.responses.create(
+            model="gpt-4o-mini",
+            input=rewrite_prompt
+        )
+        ai_output = ai.output_text.strip()
 
-        except Exception as e:
-            print("❌ AI error:", e)
-            return jsonify({
-                "question": spoken_text,
-                "answer": "There was an error generating the answer.",
-                "detected_language": detected_lang
-            })
-
-        # -------------------------
-        # RETURN JSON
-        # -------------------------
         return jsonify({
             "question": spoken_text,
             "answer": ai_output,
@@ -275,6 +247,7 @@ Rules:
         })
 
     finally:
+        # Cleanup
         for p in (input_path, wav_path):
             if p and os.path.exists(p):
                 try:
@@ -284,7 +257,7 @@ Rules:
 
 
 # ============================
-# TEXT MODE (TYPE ANSWER)
+# TEXT MODE
 # ============================
 @app.route("/interview_answer", methods=["POST"])
 def interview_answer():
@@ -347,6 +320,58 @@ Output ONLY the improved answer.
         return jsonify({"answer": result.output_text.strip()})
     except Exception:
         return jsonify({"answer": "Error regenerating answer."})
+
+
+# ============================
+# 🔥 ADMIN / FOUNDER PANEL ROUTES
+# ============================
+@app.route("/admin")
+def admin_page():
+    if not user_is_founder():
+        return "Access denied", 403
+    return render_template("admin.html")
+
+
+@app.route("/admin_status")
+def admin_status():
+    return jsonify({
+        "founder": user_is_founder(),
+        "premium": user_is_premium(),
+        "uses": session.get("uses", 0)
+    })
+
+
+@app.route("/admin_reset_uses", methods=["POST"])
+def admin_reset_uses():
+    if not user_is_founder():
+        return "Access denied", 403
+    session["uses"] = 0
+    return "ok"
+
+
+@app.route("/admin_enable_premium", methods=["POST"])
+def admin_enable_premium():
+    if not user_is_founder():
+        return "Access denied", 403
+    session["premium_mode"] = True
+    return "ok"
+
+
+@app.route("/admin_disable_premium", methods=["POST"])
+def admin_disable_premium():
+    if not user_is_founder():
+        return "Access denied", 403
+    session["premium_mode"] = False
+    return "ok"
+
+
+@app.route("/admin_clear_session", methods=["POST"])
+def admin_clear_session():
+    if not user_is_founder():
+        return "Access denied", 403
+    session.clear()
+    session["founder_mode"] = True  # keep founder always on
+    return "ok"
 
 
 # ============================

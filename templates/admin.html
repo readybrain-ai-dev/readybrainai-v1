@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReadyBrainAI Admin Panel</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: radial-gradient(circle at top right, #e6eeff, #f8faff 60%);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --surface: #f1f5f9;
+            --shadow-main: 0 12px 36px rgba(15,23,42,0.05);
+            --accent: #4f46e5;
+        }
+
+        body.dark-mode {
+            --bg-main: radial-gradient(circle at top right, #020617, #0f172a 60%);
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: #0f172a;
+            --card-border: #1e293b;
+            --surface: #1e293b;
+            --shadow-main: 0 18px 50px rgba(0,0,0,0.55);
+            --accent: #818cf8;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 16px;
+            font-family: "Inter", sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            transition: 0.3s ease;
+        }
+
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* NAV */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 15px;
+            box-shadow: 0 8px 22px rgba(79,70,229,0.4);
+        }
+
+        .section-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-main);
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 20px;
+        }
+
+        .info-line {
+            font-size: 15px;
+            margin: 6px 0;
+            color: var(--text-muted);
+        }
+
+        button {
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- NAV -->
+    <header class="nav">
+        <div class="brand">
+            <div class="brand-logo">RB</div>
+            <div>ReadyBrainAI Admin</div>
+        </div>
+
+        <button id="themeToggle" class="theme-toggle">🌙</button>
+    </header>
+
+    <h1 class="section-title">Founder Control Panel</h1>
+
+    <!-- SYSTEM STATUS -->
+    <div class="card">
+        <h3>System Status</h3>
+        <div class="info-line">Founder Mode: <strong id="founderStatus">loading...</strong></div>
+        <div class="info-line">Premium Mode: <strong id="premiumStatus">loading...</strong></div>
+        <div class="info-line">Free Uses This Session: <strong id="uses">loading...</strong></div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="card">
+        <h3>Controls</h3>
+        <button onclick="resetLimit()">Reset Free Usage Limit</button><br>
+        <button onclick="enablePremium()">Force Enable Premium</button><br>
+        <button onclick="disablePremium()">Disable Premium</button><br>
+        <button onclick="clearSession()">Clear Session</button>
+    </div>
+
+</div>
+
+<script>
+    const saved = localStorage.getItem("rb-dark");
+    if (saved === "true") document.body.classList.add("dark-mode");
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
+    });
+
+    // Load admin info
+    fetch("/admin_status")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("founderStatus").innerText = data.founder;
+            document.getElementById("premiumStatus").innerText = data.premium;
+            document.getElementById("uses").innerText = data.uses;
+        });
+
+    function resetLimit() {
+        fetch("/admin_reset_uses", { method: "POST" }).then(() => location.reload());
+    }
+
+    function enablePremium() {
+        fetch("/admin_enable_premium", { method: "POST" }).then(() => location.reload());
+    }
+
+    function disablePremium() {
+        fetch("/admin_disable_premium", { method: "POST" }).then(() => location.reload());
+    }
+
+    function clearSession() {
+        fetch("/admin_clear_session", { method: "POST" }).then(() => location.reload());
+    }
+</script>
+
+</body>
+</html>
