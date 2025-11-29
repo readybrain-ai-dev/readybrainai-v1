@@ -89,11 +89,6 @@
             cursor: pointer;
             font-size: 13px;
             text-decoration: none;
-            transition: 0.2s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(0,0,0,0.05);
         }
 
         .theme-toggle {
@@ -105,14 +100,8 @@
             border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.45);
             cursor: pointer;
-            font-size: 13px;
             background: rgba(255,255,255,0.4);
             color: var(--text-muted);
-            transition: 0.2s ease;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255,255,255,0.6);
         }
 
         /* LAYOUT */
@@ -120,7 +109,6 @@
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 36px;
-            align-items: start;
         }
 
         @media (max-width: 900px) {
@@ -155,12 +143,6 @@
             border-radius: 24px;
             border: 1px solid var(--card-border);
             box-shadow: var(--shadow-main);
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(8px);}
-            to {opacity: 1; transform: translateY(0);}
         }
 
         .card-header {
@@ -176,7 +158,6 @@
             background: var(--surface);
             border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.45);
-            cursor: pointer;
         }
 
         /* BUTTONS */
@@ -210,13 +191,6 @@
         .status-line {
             font-size: 13px;
             color: var(--text-muted);
-            margin: 4px 0 10px 0;
-        }
-
-        /* OUTPUT */
-        h3 {
-            margin: 12px 0 6px 0;
-            font-size: 14px;
         }
 
         .output-box {
@@ -227,10 +201,8 @@
             min-height: 70px;
             font-size: 14px;
             white-space: pre-line;
-            margin-bottom: 8px;
         }
 
-        /* AD BOX */
         .ad-box {
             background: var(--surface);
             padding: 16px;
@@ -242,11 +214,9 @@
             color: var(--text-muted);
         }
 
-        /* ACTION BUTTONS */
         .action-buttons {
             display: flex;
             gap: 8px;
-            margin-bottom: 4px;
         }
 
         .copy-btn {
@@ -289,6 +259,67 @@
             width: 100%;
             cursor: pointer;
         }
+
+        /* POPUP */
+        #premiumPopup {
+            position: fixed;
+            top: 0; left:0;
+            width:100%; height:100%;
+            background: rgba(0,0,0,0.45);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index: 9999;
+        }
+
+        .popup-box {
+            background: var(--card-bg);
+            border-radius: 22px;
+            padding: 28px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: var(--shadow-main);
+            text-align:center;
+            animation: fadeInPopup 0.3s ease;
+        }
+
+        @keyframes fadeInPopup {
+            from {opacity:0; transform: translateY(10px);}
+            to {opacity:1; transform: translateY(0);}
+        }
+
+        .popup-title {
+            font-size: 20px;
+            font-weight:700;
+            margin-bottom: 6px;
+        }
+
+        .popup-msg {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        .popup-btn {
+            padding: 12px;
+            width:100%;
+            border-radius:999px;
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color:white;
+            font-size:15px;
+            font-weight:600;
+            margin-bottom:10px;
+        }
+
+        .popup-cancel {
+            padding:12px;
+            width:100%;
+            border-radius:999px;
+            background: rgba(148,163,184,0.25);
+            color: var(--text-main);
+            font-size:15px;
+            font-weight:600;
+        }
     </style>
 </head>
 
@@ -328,7 +359,6 @@
             <div class="card-header">
                 <h2>🎤 Answer Refinement</h2>
 
-                <!-- INPUT LANGUAGE -->
                 <select id="languageSelect" class="select-box">
                     <option value="auto">🌍 Auto Detect</option>
                     <option value="en">🇺🇸 English</option>
@@ -339,7 +369,6 @@
                 </select>
             </div>
 
-            <!-- OUTPUT LANGUAGE -->
             <label class="label-inline">Answer output language</label>
             <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
                 <option value="same">🟦 Same as spoken</option>
@@ -351,7 +380,7 @@
             </select>
 
             <div class="button-row">
-                <button id="startBtn" onclick="startListening()">Start Recording</button>
+                <button id="startBtn" onclick="limitedStart()">Start Recording</button>
                 <button id="stopBtn" onclick="stopListening()">Stop Recording</button>
             </div>
 
@@ -363,7 +392,6 @@
             <h3>Improved Answer:</h3>
             <div id="answer" class="output-box"></div>
 
-            <!-- ⭐ AD PLACEHOLDER -->
             <div class="ad-box">
                 📢 Advertisement (coming soon)
             </div>
@@ -372,7 +400,6 @@
                 <button class="copy-btn" onclick="copyAnswer()">Copy</button>
             </div>
 
-            <!-- TEXT MODE -->
             <div class="text-mode">
                 <div>💬 Text Mode (Beta)</div>
 
@@ -385,15 +412,30 @@
 
                 <div id="textStatus"></div>
             </div>
-
         </section>
     </main>
+</div>
+
+<!-- PREMIUM POPUP -->
+<div id="premiumPopup">
+    <div class="popup-box">
+        <div class="popup-title">Daily Limit Reached</div>
+        <div class="popup-msg">
+            You’ve used your free 3 responses for today.<br>
+            Upgrade to Premium for unlimited voice answers.
+        </div>
+        <button class="popup-btn" onclick="window.location='/premium'">Upgrade to Premium</button>
+        <button class="popup-cancel" onclick="closePopup()">Cancel</button>
+    </div>
 </div>
 
 <!-- JS -->
 <script src="/static/interview.js"></script>
 
 <script>
+    /* =====================
+       DARK MODE
+    ===================== */
     const saved = localStorage.getItem("rb-dark");
     if (saved === "true") document.body.classList.add("dark-mode");
 
@@ -401,6 +443,49 @@
         document.body.classList.toggle("dark-mode");
         localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
     });
+
+    /* =====================
+       FREE LIMIT SYSTEM
+    ===================== */
+
+    const DAILY_LIMIT = 3;
+
+    function getTodayKey() {
+        const d = new Date();
+        return `rb-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+    }
+
+    function getUses() {
+        const key = getTodayKey();
+        return Number(localStorage.getItem(key) || 0);
+    }
+
+    function addUse() {
+        const key = getTodayKey();
+        const current = getUses();
+        localStorage.setItem(key, current + 1);
+    }
+
+    function limitedStart() {
+        const used = getUses();
+        if (used >= DAILY_LIMIT) {
+            openPopup();
+            return;
+        }
+        addUse();
+        startListening();
+    }
+
+    /* =====================
+       POPUP HANDLERS
+    ===================== */
+    function openPopup() {
+        document.getElementById("premiumPopup").style.display = "flex";
+    }
+
+    function closePopup() {
+        document.getElementById("premiumPopup").style.display = "none";
+    }
 </script>
 
 </body>
