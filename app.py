@@ -69,11 +69,8 @@ def interview_listen():
     print("\n===== 🎤 /interview_listen START =====")
 
     # ----------------------------------------------------
-    # FREE LIMIT SYSTEM (Currently DISABLED)
+    # 🌟 FREE LIMIT SYSTEM (ENABLED NOW)
     # ----------------------------------------------------
-    # To enable later, simply uncomment this block:
-
-    """
     uses = session.get("uses", 0)
     if uses >= 3:
         return jsonify({
@@ -81,7 +78,6 @@ def interview_listen():
             "redirect": "/premium"
         })
     session["uses"] = uses + 1
-    """
 
     input_lang = request.form.get("language", "auto")          # from dropdown
     output_lang = request.form.get("output_language", "same")  # from dropdown

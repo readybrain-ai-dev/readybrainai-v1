@@ -77,13 +77,17 @@
         .nav-buttons {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            font-size: 15px;
+            color: var(--accent);
+            font-weight: 500;
         }
 
         .theme-toggle {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             width: 32px;
             height: 32px;
             border-radius: 999px;
@@ -96,10 +100,13 @@
 
         /* HERO */
         .hero-title {
-            font-size: 34px;
+            font-size: 38px;
             font-weight: 700;
             margin-bottom: 10px;
             text-align: center;
+            background: linear-gradient(to right, #4f46e5, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .hero-sub {
@@ -111,10 +118,18 @@
             line-height: 1.6;
         }
 
+        .limited-offer {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #f97316;
+        }
+
         /* CARD */
         .pricing-card {
             background: var(--card-bg);
-            padding: 30px;
+            padding: 34px;
             margin-top: 36px;
             border-radius: 24px;
             border: 1px solid var(--card-border);
@@ -130,12 +145,18 @@
         }
 
         .price {
-            font-size: 40px;
-            font-weight: 700;
-            margin: 6px 0 14px 0;
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            font-size: 44px;
+            font-weight: 800;
+            margin: 6px 0 14px;
+            background: linear-gradient(92deg, #4f46e5, #6366f1, #22c55e);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .price-note {
+            font-size: 14px;
+            color: #f97316;
+            margin-bottom: 16px;
         }
 
         .feature {
@@ -144,15 +165,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text-main);
         }
 
         .upgrade-btn {
             width: 100%;
             padding: 16px;
-            margin-top: 20px;
+            margin-top: 24px;
             border: none;
             border-radius: 999px;
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            background: linear-gradient(92deg, #4f46e5, #3b82f6);
             color: white;
             font-size: 16px;
             font-weight: 600;
@@ -164,6 +186,22 @@
             margin-top: 20px;
             color: var(--text-muted);
             font-size: 13px;
+        }
+
+        .trust-row {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .trust-pill {
+            background: rgba(15,23,42,0.08);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            border: 1px solid rgba(148,163,184,0.4);
         }
 
     </style>
@@ -191,11 +229,14 @@
     <p class="hero-sub">
         Unlock unlimited rewriting, advanced coaching, faster answers, and lifetime access — all for a one-time payment.
     </p>
+    <p class="limited-offer">🔥 Limited-time launch price: <strong>$10</strong> (will increase soon)</p>
 
     <!-- PRICING CARD -->
     <section class="pricing-card">
         <div class="card-title">Lifetime Premium</div>
+
         <div class="price">$10</div>
+        <div class="price-note">One-time payment — lifetime access</div>
 
         <div class="feature">✔ Unlimited voice answers</div>
         <div class="feature">✔ Advanced clarity rewriting</div>
@@ -204,10 +245,17 @@
         <div class="feature">✔ Follow-up suggestions</div>
         <div class="feature">✔ Save & review your answers</div>
         <div class="feature">✔ Early access to new features</div>
+        <div class="feature">✔ Priority support</div>
 
         <button class="upgrade-btn">Unlock Premium</button>
 
-        <p class="bottom-note">Pay with Apple Pay or PayPal — no subscription.</p>
+        <p class="bottom-note">Pay with Apple Pay or PayPal — no subscription required.</p>
+
+        <div class="trust-row">
+            <div class="trust-pill">Secure payment</div>
+            <div class="trust-pill">One-time only</div>
+            <div class="trust-pill">No auto-charge</div>
+        </div>
     </section>
 
 </div>
