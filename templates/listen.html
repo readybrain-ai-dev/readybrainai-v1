@@ -37,6 +37,7 @@
             font-family: "Inter", sans-serif;
             background: var(--bg-main);
             color: var(--text-main);
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .page {
@@ -91,6 +92,9 @@
         }
 
         .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             width: 32px;
             height: 32px;
             border-radius: 999px;
@@ -113,7 +117,7 @@
             }
         }
 
-        /* HERO */
+        /* HERO TEXT */
         .hero-title {
             font-size: 32px;
             font-weight: 700;
@@ -129,6 +133,7 @@
         .hero-sub {
             font-size: 15px;
             color: var(--text-muted);
+            line-height: 1.5;
         }
 
         /* CARD */
@@ -159,7 +164,17 @@
         .button-row {
             display: flex;
             gap: 10px;
-            margin: 16px 0 6px 0;
+            margin: 16px 0 10px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
         }
 
         #startBtn {
@@ -173,32 +188,19 @@
             color: white;
         }
 
-        /* PREMIUM COUNTER */
-        #limitCounter {
-            margin: 8px auto 18px auto;
-            padding: 8px 18px;
-            width: fit-content;
-
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: white;
-
+        .status-line {
             font-size: 13px;
-            font-weight: 600;
-
-            border-radius: 999px;
-            box-shadow: 0 6px 18px rgba(79,70,229,0.30);
-
-            opacity: 0;
-            transition: opacity 0.35s ease;
+            color: var(--text-muted);
         }
 
-        /* TEXT BLOCKS */
         .output-box {
             background: var(--surface);
             padding: 16px;
             border-radius: 14px;
             border: 1px solid rgba(148,163,184,0.45);
             min-height: 70px;
+            font-size: 14px;
+            white-space: pre-line;
         }
 
         .ad-box {
@@ -208,12 +210,60 @@
             border-radius: 14px;
             border: 1px dashed rgba(148,163,184,0.5);
             text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: white;
+        }
+
+        /* TEXT MODE */
+        .text-mode {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(148,163,184,0.6);
+            font-size: 13px;
+        }
+
+        .text-input,
+        .text-textarea {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(148,163,184,0.7);
+            padding: 10px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            background: var(--surface);
+            color: var(--text-main);
+        }
+
+        .text-textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .text-button {
+            padding: 11px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 999px;
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: white;
+            width: 100%;
+            cursor: pointer;
         }
 
         /* POPUP */
         #premiumPopup {
             position: fixed;
-            top:0; left:0;
+            top: 0; left:0;
             width:100%; height:100%;
             background: rgba(0,0,0,0.45);
             display:none;
@@ -236,6 +286,18 @@
         @keyframes fadeInPopup {
             from {opacity:0; transform: translateY(10px);}
             to {opacity:1; transform: translateY(0);}
+        }
+
+        .popup-title {
+            font-size: 20px;
+            font-weight:700;
+            margin-bottom: 6px;
+        }
+
+        .popup-msg {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
         }
 
         .popup-btn {
@@ -279,7 +341,6 @@
 
     <main class="layout">
 
-        <!-- LEFT SIDE -->
         <section class="hero-text">
             <div class="hero-pill">🔴 Live prototype · Voice Interview Coach</div>
 
@@ -287,12 +348,12 @@
 
             <p class="hero-sub">
                 Record your response, just like in a real interview.
-                ReadyBrainAI instantly rewrites it into a clear, confident, and professional answer —
+                ReadyBrainAI instantly rewrites it into a clear, confident, and professional answer —  
                 in the language you choose.
             </p>
         </section>
 
-        <!-- RIGHT SIDE CARD -->
+        <!-- LISTENER CARD -->
         <section class="card">
 
             <div class="card-header">
@@ -308,7 +369,7 @@
                 </select>
             </div>
 
-            <label>Answer output language</label>
+            <label class="label-inline">Answer output language</label>
             <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
                 <option value="same">🟦 Same as spoken</option>
                 <option value="en">🇺🇸 English</option>
@@ -318,14 +379,10 @@
                 <option value="es">🇪🇸 Spanish</option>
             </select>
 
-            <!-- START/STOP BUTTONS -->
             <div class="button-row">
                 <button id="startBtn" onclick="limitedStart()">Start Recording</button>
                 <button id="stopBtn" onclick="stopListening()">Stop Recording</button>
             </div>
-
-            <!-- DAILY COUNTER -->
-            <div id="limitCounter">3 / 3 free uses left today</div>
 
             <p id="status" class="status-line">Idle</p>
 
@@ -345,13 +402,16 @@
 
             <div class="text-mode">
                 <div>💬 Text Mode (Beta)</div>
+
                 <textarea id="textQuestion" class="text-textarea" placeholder="Type your interview question here..."></textarea>
+
                 <input id="textJobRole" class="text-input" placeholder="Target role (optional)" />
                 <input id="textBackground" class="text-input" placeholder="Your background (optional)" />
+
                 <button class="text-button" onclick="generateTextAnswer()">✏️ Generate Answer</button>
+
                 <div id="textStatus"></div>
             </div>
-
         </section>
     </main>
 </div>
@@ -369,78 +429,63 @@
     </div>
 </div>
 
-<!-- JS FILE -->
+<!-- JS -->
 <script src="/static/interview.js"></script>
 
 <script>
-/* =====================
-   DARK MODE
-===================== */
-const saved = localStorage.getItem("rb-dark");
-if (saved === "true") document.body.classList.add("dark-mode");
+    /* =====================
+       DARK MODE
+    ===================== */
+    const saved = localStorage.getItem("rb-dark");
+    if (saved === "true") document.body.classList.add("dark-mode");
 
-document.getElementById("themeToggle").addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-    localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
-});
+    document.getElementById("themeToggle").addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
+    });
 
-/* =====================
-   DAILY LIMIT SYSTEM
-===================== */
+    /* =====================
+       FREE LIMIT SYSTEM
+    ===================== */
 
-const DAILY_LIMIT = 3;
+    const DAILY_LIMIT = 3;
 
-function getTodayKey() {
-    const d = new Date();
-    return `rb-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-}
-
-function getUses() {
-    return Number(localStorage.getItem(getTodayKey()) || 0);
-}
-
-function addUse() {
-    localStorage.setItem(getTodayKey(), getUses() + 1);
-}
-
-function updateCounter() {
-    const used = getUses();
-    const left = DAILY_LIMIT - used;
-
-    const counter = document.getElementById("limitCounter");
-    counter.textContent = `${left} / ${DAILY_LIMIT} free uses left today`;
-
-    counter.style.opacity = 1; // fade in
-}
-
-function limitedStart() {
-    const used = getUses();
-
-    if (used >= DAILY_LIMIT) {
-        openPopup();
-        return;
+    function getTodayKey() {
+        const d = new Date();
+        return `rb-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
     }
 
-    addUse();
-    updateCounter();
-    startListening();
-}
+    function getUses() {
+        const key = getTodayKey();
+        return Number(localStorage.getItem(key) || 0);
+    }
 
-/* =====================
-   POPUP
-===================== */
-function openPopup() {
-    document.getElementById("premiumPopup").style.display = "flex";
-}
+    function addUse() {
+        const key = getTodayKey();
+        const current = getUses();
+        localStorage.setItem(key, current + 1);
+    }
 
-function closePopup() {
-    document.getElementById("premiumPopup").style.display = "none";
-}
+    function limitedStart() {
+        const used = getUses();
+        if (used >= DAILY_LIMIT) {
+            openPopup();
+            return;
+        }
+        addUse();
+        startListening();
+    }
 
-/* =====================
-   INIT
-===================== */
-updateCounter();
+    /* =====================
+       POPUP HANDLERS
+    ===================== */
+    function openPopup() {
+        document.getElementById("premiumPopup").style.display = "flex";
+    }
+
+    function closePopup() {
+        document.getElementById("premiumPopup").style.display = "none";
+    }
 </script>
 
 </body>
