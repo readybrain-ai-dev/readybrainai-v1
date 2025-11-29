@@ -1,7 +1,7 @@
 import os
 import tempfile
 import subprocess
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, render_template, session, redirect
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -35,12 +35,12 @@ def user_is_premium():
 
 
 # ============================
-# ⭐ FIX: Founder can ALWAYS access admin
+# ⭐ FIX: Founder can ALWAYS open /admin
 # ============================
 @app.before_request
 def allow_admin_for_founder():
+    # Founder override keeps admin UNLOCKED for you
     if request.endpoint == "admin_page":
-        # When founder switches to user, this keeps admin unlocked ONLY for you
         if session.get("founder_override") is True:
             session["founder_mode"] = True
 
@@ -116,7 +116,6 @@ def interview_listen():
     elif user_is_premium():
         print("🌟 Premium user → unlimited")
     else:
-        # Free limit
         uses = session.get("uses", 0)
         if uses >= 3:
             return jsonify({
@@ -124,10 +123,6 @@ def interview_listen():
                 "redirect": "/premium"
             })
         session["uses"] = uses + 1
-
-    # ============================
-    # Recording logic (unchanged)
-    # ============================
 
     input_lang = request.form.get("language", "auto")
     output_lang = request.form.get("output_language", "same")
@@ -147,12 +142,10 @@ def interview_listen():
     wav_path = None
 
     try:
-        # Save audio
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp:
             audio.save(temp.name)
             input_path = temp.name
 
-        # Convert to wav
         wav_path = input_path.replace(f".{ext}", ".wav")
         subprocess.run(
             [
@@ -168,7 +161,6 @@ def interview_listen():
             check=True
         )
 
-        # Transcribe
         def transcribe(language_hint=None):
             with open(wav_path, "rb") as f:
                 return client.audio.transcriptions.create(
@@ -185,7 +177,6 @@ def interview_listen():
         spoken_text = (result.text or "").strip()
         detected_lang = getattr(result, "language", None) or input_lang or "unknown"
 
-        # Retry Burmese
         if len(spoken_text) < 2 and input_lang == "my":
             result = transcribe("my")
             spoken_text = (result.text or "").strip()
@@ -193,7 +184,6 @@ def interview_listen():
 
         clean_text = spoken_text.strip()
 
-        # UNCLEAR detection
         if not clean_text or len(clean_text) < 4:
             return jsonify({
                 "question": "(unclear)",
@@ -201,7 +191,6 @@ def interview_listen():
                 "detected_language": detected_lang
             })
 
-        # Noise detection
         segments = getattr(result, "segments", None)
         if segments:
             max_no_speech = max(
@@ -217,7 +206,6 @@ def interview_listen():
                     "detected_language": detected_lang
                 })
 
-        # Decide output language
         if output_lang == "same":
             if detected_lang != "unknown":
                 final_lang = detected_lang
@@ -228,7 +216,6 @@ def interview_listen():
 
         final_lang_name = lang_to_name(final_lang)
 
-        # Rewrite prompt
         rewrite_prompt = f"""
 You are ReadyBrain AI.
 
@@ -249,6 +236,7 @@ Rules:
             model="gpt-4o-mini",
             input=rewrite_prompt
         )
+
         ai_output = ai.output_text.strip()
 
         return jsonify({
@@ -391,10 +379,9 @@ def admin_clear_session():
 # ============================
 @app.route("/admin_switch_to_user", methods=["POST"])
 def admin_switch_to_user():
-    # founder override stays TRUE so you never get locked out
     session.clear()
-    session["founder_override"] = True  # lets you still open /admin
-    print("🔁 Switched to USER MODE (limit active, but admin still open)")
+    session["founder_override"] = True   # keeps admin unlocked
+    print("🔁 Switched to USER MODE (admin still unlocked)")
     return "ok"
 
 
