@@ -260,65 +260,77 @@
             cursor: pointer;
         }
 
-        /* POPUP */
+        /* BEAUTIFUL POPUP (RESTORED) */
         #premiumPopup {
             position: fixed;
-            top: 0; left:0;
-            width:100%; height:100%;
-            background: rgba(0,0,0,0.45);
-            display:none;
-            align-items:center;
-            justify-content:center;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
             z-index: 9999;
+            animation: fadeBackdrop 0.25s ease;
+        }
+
+        @keyframes fadeBackdrop {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .popup-box {
             background: var(--card-bg);
+            padding: 32px;
+            width: 92%;
+            max-width: 440px;
             border-radius: 22px;
-            padding: 28px;
-            width: 90%;
-            max-width: 420px;
-            box-shadow: var(--shadow-main);
-            text-align:center;
-            animation: fadeInPopup 0.3s ease;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+            text-align: center;
+            animation: fadePopup 0.25s ease;
         }
 
-        @keyframes fadeInPopup {
-            from {opacity:0; transform: translateY(10px);}
-            to {opacity:1; transform: translateY(0);}
+        @keyframes fadePopup {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .popup-title {
-            font-size: 20px;
-            font-weight:700;
-            margin-bottom: 6px;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
 
         .popup-msg {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-muted);
-            margin-bottom: 18px;
+            margin-bottom: 24px;
+            line-height: 1.5;
         }
 
         .popup-btn {
-            padding: 12px;
-            width:100%;
-            border-radius:999px;
+            padding: 14px;
+            width: 100%;
+            border-radius: 999px;
             background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color:white;
-            font-size:15px;
-            font-weight:600;
-            margin-bottom:10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            cursor: pointer;
+            border: none;
         }
 
         .popup-cancel {
-            padding:12px;
-            width:100%;
-            border-radius:999px;
-            background: rgba(148,163,184,0.25);
+            padding: 14px;
+            width: 100%;
+            border-radius: 999px;
+            background: #e2e8f0;
             color: var(--text-main);
-            font-size:15px;
-            font-weight:600;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
         }
     </style>
 </head>
@@ -369,7 +381,7 @@
                 </select>
             </div>
 
-            <label class="label-inline">Answer output language</label>
+            <label>Answer output language</label>
             <select id="outputLanguage" class="select-box" style="margin-bottom:12px;">
                 <option value="same">🟦 Same as spoken</option>
                 <option value="en">🇺🇸 English</option>
