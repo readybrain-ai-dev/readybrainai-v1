@@ -144,10 +144,15 @@
     <!-- CONTROLS -->
     <div class="card">
         <h3>Controls</h3>
+
         <button onclick="resetLimit()">Reset Free Usage Limit</button><br>
         <button onclick="enablePremium()">Force Enable Premium</button><br>
         <button onclick="disablePremium()">Disable Premium</button><br>
-        <button onclick="clearSession()">Clear Session</button>
+        <button onclick="clearSession()">Clear Session</button><br>
+
+        <!-- ⭐ ADDED HERE: SWITCH MODES -->
+        <button onclick="switchToUser()">Switch to USER Mode (limit)</button><br>
+        <button onclick="switchToFounder()">Switch to FOUNDER Mode (unlimited)</button>
     </div>
 
 </div>
@@ -184,6 +189,15 @@
 
     function clearSession() {
         fetch("/admin_clear_session", { method: "POST" }).then(() => location.reload());
+    }
+
+    // ⭐ NEW FUNCTIONS
+    function switchToUser() {
+        fetch("/admin_switch_to_user", { method: "POST" }).then(() => location.reload());
+    }
+
+    function switchToFounder() {
+        fetch("/admin_switch_to_founder", { method: "POST" }).then(() => location.reload());
     }
 </script>
 

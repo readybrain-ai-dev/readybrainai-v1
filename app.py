@@ -27,11 +27,11 @@ PREMIUM_COOKIE = "rb_premium_mode"
 
 
 def user_is_founder():
-    return session.get("founder_mode") == True
+    return session.get("founder_mode") is True
 
 
 def user_is_premium():
-    return session.get("premium_mode") == True
+    return session.get("premium_mode") is True
 
 
 # ============================
@@ -247,12 +247,11 @@ Rules:
         })
 
     finally:
-        # Cleanup
         for p in (input_path, wav_path):
             if p and os.path.exists(p):
                 try:
                     os.remove(p)
-                except Exception:
+                except:
                     pass
 
 
@@ -287,7 +286,7 @@ Output ONLY the final answer.
             input=prompt
         )
         return jsonify({"answer": result.output_text.strip()})
-    except Exception:
+    except:
         return jsonify({"answer": "Error generating answer."})
 
 
@@ -318,7 +317,7 @@ Output ONLY the improved answer.
             input=prompt
         )
         return jsonify({"answer": result.output_text.strip()})
-    except Exception:
+    except:
         return jsonify({"answer": "Error regenerating answer."})
 
 
@@ -370,7 +369,25 @@ def admin_clear_session():
     if not user_is_founder():
         return "Access denied", 403
     session.clear()
-    session["founder_mode"] = True  # keep founder always on
+    session["founder_mode"] = True  # keep you logged in as founder
+    return "ok"
+
+
+# ============================
+# ⭐ NEW: SWITCH BETWEEN USER + FOUNDER
+# ============================
+@app.route("/admin_switch_to_user", methods=["POST"])
+def admin_switch_to_user():
+    session.clear()
+    print("🔁 Switched to USER MODE (limit active)")
+    return "ok"
+
+
+@app.route("/admin_switch_to_founder", methods=["POST"])
+def admin_switch_to_founder():
+    session.clear()
+    session["founder_mode"] = True
+    print("🔥 Switched to FOUNDER MODE (unlimited)")
     return "ok"
 
 
