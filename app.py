@@ -1,7 +1,7 @@
 import os
 import tempfile
 import subprocess
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -14,6 +14,9 @@ API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 
 app = Flask(__name__)
+
+# Needed for usage tracking later
+app.secret_key = "RB_SECRET_KEY_123456"
 
 
 # ============================
@@ -47,6 +50,12 @@ def listen_page():
     return render_template("listen.html")
 
 
+# ⭐ NEW PREMIUM PAGE ROUTE
+@app.route("/premium")
+def premium_page():
+    return render_template("premium.html")
+
+
 @app.route("/health")
 def health():
     return "ok", 200
@@ -58,6 +67,21 @@ def health():
 @app.route("/interview_listen", methods=["POST"])
 def interview_listen():
     print("\n===== 🎤 /interview_listen START =====")
+
+    # ----------------------------------------------------
+    # FREE LIMIT SYSTEM (Currently DISABLED)
+    # ----------------------------------------------------
+    # To enable later, simply uncomment this block:
+
+    """
+    uses = session.get("uses", 0)
+    if uses >= 3:
+        return jsonify({
+            "error": "limit_reached",
+            "redirect": "/premium"
+        })
+    session["uses"] = uses + 1
+    """
 
     input_lang = request.form.get("language", "auto")          # from dropdown
     output_lang = request.form.get("output_language", "same")  # from dropdown
@@ -173,7 +197,7 @@ def interview_listen():
                 "detected_language": detected_lang
             })
 
-        # 2) High no-speech probability in segments → mostly noise
+        # 2) High no-speech probability in segments → noise
         segments = getattr(result, "segments", None)
         if segments:
             max_no_speech = 0.0

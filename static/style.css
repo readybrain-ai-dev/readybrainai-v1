@@ -194,7 +194,7 @@ body {
     background: rgba(15, 23, 42, 0.5);
 }
 
-/* Hero right card */
+/* ===== Hero Right Card ===== */
 
 .hero-card {
     max-width: 420px;
@@ -392,6 +392,8 @@ body {
     padding: 1.3rem;
     border: 1px solid rgba(148, 163, 184, 0.7);
     font-size: 0.95rem;
+
+    /* FIXED LINE */
     transition: transform 0.16s ease, box-shadow 0.16s ease,
         border-color 0.16s ease;
 }
@@ -585,6 +587,76 @@ body {
     }
 }
 
+/* ===== Premium Page Card ===== */
+
+.premium-card {
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 1.4rem;
+    padding: 2rem 1.8rem;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    color: #e5e7eb;
+    max-width: 780px;
+    margin: 2rem auto;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.premium-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #818cf8, #3b82f6, #22c55e);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.premium-price {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin: 1rem 0;
+}
+
+.premium-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.4rem 0;
+    text-align: left;
+    line-height: 1.6;
+}
+
+.premium-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.6rem;
+    color: #cbd5f5;
+}
+
+.premium-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: 700;
+    color: #22c55e;
+}
+
+.premium-btn {
+    margin-top: 1.3rem;
+    display: inline-block;
+    padding: 0.9rem 1.6rem;
+    border-radius: 999px;
+    background: linear-gradient(to right, #4f46e5, #3b82f6);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    box-shadow: 0 14px 40px rgba(37, 99, 235, 0.45);
+}
+
+.premium-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 50px rgba(37, 99, 235, 0.55);
+}
+
 /* ===== Responsive ===== */
 
 @media (max-width: 900px) {
@@ -602,7 +674,7 @@ body {
     }
 
     .nav-links {
-        display: none; /* mobile: keep it simple for now */
+        display: none;
     }
 
     .hero-card {
