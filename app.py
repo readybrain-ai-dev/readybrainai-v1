@@ -35,6 +35,17 @@ def user_is_premium():
 
 
 # ============================
+# ⭐ FIX: Founder can ALWAYS access admin
+# ============================
+@app.before_request
+def allow_admin_for_founder():
+    if request.endpoint == "admin_page":
+        # When founder switches to user, this keeps admin unlocked ONLY for you
+        if session.get("founder_override") is True:
+            session["founder_mode"] = True
+
+
+# ============================
 # LANGUAGE MAP
 # ============================
 LANGUAGE_NAMES = {
@@ -66,6 +77,7 @@ def listen_page():
     founder_key = request.args.get("founderKey")
     if founder_key == FOUNDER_KEY:
         session["founder_mode"] = True
+        session["founder_override"] = True
         print("🔥 Founder mode ENABLED")
 
     return render_template("listen.html")
@@ -369,7 +381,8 @@ def admin_clear_session():
     if not user_is_founder():
         return "Access denied", 403
     session.clear()
-    session["founder_mode"] = True  # keep you logged in as founder
+    session["founder_mode"] = True
+    session["founder_override"] = True
     return "ok"
 
 
@@ -378,8 +391,10 @@ def admin_clear_session():
 # ============================
 @app.route("/admin_switch_to_user", methods=["POST"])
 def admin_switch_to_user():
+    # founder override stays TRUE so you never get locked out
     session.clear()
-    print("🔁 Switched to USER MODE (limit active)")
+    session["founder_override"] = True  # lets you still open /admin
+    print("🔁 Switched to USER MODE (limit active, but admin still open)")
     return "ok"
 
 
@@ -387,6 +402,7 @@ def admin_switch_to_user():
 def admin_switch_to_founder():
     session.clear()
     session["founder_mode"] = True
+    session["founder_override"] = True
     print("🔥 Switched to FOUNDER MODE (unlimited)")
     return "ok"
 
