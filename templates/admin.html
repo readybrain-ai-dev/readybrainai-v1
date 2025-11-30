@@ -150,9 +150,17 @@
         <button onclick="disablePremium()">Disable Premium</button><br>
         <button onclick="clearSession()">Clear Session</button><br>
 
-        <!-- ⭐ ADDED HERE: SWITCH MODES -->
-        <button onclick="switchToUser()">Switch to USER Mode (limit)</button><br>
-        <button onclick="switchToFounder()">Switch to FOUNDER Mode (unlimited)</button>
+        <!-- ⭐ FIXED: SWITCH TO USER = REAL REDIRECT -->
+        <form action="/admin_switch_to_user" method="POST" style="display:inline;">
+            <button type="submit">Switch to USER Mode (limit)</button>
+        </form>
+        <br>
+
+        <!-- ⭐ FIXED: SWITCH TO FOUNDER = REAL REDIRECT -->
+        <form action="/admin_switch_to_founder" method="POST" style="display:inline;">
+            <button type="submit">Switch to FOUNDER Mode (unlimited)</button>
+        </form>
+
     </div>
 
 </div>
@@ -191,14 +199,11 @@
         fetch("/admin_clear_session", { method: "POST" }).then(() => location.reload());
     }
 
-    // ⭐ NEW FUNCTIONS
-    function switchToUser() {
-        fetch("/admin_switch_to_user", { method: "POST" }).then(() => location.reload());
-    }
-
-    function switchToFounder() {
-        fetch("/admin_switch_to_founder", { method: "POST" }).then(() => location.reload());
-    }
+    /* 
+       ⭐ REMOVED old JS switch functions 
+       because fetch() cannot follow redirects.
+       Now the <form> buttons do the switching.
+    */
 </script>
 
 </body>

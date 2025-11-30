@@ -45,7 +45,6 @@
             margin: 0 auto;
         }
 
-        /* NAV */
         .nav {
             display: flex;
             align-items: center;
@@ -104,7 +103,6 @@
             color: var(--text-muted);
         }
 
-        /* FOUNDER BADGE */
         #founderBadge {
             background: linear-gradient(90deg, #4f46e5, #6366f1);
             color: white;
@@ -112,10 +110,9 @@
             border-radius: 999px;
             font-size: 12px;
             margin-left: 10px;
-            display: none; 
+            display: none;
         }
 
-        /* LAYOUT */
         .layout {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -267,7 +264,6 @@
             cursor: pointer;
         }
 
-        /* POPUP */
         #premiumPopup {
             position: fixed;
             top: 0; left: 0;
@@ -328,7 +324,6 @@
             border: none;
         }
 
-        /* ADMIN BUTTON FOR FOUNDER */
         #adminBtn {
             padding: 7px 14px;
             border-radius: 999px;
@@ -448,22 +443,47 @@ document.getElementById("themeToggle").onclick = () => {
     localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
 };
 
-/* Founder Mode */
-function isFounder() {
+/* Founder Mode (localStorage) */
+function isFounderFrontend() {
     return localStorage.getItem("rb_founder_mode") === "1";
 }
 
+/* ⭐ BACKEND SYNC FIX — ensures UI matches Flask session */
+async function syncFounderStatus() {
+    try {
+        const res = await fetch("/admin_status");
+        const data = await res.json();
+
+        if (data.founder) {
+            // backend founder → frontend must match
+            localStorage.setItem("rb_founder_mode", "1");
+        } else {
+            // backend user → frontend must hide founder mode too
+            localStorage.removeItem("rb_founder_mode");
+        }
+    } catch (err) {
+        console.warn("Could not sync founder status");
+    }
+
+    // update UI appearance
+    if (isFounderFrontend()) {
+        document.getElementById("founderBadge").style.display = "inline-flex";
+        document.getElementById("adminBtn").style.display = "inline-flex";
+    } else {
+        document.getElementById("founderBadge").style.display = "none";
+        document.getElementById("adminBtn").style.display = "none";
+    }
+}
+
+syncFounderStatus();
+
+/* handle founderKey=... in URL */
 (function() {
     const params = new URLSearchParams(window.location.search);
     const key = params.get("founderKey");
 
     if (key === "READYBRAIN-UCSD-A18565216") {
         localStorage.setItem("rb_founder_mode", "1");
-    }
-
-    if (isFounder()) {
-        document.getElementById("founderBadge").style.display = "inline-flex";
-        document.getElementById("adminBtn").style.display = "inline-flex";
     }
 })();
 
@@ -481,7 +501,7 @@ function addUse() {
 }
 
 function limitedStart() {
-    if (isFounder()) {
+    if (isFounderFrontend()) {
         startListening();
         return;
     }

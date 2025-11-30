@@ -375,14 +375,14 @@ def admin_clear_session():
 
 
 # ============================
-# ⭐ NEW: SWITCH BETWEEN USER + FOUNDER
+# ⭐ NEW: SWITCH BETWEEN USER + FOUNDER (with REDIRECT)
 # ============================
 @app.route("/admin_switch_to_user", methods=["POST"])
 def admin_switch_to_user():
     session.clear()
     session["founder_override"] = True   # keeps admin unlocked
     print("🔁 Switched to USER MODE (admin still unlocked)")
-    return "ok"
+    return redirect("/listen")            # 🔥 redirect to user page
 
 
 @app.route("/admin_switch_to_founder", methods=["POST"])
@@ -391,7 +391,7 @@ def admin_switch_to_founder():
     session["founder_mode"] = True
     session["founder_override"] = True
     print("🔥 Switched to FOUNDER MODE (unlimited)")
-    return "ok"
+    return redirect("/admin")            # 🔥 redirect back to admin
 
 
 # ============================

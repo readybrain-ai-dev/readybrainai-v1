@@ -61,11 +61,9 @@ async function startListening() {
     }
 
     currentMimeType = chooseMimeType();
-
     let options = {};
     if (currentMimeType) options.mimeType = currentMimeType;
 
-    // Try to create MediaRecorder
     try {
         mediaRecorder = new MediaRecorder(stream, options);
     } catch (err) {
@@ -110,7 +108,7 @@ async function stopListening() {
     mediaRecorder.stop();
 
     mediaRecorder.onstop = async () => {
-        await new Promise(r => setTimeout(r, 200)); // gather chunks
+        await new Promise(r => setTimeout(r, 200)); // ensure chunks collected
 
         let blob;
         try {
@@ -120,10 +118,11 @@ async function stopListening() {
             currentMimeType = "audio/ogg";
         }
 
+        // ⭐ FIX: detect no voice or very quiet recordings
         if (blob.size < 800) {
-            status.innerText = "❌ No audio detected.";
-            qBox.innerText = "(no voice captured)";
-            aBox.innerText = "(no answer)";
+            status.innerText = "❌ No clear voice detected.";
+            qBox.innerText = "(unclear)";
+            aBox.innerText = "Unclear. Please try again.";
             return;
         }
 
@@ -136,14 +135,12 @@ async function stopListening() {
         const formData = new FormData();
         formData.append("audio", blob, "speech." + ext);
 
-        // Language settings
         const inputLang  = document.getElementById("languageSelect")?.value || "auto";
         const outputLang = document.getElementById("outputLanguage")?.value || "same";
 
         formData.append("language", inputLang);
         formData.append("output_language", outputLang);
 
-        // Fetch backend result
         let data;
         try {
             const res = await fetch("/interview_listen", {
@@ -158,9 +155,15 @@ async function stopListening() {
             return;
         }
 
-        // Show results
-        qBox.innerText = data.question ?? "(no text)";
-        aBox.innerText = data.answer ?? "(no answer)";
+        // ⭐ FIX: backend returns limit_reached
+        if (data.error === "limit_reached") {
+            document.getElementById("premiumPopup").style.display = "flex";
+            status.innerText = "Idle";
+            return;
+        }
+
+        qBox.innerText = data.question ?? "(unclear)";
+        aBox.innerText = data.answer ?? "(unclear)";
         status.innerText = "Idle";
 
         // Detected language tag
