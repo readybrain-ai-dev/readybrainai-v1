@@ -44,7 +44,6 @@
             margin: 0 auto;
         }
 
-        /* NAV */
         .nav {
             display: flex;
             align-items: center;
@@ -150,16 +149,8 @@
         <button onclick="disablePremium()">Disable Premium</button><br>
         <button onclick="clearSession()">Clear Session</button><br>
 
-        <!-- ⭐ FIXED: SWITCH TO USER = REAL REDIRECT -->
-        <form action="/admin_switch_to_user" method="POST" style="display:inline;">
-            <button type="submit">Switch to USER Mode (limit)</button>
-        </form>
-        <br>
-
-        <!-- ⭐ FIXED: SWITCH TO FOUNDER = REAL REDIRECT -->
-        <form action="/admin_switch_to_founder" method="POST" style="display:inline;">
-            <button type="submit">Switch to FOUNDER Mode (unlimited)</button>
-        </form>
+        <!-- ❌ REMOVED Switch to User button -->
+        <!-- ❌ REMOVED Switch to Founder button (not needed) -->
 
     </div>
 
@@ -174,7 +165,6 @@
         localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
     });
 
-    // Load admin info
     fetch("/admin_status")
         .then(res => res.json())
         .then(data => {
@@ -198,12 +188,6 @@
     function clearSession() {
         fetch("/admin_clear_session", { method: "POST" }).then(() => location.reload());
     }
-
-    /* 
-       ⭐ REMOVED old JS switch functions 
-       because fetch() cannot follow redirects.
-       Now the <form> buttons do the switching.
-    */
 </script>
 
 </body>
