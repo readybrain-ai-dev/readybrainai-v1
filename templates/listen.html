@@ -426,7 +426,10 @@
 <div id="premiumPopup">
     <div class="popup-box">
         <div class="popup-title">Daily Limit Reached</div>
-        <div class="popup-msg">You used your 3 free daily responses.</div>
+
+        <!-- UPDATED -->
+        <div class="popup-msg">You used your 5 free daily responses.</div>
+
         <button class="popup-btn" onclick="window.location='/premium'">Upgrade</button>
         <button class="popup-cancel" onclick="closePopup()">Cancel</button>
     </div>
@@ -455,17 +458,14 @@ async function syncFounderStatus() {
         const data = await res.json();
 
         if (data.founder) {
-            // backend founder → frontend must match
             localStorage.setItem("rb_founder_mode", "1");
         } else {
-            // backend user → frontend must hide founder mode too
             localStorage.removeItem("rb_founder_mode");
         }
     } catch (err) {
         console.warn("Could not sync founder status");
     }
 
-    // update UI appearance
     if (isFounderFrontend()) {
         document.getElementById("founderBadge").style.display = "inline-flex";
         document.getElementById("adminBtn").style.display = "inline-flex";
@@ -477,7 +477,7 @@ async function syncFounderStatus() {
 
 syncFounderStatus();
 
-/* handle founderKey=... in URL */
+/* founderKey in URL */
 (function() {
     const params = new URLSearchParams(window.location.search);
     const key = params.get("founderKey");
@@ -488,7 +488,8 @@ syncFounderStatus();
 })();
 
 /* Free Limit */
-const DAILY_LIMIT = 3;
+const DAILY_LIMIT = 5;   <!-- UPDATED -->
+
 function getTodayKey() {
     const d = new Date();
     return `rb-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
