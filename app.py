@@ -117,7 +117,7 @@ def interview_listen():
         print("🌟 Premium user → unlimited")
     else:
         uses = session.get("uses", 0)
-        if uses >= 3:
+        if uses >= 5:     # <<<<<< CHANGED FROM 3 TO 5
             return jsonify({
                 "error": "limit_reached",
                 "redirect": "/premium"
