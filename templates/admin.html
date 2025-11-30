@@ -149,8 +149,12 @@
         <button onclick="disablePremium()">Disable Premium</button><br>
         <button onclick="clearSession()">Clear Session</button><br>
 
-        <!-- ❌ REMOVED Switch to User button -->
-        <!-- ❌ REMOVED Switch to Founder button (not needed) -->
+        <hr style="margin: 16px 0; border-color: var(--card-border); opacity: 0.3;">
+
+        <!-- ⭐ ONLY KEEP SWITCH TO FOUNDER (no switch to user) -->
+        <form action="/admin_switch_to_founder" method="POST">
+            <button type="submit" style="background:#10b981;">Switch to Founder Mode</button>
+        </form>
 
     </div>
 

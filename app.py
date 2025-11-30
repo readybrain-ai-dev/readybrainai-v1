@@ -177,6 +177,7 @@ def interview_listen():
         spoken_text = (result.text or "").strip()
         detected_lang = getattr(result, "language", None) or input_lang or "unknown"
 
+        # Extra retry for Burmese (MY) if very short
         if len(spoken_text) < 2 and input_lang == "my":
             result = transcribe("my")
             spoken_text = (result.text or "").strip()
@@ -184,6 +185,7 @@ def interview_listen():
 
         clean_text = spoken_text.strip()
 
+        # 🔴 Silence / unclear handling
         if not clean_text or len(clean_text) < 4:
             return jsonify({
                 "question": "(unclear)",
@@ -191,6 +193,7 @@ def interview_listen():
                 "detected_language": detected_lang
             })
 
+        # Whisper no_speech_prob check
         segments = getattr(result, "segments", None)
         if segments:
             max_no_speech = max(
@@ -206,6 +209,7 @@ def interview_listen():
                     "detected_language": detected_lang
                 })
 
+        # Decide final output language
         if output_lang == "same":
             if detected_lang != "unknown":
                 final_lang = detected_lang
@@ -375,14 +379,14 @@ def admin_clear_session():
 
 
 # ============================
-# ⭐ NEW: SWITCH BETWEEN USER + FOUNDER (with REDIRECT)
+# ⭐ SWITCH BETWEEN USER + FOUNDER (with REDIRECT)
 # ============================
 @app.route("/admin_switch_to_user", methods=["POST"])
 def admin_switch_to_user():
     session.clear()
-    session["founder_override"] = True   # keeps admin unlocked
-    print("🔁 Switched to USER MODE (admin still unlocked)")
-    return redirect("/listen")            # 🔥 redirect to user page
+    session["founder_override"] = True   # keeps admin unlocked (if you go back)
+    print("🔁 Switched to USER MODE (admin still unlocked via override)")
+    return redirect("/listen")            # redirect to user page
 
 
 @app.route("/admin_switch_to_founder", methods=["POST"])
@@ -391,7 +395,7 @@ def admin_switch_to_founder():
     session["founder_mode"] = True
     session["founder_override"] = True
     print("🔥 Switched to FOUNDER MODE (unlimited)")
-    return redirect("/admin")            # 🔥 redirect back to admin
+    return redirect("/admin")             # redirect back to admin
 
 
 # ============================
