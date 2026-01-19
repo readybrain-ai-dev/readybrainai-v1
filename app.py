@@ -1,7 +1,7 @@
 import os
 import tempfile
 import subprocess
-from flask import Flask, request, jsonify, render_template, session, redirect
+from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -91,6 +91,14 @@ def premium_page():
 @app.route("/health")
 def health():
     return "ok", 200
+
+
+# ============================
+# ⭐ ADS.TXT (FOR ADSENSE)
+# ============================
+@app.route("/ads.txt")
+def ads_txt():
+    return send_from_directory(app.static_folder, "ads.txt")
 
 
 # ============================
