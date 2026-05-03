@@ -32,7 +32,6 @@
             padding: 0;
         }
 
-        /* noise overlay */
         body::before {
             content: '';
             position: fixed;
@@ -43,7 +42,6 @@
             opacity: 0.4;
         }
 
-        /* ── NAVBAR ── */
         .navbar {
             position: sticky;
             top: 0;
@@ -57,12 +55,7 @@
             justify-content: space-between;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 
         .brand-logo {
             width: 34px; height: 34px;
@@ -92,13 +85,10 @@
             font-size: 11px;
             font-weight: 700;
             display: none;
+            margin-left: 8px;
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
 
         .back-btn {
             padding: 7px 16px;
@@ -111,10 +101,7 @@
             transition: all 0.2s;
         }
 
-        .back-btn:hover {
-            border-color: rgba(255,255,255,0.3);
-            color: var(--white);
-        }
+        .back-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
 
         #adminBtn {
             padding: 7px 14px;
@@ -129,7 +116,6 @@
             width: auto;
         }
 
-        /* ── MAIN LAYOUT ── */
         .page {
             max-width: 1100px;
             margin: 0 auto;
@@ -146,7 +132,6 @@
             .page { grid-template-columns: 1fr; padding: 32px 16px; }
         }
 
-        /* ── LEFT SIDE ── */
         .hero-pill {
             display: inline-flex;
             align-items: center;
@@ -161,11 +146,7 @@
             margin-bottom: 20px;
         }
 
-        .hero-pill::before {
-            content: '●';
-            font-size: 8px;
-            animation: pulse 2s infinite;
-        }
+        .hero-pill::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -191,21 +172,11 @@
             margin-bottom: 28px;
         }
 
-        .steps {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .step {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-        }
+        .steps { display: flex; flex-direction: column; gap: 14px; }
+        .step { display: flex; align-items: flex-start; gap: 14px; }
 
         .step-num {
-            width: 28px;
-            height: 28px;
+            width: 28px; height: 28px;
             border-radius: 8px;
             background: var(--green);
             color: var(--black);
@@ -218,18 +189,9 @@
             flex-shrink: 0;
         }
 
-        .step-text {
-            font-size: 14px;
-            color: var(--gray-light);
-            line-height: 1.5;
-            padding-top: 4px;
-        }
+        .step-text { font-size: 14px; color: var(--gray-light); line-height: 1.5; padding-top: 4px; }
+        .step-text strong { color: var(--text); }
 
-        .step-text strong {
-            color: var(--text);
-        }
-
-        /* ── RIGHT SIDE — CARD ── */
         .card {
             background: var(--gray);
             border: 1px solid var(--gray-mid);
@@ -242,10 +204,8 @@
         .card::before {
             content: '';
             position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 300px;
-            height: 300px;
+            top: -100px; right: -100px;
+            width: 300px; height: 300px;
             background: radial-gradient(circle, rgba(0,232,122,0.06) 0%, transparent 70%);
             pointer-events: none;
         }
@@ -257,12 +217,7 @@
             margin-bottom: 20px;
         }
 
-        .card-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--white);
-        }
+        .card-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--white); }
 
         .lang-select {
             padding: 8px 14px;
@@ -275,7 +230,6 @@
             cursor: pointer;
         }
 
-        /* ── RECORD BUTTON ── */
         .record-btn {
             width: 100%;
             padding: 15px;
@@ -289,38 +243,15 @@
             margin-bottom: 10px;
         }
 
-        #startBtn {
-            background: var(--green);
-            color: var(--black);
-        }
+        #startBtn { background: var(--green); color: var(--black); }
+        #startBtn:hover { background: var(--green-dark); transform: translateY(-1px); }
+        #stopBtn { display: none; background: linear-gradient(92deg, #ef4444, #dc2626); color: white; }
 
-        #startBtn:hover {
-            background: var(--green-dark);
-            transform: translateY(-1px);
-        }
+        .status-line { font-size: 12px; color: var(--gray-light); margin-bottom: 16px; min-height: 18px; }
 
-        #stopBtn {
-            display: none;
-            background: linear-gradient(92deg, #ef4444, #dc2626);
-            color: white;
-        }
-
-        .status-line {
-            font-size: 12px;
-            color: var(--gray-light);
-            margin-bottom: 16px;
-            min-height: 18px;
-        }
-
-        /* ── OUTPUT BOXES ── */
         .section-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--gray-light);
-            margin-bottom: 8px;
-            margin-top: 16px;
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--gray-light); margin-bottom: 8px; margin-top: 16px;
         }
 
         .output-box {
@@ -335,20 +266,9 @@
             color: var(--text);
         }
 
-        .detected-lang {
-            font-size: 11px;
-            color: var(--gray-light);
-            margin-top: 5px;
-            margin-bottom: 2px;
-        }
+        .detected-lang { font-size: 11px; color: var(--gray-light); margin-top: 5px; margin-bottom: 2px; }
 
-        /* ── ACTION BUTTONS ── */
-        .action-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
+        .action-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 
         .action-btn {
             padding: 9px 18px;
@@ -362,23 +282,12 @@
             font-family: 'DM Sans', sans-serif;
         }
 
-        .btn-copy {
-            background: var(--gray-mid);
-            color: var(--text);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
+        .btn-copy { background: var(--gray-mid); color: var(--text); border: 1px solid rgba(255,255,255,0.08); }
         .btn-copy:hover { background: #3a3d42; }
 
-        .btn-convert {
-            background: var(--green);
-            color: var(--black);
-            display: none;
-        }
-
+        .btn-convert { background: var(--green); color: var(--black); display: none; }
         .btn-convert:hover { background: var(--green-dark); }
 
-        /* ── ENGLISH ANSWER BOX ── */
         #englishBox {
             display: none;
             margin-top: 14px;
@@ -408,10 +317,7 @@
             color: var(--text);
         }
 
-        #copyEnWrapper {
-            display: none;
-            margin-top: 8px;
-        }
+        #copyEnWrapper { display: none; margin-top: 8px; }
 
         .btn-copy-en {
             background: rgba(0,232,122,0.15);
@@ -421,7 +327,6 @@
 
         .btn-copy-en:hover { background: rgba(0,232,122,0.25); }
 
-        /* ── AD BOX ── */
         .ad-box {
             background: var(--black);
             border: 1px dashed rgba(255,255,255,0.08);
@@ -433,24 +338,24 @@
             margin-top: 16px;
         }
 
-        /* ── POPUP ── */
-        #premiumPopup {
+        /* ── POPUPS ── */
+        .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(8px);
         }
 
         .popup-box {
             background: var(--gray);
             border: 1px solid var(--gray-mid);
-            padding: 36px;
+            padding: 32px;
             width: 92%;
-            max-width: 420px;
+            max-width: 440px;
             border-radius: 22px;
             text-align: center;
             box-shadow: 0 24px 60px rgba(0,0,0,0.5);
@@ -458,21 +363,21 @@
 
         .popup-title {
             font-family: 'Syne', sans-serif;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--white);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .popup-msg {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--gray-light);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             line-height: 1.5;
         }
 
         .popup-btn {
-            padding: 14px;
+            padding: 13px;
             width: 100%;
             border-radius: 999px;
             background: var(--green);
@@ -486,17 +391,102 @@
         }
 
         .popup-cancel {
-            padding: 14px;
+            padding: 13px;
             width: 100%;
             border-radius: 999px;
             background: var(--gray-mid);
             color: var(--text);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             border: none;
             font-family: 'DM Sans', sans-serif;
         }
+
+        /* ── AD POPUP ── */
+        .ad-popup-box {
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
+            padding: 28px;
+            width: 92%;
+            max-width: 480px;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+        }
+
+        .ad-popup-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .ad-popup-label {
+            font-size: 11px;
+            color: var(--gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .ad-countdown {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green);
+            background: rgba(0,232,122,0.1);
+            border: 1px solid rgba(0,232,122,0.25);
+            padding: 4px 12px;
+            border-radius: 999px;
+        }
+
+        .ad-slot {
+            background: var(--black);
+            border: 1px solid var(--gray-mid);
+            border-radius: 14px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .ad-continue-btn {
+            padding: 13px;
+            width: 100%;
+            border-radius: 999px;
+            background: var(--gray-mid);
+            color: var(--gray-light);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: not-allowed;
+            border: none;
+            margin-bottom: 10px;
+            font-family: 'Syne', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .ad-continue-btn.ready {
+            background: var(--green);
+            color: var(--black);
+            cursor: pointer;
+        }
+
+        .ad-upgrade-btn {
+            padding: 13px;
+            width: 100%;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--green);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid rgba(0,232,122,0.3);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .ad-upgrade-btn:hover { background: rgba(0,232,122,0.08); }
     </style>
 </head>
 
@@ -595,27 +585,53 @@
             <button class="action-btn btn-convert" id="convertEnBtn" onclick="convertToEnglish()">🇺🇸 Convert to English</button>
         </div>
 
-        <!-- English answer -->
         <div id="englishBox">
             <div class="english-label">🇺🇸 English — say this to your interviewer</div>
             <div class="english-content" id="answerEnglish"></div>
         </div>
 
         <div id="copyEnWrapper">
-            <button class="action-btn btn-copy-en action-btn" onclick="copyEnglish()">📋 Copy English</button>
+            <button class="action-btn btn-copy-en" onclick="copyEnglish()">📋 Copy English</button>
         </div>
 
         <div class="ad-box">📢 Advertisement</div>
     </div>
 </div>
 
-<!-- POPUP -->
-<div id="premiumPopup">
+<!-- ── AD POPUP (shows after 5 uses) ── -->
+<div class="overlay" id="adPopup">
+    <div class="ad-popup-box">
+        <div class="ad-popup-top">
+            <div class="ad-popup-label">📢 Short ad break</div>
+            <div class="ad-countdown" id="adCountdown">Wait 10s</div>
+        </div>
+
+        <!-- AdSense ad slot -->
+        <div class="ad-slot">
+            <ins class="adsbygoogle"
+                 style="display:block; width:100%; height:120px;"
+                 data-ad-client="ca-pub-7757881269834722"
+                 data-ad-slot="auto"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+        </div>
+
+        <button class="ad-continue-btn" id="adContinueBtn" disabled onclick="continueAfterAd()">
+            ⏳ Please wait...
+        </button>
+        <button class="ad-upgrade-btn" onclick="window.location='/premium'">
+            ⚡ Skip ads forever — Upgrade to Premium
+        </button>
+    </div>
+</div>
+
+<!-- ── PREMIUM POPUP (hard limit) ── -->
+<div class="overlay" id="premiumPopup">
     <div class="popup-box">
-        <div class="popup-title">Daily Limit Reached</div>
-        <div class="popup-msg">You used your 5 free daily responses. Upgrade for unlimited access.</div>
+        <div class="popup-title">Upgrade to Premium</div>
+        <div class="popup-msg">Get unlimited practice sessions with no ads — perfect for serious interview prep.</div>
         <button class="popup-btn" onclick="window.location='/premium'">Upgrade to Premium</button>
-        <button class="popup-cancel" onclick="closePopup()">Cancel</button>
+        <button class="popup-cancel" onclick="closePopup()">Maybe later</button>
     </div>
 </div>
 
@@ -658,8 +674,9 @@ syncFounderStatus();
     }
 })();
 
-/* Free Limit */
-const DAILY_LIMIT = 9999;
+/* ── USAGE TRACKING ── */
+const FREE_LIMIT = 5;
+const AD_EVERY = 3; // show ad every 3 uses after free limit
 
 function getTodayKey() {
     const d = new Date();
@@ -668,11 +685,74 @@ function getTodayKey() {
 function getUses() { return Number(localStorage.getItem(getTodayKey()) || 0); }
 function addUse() { localStorage.setItem(getTodayKey(), getUses() + 1); }
 
+let pendingStart = false;
+
 function limitedStart() {
-    if (isFounderFrontend()) { startListening(); return; }
-    if (getUses() >= DAILY_LIMIT) { openPopup(); return; }
-    addUse();
-    startListening();
+    if (isFounderFrontend()) {
+        startListening();
+        return;
+    }
+
+    const uses = getUses();
+
+    if (uses < FREE_LIMIT) {
+        // Free uses — just go
+        addUse();
+        startListening();
+    } else {
+        // After free limit — show ad every AD_EVERY uses
+        const usesOverLimit = uses - FREE_LIMIT;
+        if (usesOverLimit % AD_EVERY === 0) {
+            pendingStart = true;
+            showAdPopup();
+        } else {
+            addUse();
+            startListening();
+        }
+    }
+}
+
+/* ── AD POPUP ── */
+let adTimer = null;
+
+function showAdPopup() {
+    const popup = document.getElementById("adPopup");
+    const btn = document.getElementById("adContinueBtn");
+    const countdown = document.getElementById("adCountdown");
+
+    popup.style.display = "flex";
+    btn.disabled = true;
+    btn.classList.remove("ready");
+    btn.innerText = "⏳ Please wait...";
+
+    // Init AdSense ad
+    try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch(e) {}
+
+    let seconds = 10;
+    countdown.innerText = `Wait ${seconds}s`;
+
+    adTimer = setInterval(() => {
+        seconds--;
+        countdown.innerText = seconds > 0 ? `Wait ${seconds}s` : "Ready!";
+        if (seconds <= 0) {
+            clearInterval(adTimer);
+            btn.disabled = false;
+            btn.classList.add("ready");
+            btn.innerText = "✅ Continue Recording";
+        }
+    }, 1000);
+}
+
+function continueAfterAd() {
+    document.getElementById("adPopup").style.display = "none";
+    clearInterval(adTimer);
+    if (pendingStart) {
+        pendingStart = false;
+        addUse();
+        startListening();
+    }
 }
 
 function openPopup() { document.getElementById("premiumPopup").style.display = "flex"; }
