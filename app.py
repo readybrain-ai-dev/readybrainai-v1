@@ -14,34 +14,24 @@ API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 
 app = Flask(__name__)
-
 app.secret_key = os.getenv("SECRET_KEY", "fallback-secret-change-this")
-
 
 # ============================
 # 🔥 FOUNDER & PREMIUM KEYS
 # ============================
 FOUNDER_KEY = os.getenv("FOUNDER_KEY", "READYBRAIN-UCSD-A18565216")
-PREMIUM_COOKIE = "rb_premium_mode"
-
 
 def user_is_founder():
     return session.get("founder_mode") is True
 
-
 def user_is_premium():
     return session.get("premium_mode") is True
 
-
-# ============================
-# ⭐ Founder can ALWAYS open /admin
-# ============================
 @app.before_request
 def allow_admin_for_founder():
     if request.endpoint == "admin_page":
         if session.get("founder_override") is True:
             session["founder_mode"] = True
-
 
 # ============================
 # LANGUAGE MAP
@@ -63,15 +53,12 @@ LANGUAGE_NAMES = {
     "en": "English",
 }
 
-# Whisper does NOT support all languages — fallback to auto for unsupported ones
 WHISPER_SUPPORTED = {
     "zh", "ja", "ko", "th", "vi", "id", "ms", "hi", "bn", "es", "pt", "en", "tl"
 }
 
-
 def lang_to_name(code):
     return LANGUAGE_NAMES.get(code, code)
-
 
 # ============================
 # ROUTES
@@ -79,7 +66,6 @@ def lang_to_name(code):
 @app.route("/")
 def landing():
     return render_template("index.html")
-
 
 @app.route("/listen")
 def listen_page():
@@ -90,27 +76,22 @@ def listen_page():
         print("🔥 Founder mode ENABLED")
     return render_template("listen.html")
 
-
 @app.route("/premium")
 def premium_page():
     return render_template("premium.html")
-
 
 @app.route("/health")
 def health():
     return "ok", 200
 
-
 @app.route("/ads.txt")
 def ads_txt():
     return send_from_directory(app.static_folder, "ads.txt")
-
 
 @app.route("/activate_premium", methods=["POST"])
 def activate_premium():
     session["premium_mode"] = True
     return jsonify({"status": "ok"})
-
 
 # ============================
 # 🎤 MAIN INTERVIEW LISTENER
@@ -120,9 +101,9 @@ def interview_listen():
     print("\n===== 🎤 /interview_listen START =====")
 
     if user_is_founder():
-        print("🔥 Founder detected → unlimited")
+        print("🔥 Founder → unlimited")
     elif user_is_premium():
-        print("🌟 Premium user → unlimited")
+        print("🌟 Premium → unlimited")
     else:
         uses = session.get("uses", 0)
         if uses >= 9999:
@@ -130,7 +111,6 @@ def interview_listen():
         session["uses"] = uses + 1
 
     input_lang = request.form.get("language", "auto")
-    output_lang = request.form.get("output_language", "same")
 
     if "audio" not in request.files:
         return jsonify({
@@ -156,8 +136,7 @@ def interview_listen():
 
         ffmpeg_result = subprocess.run(
             ["ffmpeg", "-y", "-i", input_path, "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", wav_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
         if ffmpeg_result.returncode != 0:
@@ -182,17 +161,15 @@ def interview_listen():
         # Only pass language hint if Whisper supports it
         if input_lang == "auto" or input_lang not in WHISPER_SUPPORTED:
             lang_hint = None
+            print(f"ℹ️ Language '{input_lang}' → using auto-detect")
         else:
             lang_hint = input_lang
 
         result = transcribe(lang_hint)
-
         spoken_text = (result.text or "").strip()
         detected_lang = getattr(result, "language", None) or input_lang or "unknown"
 
-        clean_text = spoken_text.strip()
-
-        if not clean_text or len(clean_text) < 4:
+        if not spoken_text or len(spoken_text) < 4:
             return jsonify({
                 "question": "(unclear)",
                 "answer": "Unclear. Please try again.",
@@ -214,24 +191,19 @@ def interview_listen():
                     "detected_language": detected_lang
                 })
 
-        # Decide output language
-        if output_lang == "same":
-            if detected_lang != "unknown":
-                final_lang = detected_lang
-            else:
-                final_lang = input_lang if input_lang != "auto" else "en"
-        else:
-            final_lang = output_lang
-
-        if input_lang == "my" and output_lang == "same":
+        # Decide output language based on input selection
+        if input_lang == "my":
             final_lang = "my"
+        elif input_lang != "auto" and input_lang in LANGUAGE_NAMES:
+            final_lang = input_lang
+        else:
+            final_lang = detected_lang if detected_lang != "unknown" else "en"
 
         final_lang_name = lang_to_name(final_lang)
 
         # ✅ Generate answer in user's language
         rewrite_prompt = f"""
 You are ReadyBrain AI.
-
 Rewrite the following into a short, confident 2–3 sentence interview answer.
 Write the FINAL version in {final_lang_name}.
 
@@ -244,19 +216,17 @@ Rules:
 - Simple and confident
 - Output ONLY the final answer
 """
-
         ai = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": rewrite_prompt}]
         )
         ai_output = ai.choices[0].message.content.strip()
 
-        # ✅ Always generate English version too
+        # ✅ ALWAYS generate English version (unless already English)
         answer_english = None
         if final_lang != "en":
             english_prompt = f"""
 You are ReadyBrain AI.
-
 Rewrite the following into a short, confident 2–3 sentence interview answer in English.
 
 Original text:
@@ -265,7 +235,7 @@ Original text:
 Rules:
 - Keep original meaning
 - No new ideas
-- Simple and confident English
+- Simple, confident English
 - Output ONLY the final answer in English
 """
             ai_en = client.chat.completions.create(
@@ -273,6 +243,9 @@ Rules:
                 messages=[{"role": "user", "content": english_prompt}]
             )
             answer_english = ai_en.choices[0].message.content.strip()
+            print(f"✅ English answer generated")
+        else:
+            print(f"ℹ️ Output is already English, skipping English translation")
 
         return jsonify({
             "question": spoken_text,
@@ -299,40 +272,6 @@ Rules:
                 except:
                     pass
 
-
-# ============================
-# TEXT MODE
-# ============================
-@app.route("/interview_answer", methods=["POST"])
-def interview_answer():
-    data = request.get_json() or {}
-    question = data.get("question", "").strip()
-    job_role = data.get("job_role", "").strip()
-    background = data.get("background", "").strip()
-
-    if not question:
-        return jsonify({"answer": "Please type a question."})
-
-    prompt = f"""
-You are ReadyBrain AI.
-Write a short 2–3 sentence interview answer in clear, confident language.
-Question: "{question}"
-Job role: "{job_role}"
-Background: "{background}"
-Output ONLY the final answer.
-"""
-
-    try:
-        result = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return jsonify({"answer": result.choices[0].message.content.strip()})
-    except Exception as e:
-        print("❌ interview_answer error:", str(e))
-        return jsonify({"answer": "Error generating answer. Please try again."})
-
-
 # ============================
 # REGENERATE
 # ============================
@@ -340,10 +279,8 @@ Output ONLY the final answer.
 def interview_regen():
     data = request.get_json() or {}
     text = data.get("text", "").strip()
-
     if not text:
         return jsonify({"answer": "(no text)"}), 400
-
     prompt = f"""
 You are ReadyBrain AI.
 Rewrite this in 2–3 confident, clean sentences.
@@ -351,7 +288,6 @@ Keep the same meaning.
 Output ONLY the improved answer.
 \"\"\"{text}\"\"\"
 """
-
     try:
         result = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -362,7 +298,6 @@ Output ONLY the improved answer.
         print("❌ interview_regen error:", str(e))
         return jsonify({"answer": "Error regenerating answer. Please try again."})
 
-
 # ============================
 # ADMIN ROUTES
 # ============================
@@ -372,7 +307,6 @@ def admin_page():
         return "Access denied", 403
     return render_template("admin.html")
 
-
 @app.route("/admin_status")
 def admin_status():
     return jsonify({
@@ -381,14 +315,12 @@ def admin_status():
         "uses": session.get("uses", 0)
     })
 
-
 @app.route("/admin_reset_uses", methods=["POST"])
 def admin_reset_uses():
     if not user_is_founder():
         return "Access denied", 403
     session["uses"] = 0
     return "ok"
-
 
 @app.route("/admin_enable_premium", methods=["POST"])
 def admin_enable_premium():
@@ -397,14 +329,12 @@ def admin_enable_premium():
     session["premium_mode"] = True
     return "ok"
 
-
 @app.route("/admin_disable_premium", methods=["POST"])
 def admin_disable_premium():
     if not user_is_founder():
         return "Access denied", 403
     session["premium_mode"] = False
     return "ok"
-
 
 @app.route("/admin_clear_session", methods=["POST"])
 def admin_clear_session():
@@ -415,13 +345,11 @@ def admin_clear_session():
     session["founder_override"] = True
     return "ok"
 
-
 @app.route("/admin_switch_to_user", methods=["POST"])
 def admin_switch_to_user():
     session.clear()
     session["founder_override"] = True
     return redirect("/listen")
-
 
 @app.route("/admin_switch_to_founder", methods=["POST"])
 def admin_switch_to_founder():
@@ -430,9 +358,5 @@ def admin_switch_to_founder():
     session["founder_override"] = True
     return redirect("/admin")
 
-
-# ============================
-# LOCAL DEV
-# ============================
 if __name__ == "__main__":
     app.run(debug=True)
