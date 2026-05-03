@@ -1,6 +1,7 @@
 let mediaRecorder;
 let audioChunks = [];
 let currentMimeType = null;
+let lastAnswer = "";
 
 // =====================================================
 // CHOOSE THE BEST MIME TYPE (CROSS-PLATFORM SUPPORT)
@@ -32,6 +33,18 @@ function chooseMimeType() {
 function resetUI() {
     document.getElementById("question").innerText = "";
     document.getElementById("answer").innerText = "";
+    lastAnswer = "";
+
+    // Hide English box
+    const englishBox = document.getElementById("englishBox");
+    const englishEl = document.getElementById("answerEnglish");
+    const copyEnWrapper = document.getElementById("copyEnWrapper");
+    const convertBtn = document.getElementById("convertEnBtn");
+
+    if (englishBox) englishBox.style.display = "none";
+    if (englishEl) englishEl.innerText = "";
+    if (copyEnWrapper) copyEnWrapper.style.display = "none";
+    if (convertBtn) convertBtn.style.display = "none";
 
     const oldTag = document.getElementById("detectedLang");
     if (oldTag) oldTag.remove();
@@ -68,7 +81,6 @@ async function startListening() {
         mediaRecorder = new MediaRecorder(stream, options);
     } catch (err) {
         console.warn("Main MIME failed. Trying ogg…");
-
         try {
             mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/ogg" });
             currentMimeType = "audio/ogg";
@@ -108,7 +120,7 @@ async function stopListening() {
     mediaRecorder.stop();
 
     mediaRecorder.onstop = async () => {
-        await new Promise(r => setTimeout(r, 200)); // ensure chunks collected
+        await new Promise(r => setTimeout(r, 200));
 
         let blob;
         try {
@@ -118,7 +130,6 @@ async function stopListening() {
             currentMimeType = "audio/ogg";
         }
 
-        // ⭐ FIX: detect no voice or very quiet recordings
         if (blob.size < 800) {
             status.innerText = "❌ No clear voice detected.";
             qBox.innerText = "(unclear)";
@@ -126,7 +137,6 @@ async function stopListening() {
             return;
         }
 
-        // Determine extension
         let ext = "webm";
         if (currentMimeType.includes("ogg")) ext = "ogg";
         if (currentMimeType.includes("mp4")) ext = "mp4";
@@ -135,11 +145,8 @@ async function stopListening() {
         const formData = new FormData();
         formData.append("audio", blob, "speech." + ext);
 
-        const inputLang  = document.getElementById("languageSelect")?.value || "auto";
-        const outputLang = document.getElementById("outputLanguage")?.value || "same";
-
+        const inputLang = document.getElementById("languageSelect")?.value || "auto";
         formData.append("language", inputLang);
-        formData.append("output_language", outputLang);
 
         let data;
         try {
@@ -155,7 +162,6 @@ async function stopListening() {
             return;
         }
 
-        // ⭐ FIX: backend returns limit_reached
         if (data.error === "limit_reached") {
             document.getElementById("premiumPopup").style.display = "flex";
             status.innerText = "Idle";
@@ -164,10 +170,13 @@ async function stopListening() {
 
         qBox.innerText = data.question ?? "(unclear)";
         aBox.innerText = data.answer ?? "(unclear)";
+        lastAnswer = data.answer ?? "";
         status.innerText = "Idle";
 
         // Detected language tag
         if (data.detected_language) {
+            const oldTag = document.getElementById("detectedLang");
+            if (oldTag) oldTag.remove();
             const tag = document.createElement("div");
             tag.id = "detectedLang";
             tag.style.fontSize = "12px";
@@ -176,7 +185,51 @@ async function stopListening() {
             tag.innerText = "Detected language: " + data.detected_language;
             qBox.parentNode.insertBefore(tag, qBox);
         }
+
+        // Always show Convert to English button after recording
+        const convertBtn = document.getElementById("convertEnBtn");
+        if (convertBtn && lastAnswer) {
+            convertBtn.style.display = "inline-block";
+            convertBtn.innerText = "🇺🇸 Convert to English";
+            convertBtn.disabled = false;
+        }
     };
+}
+
+// =====================================================
+// CONVERT TO ENGLISH
+// =====================================================
+async function convertToEnglish() {
+    if (!lastAnswer) return;
+
+    const convertBtn = document.getElementById("convertEnBtn");
+    const englishBox = document.getElementById("englishBox");
+    const englishEl = document.getElementById("answerEnglish");
+    const copyEnWrapper = document.getElementById("copyEnWrapper");
+
+    convertBtn.innerText = "Translating...";
+    convertBtn.disabled = true;
+
+    try {
+        const response = await fetch("/interview_regen", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: lastAnswer, translate_to_english: true })
+        });
+        const data = await response.json();
+
+        if (data.answer) {
+            englishEl.innerText = data.answer;
+            englishBox.style.display = "block";
+            if (copyEnWrapper) copyEnWrapper.style.display = "block";
+        }
+    } catch (e) {
+        englishEl.innerText = "Could not translate. Please try again.";
+        englishBox.style.display = "block";
+    }
+
+    convertBtn.innerText = "🇺🇸 Convert to English";
+    convertBtn.disabled = false;
 }
 
 // =====================================================
@@ -186,6 +239,11 @@ function copyAnswer() {
     const ans = document.getElementById("answer").innerText.trim();
     if (!ans) return;
     navigator.clipboard.writeText(ans);
+}
+
+function copyEnglish() {
+    const text = document.getElementById("answerEnglish").innerText.trim();
+    if (text) navigator.clipboard.writeText(text);
 }
 
 // =====================================================
@@ -210,6 +268,7 @@ async function regenerateAnswer() {
         });
         const data = await res.json();
         aBox.innerText = data.answer || "(no answer)";
+        lastAnswer = data.answer || "";
     } catch {
         aBox.innerText = "(server error)";
     }
@@ -241,6 +300,7 @@ async function generateTextAnswer() {
 
         const data = await res.json();
         aBox.innerText = data.answer || "(no answer)";
+        lastAnswer = data.answer || "";
         statusEl.innerText = "Done.";
     } catch (err) {
         statusEl.innerText = "Error: could not generate answer.";
