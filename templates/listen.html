@@ -8,10 +8,7 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7757881269834722"
     crossorigin="anonymous"></script>
 
-
     <!-- Google Font -->
-
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -170,6 +167,7 @@
             background: var(--surface);
             border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.45);
+            color: var(--text-main);
         }
 
         .button-row {
@@ -252,6 +250,7 @@
             margin-bottom: 8px;
             background: var(--surface);
             color: var(--text-main);
+            box-sizing: border-box;
         }
 
         .text-textarea {
@@ -375,24 +374,61 @@
         <section class="card">
             <div class="card-header">
                 <h2>🎤 Answer Refinement</h2>
+
+                <!-- INPUT LANGUAGE -->
                 <select id="languageSelect" class="select-box">
-                    <option value="auto">🌍 Auto Detect</option>
-                    <option value="en">🇺🇸 English</option>
-                    <option value="ja">🇯🇵 Japanese</option>
-                    <option value="ko">🇰🇷 Korean</option>
-                    <option value="zh">🇨🇳 Chinese</option>
-                    <option value="es">🇪🇸 Spanish</option>
+                    <option value="auto">🌐 Auto Detect</option>
+                    <optgroup label="🇲🇲 Burmese">
+                        <option value="my">Burmese (မြန်မာ)</option>
+                    </optgroup>
+                    <optgroup label="🌏 Asian">
+                        <option value="zh">Chinese (中文)</option>
+                        <option value="ja">Japanese (日本語)</option>
+                        <option value="ko">Korean (한국어)</option>
+                        <option value="th">Thai (ภาษาไทย)</option>
+                        <option value="vi">Vietnamese (Tiếng Việt)</option>
+                        <option value="id">Indonesian (Bahasa)</option>
+                        <option value="ms">Malay (Bahasa Melayu)</option>
+                        <option value="tl">Filipino (Tagalog)</option>
+                        <option value="hi">Hindi (हिन्दी)</option>
+                        <option value="bn">Bengali (বাংলা)</option>
+                    </optgroup>
+                    <optgroup label="🌎 Latino">
+                        <option value="es">Spanish (Español)</option>
+                        <option value="pt">Portuguese (Português)</option>
+                    </optgroup>
+                    <optgroup label="🌍 Other">
+                        <option value="en">English</option>
+                    </optgroup>
                 </select>
             </div>
 
+            <!-- OUTPUT LANGUAGE -->
             <label>Answer output language</label>
             <select id="outputLanguage" class="select-box">
-                <option value="same">Same</option>
-                <option value="en">English</option>
-                <option value="ja">Japanese</option>
-                <option value="ko">Korean</option>
-                <option value="zh">Chinese</option>
-                <option value="es">Spanish</option>
+                <option value="same">Same as input</option>
+                <optgroup label="🇲🇲 Burmese">
+                    <option value="my">Burmese (မြန်မာ)</option>
+                </optgroup>
+                <optgroup label="🌏 Asian">
+                    <option value="zh">Chinese (中文)</option>
+                    <option value="ja">Japanese (日本語)</option>
+                    <option value="ko">Korean (한국어)</option>
+                    <option value="th">Thai (ภาษาไทย)</option>
+                    <option value="vi">Vietnamese (Tiếng Việt)</option>
+                    <option value="id">Indonesian (Bahasa)</option>
+                    <option value="ms">Malay (Bahasa Melayu)</option>
+                    <option value="tl">Filipino (Tagalog)</option>
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="bn">Bengali (বাংলা)</option>
+                </optgroup>
+                <optgroup label="🌎 Latino">
+                    <option value="es">Spanish (Español)</option>
+                    <option value="pt">Portuguese (Português)</option>
+                </optgroup>
+                <optgroup label="🌍 Other">
+                    <option value="en">English</option>
+                </optgroup>
             </select>
 
             <div class="button-row">
@@ -432,10 +468,7 @@
 <div id="premiumPopup">
     <div class="popup-box">
         <div class="popup-title">Daily Limit Reached</div>
-
-        <!-- UPDATED -->
         <div class="popup-msg">You used your 5 free daily responses.</div>
-
         <button class="popup-btn" onclick="window.location='/premium'">Upgrade</button>
         <button class="popup-cancel" onclick="closePopup()">Cancel</button>
     </div>
@@ -457,12 +490,11 @@ function isFounderFrontend() {
     return localStorage.getItem("rb_founder_mode") === "1";
 }
 
-/* ⭐ BACKEND SYNC FIX — ensures UI matches Flask session */
+/* Backend sync — ensures UI matches Flask session */
 async function syncFounderStatus() {
     try {
         const res = await fetch("/admin_status");
         const data = await res.json();
-
         if (data.founder) {
             localStorage.setItem("rb_founder_mode", "1");
         } else {
@@ -487,14 +519,13 @@ syncFounderStatus();
 (function() {
     const params = new URLSearchParams(window.location.search);
     const key = params.get("founderKey");
-
     if (key === "READYBRAIN-UCSD-A18565216") {
         localStorage.setItem("rb_founder_mode", "1");
     }
 })();
 
 /* Free Limit */
-const DAILY_LIMIT = 5;   <!-- UPDATED -->
+const DAILY_LIMIT = 5;
 
 function getTodayKey() {
     const d = new Date();
@@ -512,12 +543,10 @@ function limitedStart() {
         startListening();
         return;
     }
-
     if (getUses() >= DAILY_LIMIT) {
         openPopup();
         return;
     }
-
     addUse();
     startListening();
 }
