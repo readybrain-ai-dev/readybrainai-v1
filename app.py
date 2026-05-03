@@ -173,18 +173,19 @@ def interview_listen():
         final_lang_name = lang_to_name(final_lang)
 
         rewrite_prompt = f"""
-You are ReadyBrain AI.
-Rewrite the following into a short, confident 2–3 sentence interview answer.
+You are ReadyBrain AI, an expert interview coach.
+
+The user spoke the following text. Rewrite it into a short, confident 2-3 sentence interview answer.
 Write the FINAL version in {final_lang_name}.
 
 Original text:
 \"\"\"{spoken_text}\"\"\"
 
 Rules:
-- Keep original meaning
-- No new ideas
-- Simple and confident
-- Output ONLY the final answer
+- Keep the original meaning and the user's personal story
+- Remove filler words and rambling
+- Sound confident, clear, and professional
+- Output ONLY the final answer, nothing else
 """
         ai = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -228,17 +229,29 @@ def interview_regen():
         return jsonify({"answer": "(no text)"}), 400
 
     if translate_to_english:
+        # ✅ This rewrites as a BEST English interview answer, not just a translation
         prompt = f"""
-You are ReadyBrain AI.
-Translate and rewrite the following into a short, confident 2–3 sentence interview answer in English.
-Keep the same meaning. Output ONLY the final answer in English.
+You are ReadyBrain AI, an expert interview coach.
 
+The following is an interview answer. Your job is to rewrite it as the BEST possible 
+confident, professional 2-3 sentence interview answer in English.
+
+This will be said out loud to a real interviewer, so make it:
+- Sound completely natural in English
+- Clear, confident, and impressive
+- Free of filler words
+- Professional but not robotic
+
+Original answer:
 \"\"\"{text}\"\"\"
+
+Output ONLY the final English answer. Nothing else.
 """
     else:
         prompt = f"""
-You are ReadyBrain AI.
-Rewrite this in 2–3 confident, clean sentences. Keep the same meaning.
+You are ReadyBrain AI, an expert interview coach.
+Rewrite this into a better 2-3 sentence interview answer.
+Keep the same meaning but make it clearer and more confident.
 Output ONLY the improved answer.
 
 \"\"\"{text}\"\"\"
