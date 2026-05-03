@@ -3,325 +3,618 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ReadyBrainAI Listener</title>
+    <title>ReadyBrainAI – Voice Coach</title>
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7757881269834722"
     crossorigin="anonymous"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --bg-main: radial-gradient(circle at top right, #e6eeff, #f8faff 60%);
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --card-bg: #ffffff;
-            --card-border: #e2e8f0;
-            --surface: #f1f5f9;
-            --shadow-main: 0 12px 36px rgba(15,23,42,0.05);
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body.dark-mode {
-            --bg-main: radial-gradient(circle at top right, #020617, #0f172a 60%);
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --card-bg: #0f172a;
-            --card-border: #1e293b;
-            --surface: #1e293b;
-            --shadow-main: 0 18px 50px rgba(0,0,0,0.55);
+        :root {
+            --black: #08090a;
+            --white: #f8f9fa;
+            --green: #00e87a;
+            --green-dark: #00c064;
+            --gray: #1a1c1e;
+            --gray-mid: #2e3034;
+            --gray-light: #6b7280;
+            --text: #e8eaed;
         }
 
         body {
-            margin: 0;
-            padding: 40px 16px;
-            font-family: "Inter", sans-serif;
-            background: var(--bg-main);
-            color: var(--text-main);
-            transition: 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0;
         }
 
-        .page { max-width: 1080px; margin: 0 auto; }
+        /* noise overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
 
-        .nav {
+        /* ── NAVBAR ── */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(16px);
+            background: rgba(8,9,10,0.85);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 28px;
         }
 
-        .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 18px; }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
 
         .brand-logo {
-            width: 34px; height: 34px; border-radius: 999px;
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 15px;
-            box-shadow: 0 8px 22px rgba(79,70,229,0.4);
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .nav-buttons { display: flex; align-items: center; gap: 10px; }
-
-        .back-btn {
-            padding: 7px 14px; border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.45);
-            background: rgba(255,255,255,0.3);
-            color: var(--text-muted); cursor: pointer; font-size: 13px; text-decoration: none;
-        }
-
-        .theme-toggle {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 32px; height: 32px; border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.45);
-            cursor: pointer; background: rgba(255,255,255,0.4); color: var(--text-muted);
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--white);
         }
 
         #founderBadge {
-            background: linear-gradient(90deg, #4f46e5, #6366f1);
-            color: white; padding: 6px 14px; border-radius: 999px;
-            font-size: 12px; margin-left: 10px; display: none;
+            background: var(--green);
+            color: var(--black);
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            display: none;
         }
 
-        .layout {
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            padding: 7px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: transparent;
+            color: var(--gray-light);
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: rgba(255,255,255,0.3);
+            color: var(--white);
+        }
+
+        #adminBtn {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: none;
+            background: var(--green);
+            color: var(--black);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            width: auto;
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 24px;
+            position: relative;
+            z-index: 1;
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-            gap: 36px;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 48px;
+            align-items: start;
         }
 
-        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+        @media (max-width: 860px) {
+            .page { grid-template-columns: 1fr; padding: 32px 16px; }
+        }
 
-        .hero-title { font-size: 32px; font-weight: 700; margin: 0 0 6px 0; }
-        .hero-pill { font-size: 13px; margin-bottom: 8px; color: #dc2626; }
-        .hero-sub { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
+        /* ── LEFT SIDE ── */
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(0,232,122,0.1);
+            border: 1px solid rgba(0,232,122,0.25);
+            color: var(--green);
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
 
+        .hero-pill::before {
+            content: '●';
+            font-size: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--white);
+            margin-bottom: 16px;
+        }
+
+        .hero-title .accent { color: var(--green); }
+
+        .hero-sub {
+            font-size: 15px;
+            color: var(--gray-light);
+            line-height: 1.65;
+            margin-bottom: 28px;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            font-size: 14px;
+            color: var(--gray-light);
+            line-height: 1.5;
+            padding-top: 4px;
+        }
+
+        .step-text strong {
+            color: var(--text);
+        }
+
+        /* ── RIGHT SIDE — CARD ── */
         .card {
-            background: var(--card-bg); padding: 26px; border-radius: 24px;
-            border: 1px solid var(--card-border); box-shadow: var(--shadow-main);
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
+            border-radius: 24px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .card-header {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0,232,122,0.06) 0%, transparent 70%);
+            pointer-events: none;
         }
 
-        .select-box {
-            padding: 9px 13px; font-size: 13px; background: var(--surface);
-            border-radius: 999px; border: 1px solid rgba(148,163,184,0.45); color: var(--text-main);
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
         }
 
-        .button-row { display: flex; gap: 10px; margin: 16px 0 10px 0; }
-
-        button {
-            width: 100%; padding: 13px; font-size: 14px; font-weight: 600;
-            border: none; border-radius: 999px; cursor: pointer;
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--white);
         }
 
-        #startBtn { background: linear-gradient(92deg, #22c55e, #16a34a); color: white; }
-        #stopBtn { display: none; background: linear-gradient(92deg, #ef4444, #dc2626); color: white; }
+        .lang-select {
+            padding: 8px 14px;
+            font-size: 13px;
+            background: var(--gray-mid);
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+        }
 
-        .status-line { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+        /* ── RECORD BUTTON ── */
+        .record-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+            border: none;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+
+        #startBtn {
+            background: var(--green);
+            color: var(--black);
+        }
+
+        #startBtn:hover {
+            background: var(--green-dark);
+            transform: translateY(-1px);
+        }
+
+        #stopBtn {
+            display: none;
+            background: linear-gradient(92deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .status-line {
+            font-size: 12px;
+            color: var(--gray-light);
+            margin-bottom: 16px;
+            min-height: 18px;
+        }
+
+        /* ── OUTPUT BOXES ── */
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-light);
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
 
         .output-box {
-            background: var(--surface); padding: 16px; border-radius: 14px;
-            border: 1px solid rgba(148,163,184,0.45); min-height: 60px;
-            font-size: 14px; white-space: pre-line;
+            background: var(--black);
+            border: 1px solid var(--gray-mid);
+            border-radius: 12px;
+            padding: 14px 16px;
+            min-height: 64px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-line;
+            color: var(--text);
         }
 
-        .answer-actions {
+        .detected-lang {
+            font-size: 11px;
+            color: var(--gray-light);
+            margin-top: 5px;
+            margin-bottom: 2px;
+        }
+
+        /* ── ACTION BUTTONS ── */
+        .action-row {
             display: flex;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 12px;
             flex-wrap: wrap;
         }
 
-        .copy-btn {
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: white;
+        .action-btn {
+            padding: 9px 18px;
+            border-radius: 999px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
             width: auto;
-            padding: 10px 20px;
+            font-family: 'DM Sans', sans-serif;
         }
 
-        #convertEnBtn {
-            background: linear-gradient(92deg, #0ea5e9, #0284c7);
-            color: white;
-            width: auto;
-            padding: 10px 20px;
+        .btn-copy {
+            background: var(--gray-mid);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .btn-copy:hover { background: #3a3d42; }
+
+        .btn-convert {
+            background: var(--green);
+            color: var(--black);
             display: none;
         }
 
-        /* English answer box */
+        .btn-convert:hover { background: var(--green-dark); }
+
+        /* ── ENGLISH ANSWER BOX ── */
         #englishBox {
             display: none;
-            margin-top: 12px;
+            margin-top: 14px;
             border-radius: 14px;
             overflow: hidden;
-            border: 1px solid rgba(14,165,233,0.3);
+            border: 1px solid rgba(0,232,122,0.25);
         }
 
         .english-label {
-            background: linear-gradient(92deg, #0ea5e9, #0284c7);
-            color: white;
+            background: rgba(0,232,122,0.12);
+            border-bottom: 1px solid rgba(0,232,122,0.2);
+            color: var(--green);
             font-size: 11px;
-            font-weight: 600;
-            padding: 7px 14px;
-            letter-spacing: 0.06em;
+            font-weight: 700;
+            padding: 8px 14px;
+            letter-spacing: 0.07em;
             text-transform: uppercase;
         }
 
         .english-content {
-            background: var(--surface);
+            background: var(--black);
             padding: 14px 16px;
             font-size: 14px;
             white-space: pre-line;
             min-height: 60px;
+            line-height: 1.6;
+            color: var(--text);
         }
 
-        .copy-en-btn {
-            background: linear-gradient(92deg, #0ea5e9, #0284c7);
-            color: white;
-            width: auto;
-            padding: 10px 20px;
+        #copyEnWrapper {
+            display: none;
             margin-top: 8px;
         }
 
-        .ad-box {
-            background: var(--surface); padding: 16px; margin: 16px 0;
-            border-radius: 14px; border: 1px dashed rgba(148,163,184,0.5);
-            text-align: center; font-size: 14px; color: var(--text-muted);
+        .btn-copy-en {
+            background: rgba(0,232,122,0.15);
+            color: var(--green);
+            border: 1px solid rgba(0,232,122,0.25);
         }
 
+        .btn-copy-en:hover { background: rgba(0,232,122,0.25); }
+
+        /* ── AD BOX ── */
+        .ad-box {
+            background: var(--black);
+            border: 1px dashed rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--gray-light);
+            margin-top: 16px;
+        }
+
+        /* ── POPUP ── */
         #premiumPopup {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.55); display: none;
-            align-items: center; justify-content: center;
-            z-index: 9999; backdrop-filter: blur(4px);
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(6px);
         }
 
         .popup-box {
-            background: var(--card-bg); padding: 32px; width: 92%; max-width: 440px;
-            border-radius: 22px; text-align: center; box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
+            padding: 36px;
+            width: 92%;
+            max-width: 420px;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
         }
 
-        .popup-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-        .popup-msg { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+        .popup-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+
+        .popup-msg {
+            font-size: 15px;
+            color: var(--gray-light);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
 
         .popup-btn {
-            padding: 14px; width: 100%; border-radius: 999px;
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: white; font-size: 16px; font-weight: 600;
-            cursor: pointer; border: none; margin-bottom: 12px;
+            padding: 14px;
+            width: 100%;
+            border-radius: 999px;
+            background: var(--green);
+            color: var(--black);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            margin-bottom: 10px;
+            font-family: 'Syne', sans-serif;
         }
 
         .popup-cancel {
-            padding: 14px; width: 100%; border-radius: 999px;
-            background: #e2e8f0; color: var(--text-main);
-            font-size: 16px; font-weight: 600; cursor: pointer; border: none;
-        }
-
-        #adminBtn {
-            padding: 7px 14px; border-radius: 999px; border: none;
-            background: linear-gradient(90deg, #4f46e5, #6366f1);
-            color: white; font-size: 12px; cursor: pointer; display: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 999px;
+            background: var(--gray-mid);
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
         }
     </style>
 </head>
 
 <body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/" class="brand">
+        <div class="brand-logo">RB</div>
+        <span class="brand-name">ReadyBrainAI</span>
+        <span id="founderBadge">FOUNDER</span>
+    </a>
+    <div class="nav-right">
+        <a href="/" class="back-btn">← Back</a>
+        <button id="adminBtn" onclick="window.location='/admin'">Admin</button>
+    </div>
+</nav>
+
+<!-- MAIN -->
 <div class="page">
 
-    <!-- NAV -->
-    <header class="nav">
-        <div class="brand">
-            <div class="brand-logo">RB</div>
-            <div>ReadyBrainAI</div>
-            <div id="founderBadge">FOUNDER</div>
+    <!-- LEFT -->
+    <div>
+        <div class="hero-pill">Live · Voice Interview Coach</div>
+        <h1 class="hero-title">Speak naturally.<br><span class="accent">Get a stronger answer.</span></h1>
+        <p class="hero-sub">
+            Record your answer in any language. ReadyBrainAI rewrites it clearly —
+            then convert to English to say it confidently to your interviewer.
+        </p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text"><strong>Choose your language</strong> — Burmese, Spanish, Chinese, and more</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text"><strong>Record your answer</strong> — speak naturally, no script needed</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text"><strong>Get a better version</strong> — clear, confident, ready to say</div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text"><strong>Convert to English</strong> — say it to your interviewer with confidence</div>
+            </div>
         </div>
-        <div class="nav-buttons">
-            <a href="/" class="back-btn">← Back</a>
-            <button id="adminBtn" onclick="window.location='/admin'">Admin Panel</button>
-            <button id="themeToggle" class="theme-toggle">🌙</button>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="card">
+        <div class="card-top">
+            <div class="card-title">🎤 Answer Refinement</div>
+            <select id="languageSelect" class="lang-select">
+                <option value="auto">🌐 Auto Detect</option>
+                <optgroup label="🇲🇲 Burmese">
+                    <option value="my">Burmese (မြန်မာ)</option>
+                </optgroup>
+                <optgroup label="🌏 Asian">
+                    <option value="zh">Chinese (中文)</option>
+                    <option value="ja">Japanese (日本語)</option>
+                    <option value="ko">Korean (한국어)</option>
+                    <option value="th">Thai (ภาษาไทย)</option>
+                    <option value="vi">Vietnamese (Tiếng Việt)</option>
+                    <option value="id">Indonesian (Bahasa)</option>
+                    <option value="ms">Malay (Bahasa Melayu)</option>
+                    <option value="tl">Filipino (Tagalog)</option>
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="bn">Bengali (বাংলা)</option>
+                </optgroup>
+                <optgroup label="🌎 Latino">
+                    <option value="es">Spanish (Español)</option>
+                    <option value="pt">Portuguese (Português)</option>
+                </optgroup>
+                <optgroup label="🌍 Other">
+                    <option value="en">English</option>
+                </optgroup>
+            </select>
         </div>
-    </header>
 
-    <main class="layout">
+        <button class="record-btn" id="startBtn" onclick="limitedStart()">🎙 Start Recording</button>
+        <button class="record-btn" id="stopBtn" onclick="stopListening()">⏹ Stop Recording</button>
 
-        <section>
-            <div class="hero-pill">🔴 Live prototype · Voice Interview Coach</div>
-            <h1 class="hero-title">Speak naturally. Get a stronger interview answer.</h1>
-            <p class="hero-sub">
-                Record your answer in any language. ReadyBrainAI rewrites it clearly —
-                then convert to English to say it to your interviewer.
-            </p>
-        </section>
+        <p id="status" class="status-line">Idle</p>
 
-        <section class="card">
-            <div class="card-header">
-                <h2>🎤 Answer Refinement</h2>
-                <select id="languageSelect" class="select-box">
-                    <option value="auto">🌐 Auto Detect</option>
-                    <optgroup label="🇲🇲 Burmese">
-                        <option value="my">Burmese (မြန်မာ)</option>
-                    </optgroup>
-                    <optgroup label="🌏 Asian">
-                        <option value="zh">Chinese (中文)</option>
-                        <option value="ja">Japanese (日本語)</option>
-                        <option value="ko">Korean (한국어)</option>
-                        <option value="th">Thai (ภาษาไทย)</option>
-                        <option value="vi">Vietnamese (Tiếng Việt)</option>
-                        <option value="id">Indonesian (Bahasa)</option>
-                        <option value="ms">Malay (Bahasa Melayu)</option>
-                        <option value="tl">Filipino (Tagalog)</option>
-                        <option value="hi">Hindi (हिन्दी)</option>
-                        <option value="bn">Bengali (বাংলা)</option>
-                    </optgroup>
-                    <optgroup label="🌎 Latino">
-                        <option value="es">Spanish (Español)</option>
-                        <option value="pt">Portuguese (Português)</option>
-                    </optgroup>
-                    <optgroup label="🌍 Other">
-                        <option value="en">English</option>
-                    </optgroup>
-                </select>
-            </div>
+        <div class="section-label">Your Response</div>
+        <p id="detectedLang" class="detected-lang"></p>
+        <div id="question" class="output-box"></div>
 
-            <div class="button-row">
-                <button id="startBtn" onclick="limitedStart()">Start Recording</button>
-                <button id="stopBtn" onclick="stopListening()">Stop Recording</button>
-            </div>
+        <div class="section-label">Improved Answer</div>
+        <div id="answer" class="output-box"></div>
 
-            <p id="status" class="status-line">Idle</p>
+        <div class="action-row">
+            <button class="action-btn btn-copy" onclick="copyAnswer()">📋 Copy</button>
+            <button class="action-btn btn-convert" id="convertEnBtn" onclick="convertToEnglish()">🇺🇸 Convert to English</button>
+        </div>
 
-            <h3>Your Response:</h3>
-            <p id="detectedLang" style="font-size:12px; color:var(--text-muted); margin-bottom:6px;"></p>
-            <div id="question" class="output-box"></div>
+        <!-- English answer -->
+        <div id="englishBox">
+            <div class="english-label">🇺🇸 English — say this to your interviewer</div>
+            <div class="english-content" id="answerEnglish"></div>
+        </div>
 
-            <h3>Improved Answer:</h3>
-            <div id="answer" class="output-box"></div>
+        <div id="copyEnWrapper">
+            <button class="action-btn btn-copy-en action-btn" onclick="copyEnglish()">📋 Copy English</button>
+        </div>
 
-            <!-- Action buttons -->
-            <div class="answer-actions">
-                <button class="copy-btn" onclick="copyAnswer()">📋 Copy</button>
-                <button id="convertEnBtn" onclick="convertToEnglish()">🇺🇸 Convert to English</button>
-            </div>
-
-            <!-- English answer box (hidden until convert is clicked) -->
-            <div id="englishBox">
-                <div class="english-label">🇺🇸 English — say this to your interviewer</div>
-                <div class="english-content" id="answerEnglish"></div>
-            </div>
-            <div id="copyEnWrapper" style="display:none;">
-                <button class="copy-en-btn" onclick="copyEnglish()">📋 Copy English</button>
-            </div>
-
-            <div class="ad-box">📢 Advertisement placeholder</div>
-        </section>
-    </main>
+        <div class="ad-box">📢 Advertisement</div>
+    </div>
 </div>
 
 <!-- POPUP -->
 <div id="premiumPopup">
     <div class="popup-box">
         <div class="popup-title">Daily Limit Reached</div>
-        <div class="popup-msg">You used your 5 free daily responses.</div>
-        <button class="popup-btn" onclick="window.location='/premium'">Upgrade</button>
+        <div class="popup-msg">You used your 5 free daily responses. Upgrade for unlimited access.</div>
+        <button class="popup-btn" onclick="window.location='/premium'">Upgrade to Premium</button>
         <button class="popup-cancel" onclick="closePopup()">Cancel</button>
     </div>
 </div>
@@ -329,14 +622,6 @@
 <script src="/static/interview.js"></script>
 
 <script>
-/* Dark Mode */
-const saved = localStorage.getItem("rb-dark");
-if (saved === "true") document.body.classList.add("dark-mode");
-document.getElementById("themeToggle").onclick = () => {
-    document.body.classList.toggle("dark-mode");
-    localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
-};
-
 /* Founder Mode */
 function isFounderFrontend() {
     return localStorage.getItem("rb_founder_mode") === "1";
@@ -351,9 +636,8 @@ async function syncFounderStatus() {
         } else {
             localStorage.removeItem("rb_founder_mode");
         }
-    } catch (err) {
-        console.warn("Could not sync founder status");
-    }
+    } catch (err) {}
+
     if (isFounderFrontend()) {
         document.getElementById("founderBadge").style.display = "inline-flex";
         document.getElementById("adminBtn").style.display = "inline-flex";
@@ -370,6 +654,7 @@ syncFounderStatus();
     const key = params.get("founderKey");
     if (key === "READYBRAIN-UCSD-A18565216") {
         localStorage.setItem("rb_founder_mode", "1");
+        syncFounderStatus();
     }
 })();
 
@@ -392,17 +677,6 @@ function limitedStart() {
 
 function openPopup() { document.getElementById("premiumPopup").style.display = "flex"; }
 function closePopup() { document.getElementById("premiumPopup").style.display = "none"; }
-
-/* Show copy English button when English box appears */
-const observer = new MutationObserver(() => {
-    const box = document.getElementById("englishBox");
-    const wrapper = document.getElementById("copyEnWrapper");
-    if (box && wrapper) {
-        wrapper.style.display = box.style.display === "block" ? "block" : "none";
-    }
-});
-const englishBox = document.getElementById("englishBox");
-if (englishBox) observer.observe(englishBox, { attributes: true, attributeFilter: ["style"] });
 </script>
 
 </body>
