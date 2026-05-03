@@ -58,6 +58,10 @@ def listen_page():
 def premium_page():
     return render_template("premium.html")
 
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
 @app.route("/health")
 def health():
     return "ok", 200

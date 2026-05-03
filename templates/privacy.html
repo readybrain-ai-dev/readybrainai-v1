@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy – ReadyBrainAI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #08090a;
+            --white: #f8f9fa;
+            --green: #00e87a;
+            --gray: #1a1c1e;
+            --gray-mid: #2e3034;
+            --gray-light: #6b7280;
+            --text: #e8eaed;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(16px);
+            background: rgba(8,9,10,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-logo {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--white);
+        }
+
+        .back-btn {
+            padding: 7px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: transparent;
+            color: var(--gray-light);
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 60px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .page-title .accent { color: var(--green); }
+
+        .updated {
+            font-size: 13px;
+            color: var(--gray-light);
+            margin-bottom: 48px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--gray-mid);
+        }
+
+        .section p {
+            font-size: 15px;
+            color: var(--gray-light);
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+        .section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .section ul li {
+            font-size: 15px;
+            color: var(--gray-light);
+            line-height: 1.65;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .section ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .contact-box {
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 16px;
+        }
+
+        .contact-box p {
+            margin: 0;
+        }
+
+        .contact-box a {
+            color: var(--green);
+            text-decoration: none;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-mid);
+            text-align: center;
+            font-size: 13px;
+            color: var(--gray-light);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/" class="brand">
+        <div class="brand-logo">RB</div>
+        <span class="brand-name">ReadyBrainAI</span>
+    </a>
+    <a href="/" class="back-btn">← Back</a>
+</nav>
+
+<div class="page">
+
+    <h1 class="page-title">Privacy <span class="accent">Policy</span></h1>
+    <p class="updated">Last updated: May 2, 2026</p>
+
+    <div class="section">
+        <h2>1. Overview</h2>
+        <p>
+            ReadyBrainAI ("we", "our", or "us") operates the website readybrainai.com. This Privacy Policy explains how we collect, use, and protect your information when you use our AI-powered interview coaching service.
+        </p>
+        <p>
+            By using ReadyBrainAI, you agree to the collection and use of information in accordance with this policy.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>2. Information We Collect</h2>
+        <p>We collect the following types of information:</p>
+        <ul>
+            <li><strong>Voice recordings</strong> — Audio recorded during your practice sessions is temporarily processed to generate transcriptions and improved answers. Audio is not permanently stored.</li>
+            <li><strong>Usage data</strong> — We track how many times you use the service per day using your browser's local storage. This data stays on your device.</li>
+            <li><strong>Session data</strong> — We use browser sessions to manage free/premium access. No personal login information is required.</li>
+            <li><strong>Cookies and ad data</strong> — Our advertising partners (Google AdSense, Adsterra) may use cookies to serve relevant ads. See Section 5 for details.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. How We Use Your Information</h2>
+        <ul>
+            <li>To transcribe your voice recordings using OpenAI Whisper</li>
+            <li>To generate improved interview answers using OpenAI GPT-4o-mini</li>
+            <li>To manage your daily usage limits</li>
+            <li>To display relevant advertisements to support our free service</li>
+            <li>To improve the quality and performance of ReadyBrainAI</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Third-Party Services</h2>
+        <p>We use the following third-party services that may collect data:</p>
+        <ul>
+            <li><strong>OpenAI</strong> — Voice audio and text are sent to OpenAI for transcription and answer generation. See <a href="https://openai.com/privacy" target="_blank" style="color: var(--green);">OpenAI's Privacy Policy</a>.</li>
+            <li><strong>Google AdSense</strong> — We use Google AdSense to display ads. Google may use cookies to serve personalized ads. See <a href="https://policies.google.com/privacy" target="_blank" style="color: var(--green);">Google's Privacy Policy</a>.</li>
+            <li><strong>Adsterra</strong> — We use Adsterra to display ads. See <a href="https://adsterra.com/privacy-policy/" target="_blank" style="color: var(--green);">Adsterra's Privacy Policy</a>.</li>
+            <li><strong>Google Fonts</strong> — We use Google Fonts for typography. See <a href="https://policies.google.com/privacy" target="_blank" style="color: var(--green);">Google's Privacy Policy</a>.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Cookies & Advertising</h2>
+        <p>
+            ReadyBrainAI uses cookies and similar tracking technologies to serve advertisements and track usage. Our advertising partners may use cookies to display ads based on your prior visits to our website or other websites.
+        </p>
+        <p>
+            You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" style="color: var(--green);">Google Ads Settings</a> or by using the <a href="https://www.networkadvertising.org/choices/" target="_blank" style="color: var(--green);">NAI opt-out tool</a>.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>6. Data Retention</h2>
+        <p>
+            Voice recordings are processed in real-time and are not permanently stored on our servers. Temporary audio files are deleted immediately after processing. Usage data is stored locally on your device and resets daily.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>7. Children's Privacy</h2>
+        <p>
+            ReadyBrainAI is not directed to children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, please contact us and we will delete it.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>8. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li>Know what data we collect about you</li>
+            <li>Request deletion of your data</li>
+            <li>Opt out of personalized advertising</li>
+            <li>Contact us with any privacy concerns</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>9. Changes to This Policy</h2>
+        <p>
+            We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last updated" date at the top of this page. We encourage you to review this Privacy Policy periodically.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>10. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us:</p>
+        <div class="contact-box">
+            <p>
+                <strong style="color: var(--white);">ReadyBrainAI</strong><br><br>
+                Website: <a href="https://readybrainai.com">readybrainai.com</a><br>
+                Email: <a href="mailto:luis.wainn@gmail.com">luis.wainn@gmail.com</a><br>
+                Founder: Aung Myo Win
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 ReadyBrainAI. Built by a CS major at UCSD.
+    </div>
+
+</div>
+
+</body>
+</html>
