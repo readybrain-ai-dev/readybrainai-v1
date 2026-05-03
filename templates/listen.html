@@ -19,7 +19,6 @@
             --card-border: #e2e8f0;
             --surface: #f1f5f9;
             --shadow-main: 0 12px 36px rgba(15,23,42,0.05);
-            --accent: #4f46e5;
         }
 
         body.dark-mode {
@@ -30,7 +29,6 @@
             --card-border: #1e293b;
             --surface: #1e293b;
             --shadow-main: 0 18px 50px rgba(0,0,0,0.55);
-            --accent: #818cf8;
         }
 
         body {
@@ -51,65 +49,36 @@
             margin-bottom: 28px;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 18px;
-        }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 18px; }
 
         .brand-logo {
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
+            width: 34px; height: 34px; border-radius: 999px;
             background: linear-gradient(135deg, #4f46e5, #6366f1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 15px;
             box-shadow: 0 8px 22px rgba(79,70,229,0.4);
         }
 
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .nav-buttons { display: flex; align-items: center; gap: 10px; }
 
         .back-btn {
-            padding: 7px 14px;
-            border-radius: 999px;
+            padding: 7px 14px; border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.45);
             background: rgba(255,255,255,0.3);
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 13px;
-            text-decoration: none;
+            color: var(--text-muted); cursor: pointer; font-size: 13px; text-decoration: none;
         }
 
         .theme-toggle {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 999px;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.45);
-            cursor: pointer;
-            background: rgba(255,255,255,0.4);
-            color: var(--text-muted);
+            cursor: pointer; background: rgba(255,255,255,0.4); color: var(--text-muted);
         }
 
         #founderBadge {
             background: linear-gradient(90deg, #4f46e5, #6366f1);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 999px;
-            font-size: 12px;
-            margin-left: 10px;
-            display: none;
+            color: white; padding: 6px 14px; border-radius: 999px;
+            font-size: 12px; margin-left: 10px; display: none;
         }
 
         .layout {
@@ -118,222 +87,91 @@
             gap: 36px;
         }
 
-        @media (max-width: 900px) {
-            .layout { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 
-        .hero-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin: 0 0 6px 0;
-        }
-
-        .hero-pill {
-            font-size: 13px;
-            margin-bottom: 8px;
-            color: #dc2626;
-        }
-
-        .hero-sub {
-            font-size: 15px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
+        .hero-title { font-size: 32px; font-weight: 700; margin: 0 0 6px 0; }
+        .hero-pill { font-size: 13px; margin-bottom: 8px; color: #dc2626; }
+        .hero-sub { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
 
         .card {
-            background: var(--card-bg);
-            padding: 26px;
-            border-radius: 24px;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-main);
+            background: var(--card-bg); padding: 26px; border-radius: 24px;
+            border: 1px solid var(--card-border); box-shadow: var(--shadow-main);
         }
 
         .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
         }
 
         .select-box {
-            padding: 9px 13px;
-            font-size: 13px;
-            background: var(--surface);
-            border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.45);
-            color: var(--text-main);
+            padding: 9px 13px; font-size: 13px; background: var(--surface);
+            border-radius: 999px; border: 1px solid rgba(148,163,184,0.45); color: var(--text-main);
         }
 
-        .preset-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .preset-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .preset-btn {
-            padding: 8px 16px;
-            border-radius: 999px;
-            border: 1.5px solid rgba(148,163,184,0.45);
-            background: var(--surface);
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: auto;
-        }
-
-        .preset-btn:hover {
-            border-color: #4f46e5;
-            color: #4f46e5;
-        }
-
-        .preset-btn.active {
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: white;
-            border-color: transparent;
-        }
-
-        .divider {
-            height: 1px;
-            background: rgba(148,163,184,0.2);
-            margin: 14px 0;
-        }
-
-        .button-row {
-            display: flex;
-            gap: 10px;
-            margin: 16px 0 10px 0;
-        }
+        .button-row { display: flex; gap: 10px; margin: 16px 0 10px 0; }
 
         button {
-            width: 100%;
-            padding: 13px;
-            font-size: 14px;
-            font-weight: 600;
-            border: none;
-            border-radius: 999px;
-            cursor: pointer;
+            width: 100%; padding: 13px; font-size: 14px; font-weight: 600;
+            border: none; border-radius: 999px; cursor: pointer;
         }
 
-        #startBtn {
-            background: linear-gradient(92deg, #22c55e, #16a34a);
-            color: white;
-        }
+        #startBtn { background: linear-gradient(92deg, #22c55e, #16a34a); color: white; }
+        #stopBtn { display: none; background: linear-gradient(92deg, #ef4444, #dc2626); color: white; }
 
-        #stopBtn {
-            display: none;
-            background: linear-gradient(92deg, #ef4444, #dc2626);
-            color: white;
-        }
-
-        .status-line {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
+        .status-line { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
 
         .output-box {
-            background: var(--surface);
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(148,163,184,0.45);
-            min-height: 70px;
-            font-size: 14px;
-            white-space: pre-line;
+            background: var(--surface); padding: 16px; border-radius: 14px;
+            border: 1px solid rgba(148,163,184,0.45); min-height: 60px;
+            font-size: 14px; white-space: pre-line;
         }
 
-        /* ── DUAL ANSWER BOX ── */
-        .answer-dual {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        /* ── DUAL ANSWER ── */
+        .answer-dual { display: flex; flex-direction: column; gap: 10px; }
 
         .answer-block {
-            border-radius: 14px;
-            overflow: hidden;
+            border-radius: 14px; overflow: hidden;
             border: 1px solid rgba(148,163,184,0.45);
         }
 
         .answer-block-label {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 14px;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
+            font-size: 11px; font-weight: 600; padding: 7px 14px;
+            letter-spacing: 0.06em; text-transform: uppercase;
         }
 
         .answer-block-label.native {
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: white;
+            background: linear-gradient(92deg, #4f46e5, #6366f1); color: white;
         }
 
         .answer-block-label.english {
-            background: linear-gradient(92deg, #0ea5e9, #0284c7);
-            color: white;
+            background: linear-gradient(92deg, #0ea5e9, #0284c7); color: white;
         }
 
         .answer-block-content {
-            background: var(--surface);
-            padding: 14px 16px;
-            font-size: 14px;
-            white-space: pre-line;
-            min-height: 60px;
+            background: var(--surface); padding: 14px 16px;
+            font-size: 14px; white-space: pre-line; min-height: 60px;
         }
 
         .ad-box {
-            background: var(--surface);
-            padding: 16px;
-            margin: 16px 0;
-            border-radius: 14px;
-            border: 1px dashed rgba(148,163,184,0.5);
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-muted);
+            background: var(--surface); padding: 16px; margin: 16px 0;
+            border-radius: 14px; border: 1px dashed rgba(148,163,184,0.5);
+            text-align: center; font-size: 14px; color: var(--text-muted);
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
+        .action-buttons { display: flex; gap: 8px; }
 
-        .copy-btn {
-            background: linear-gradient(92deg, #4f46e5, #6366f1);
-            color: white;
-        }
-
-        .copy-en-btn {
-            background: linear-gradient(92deg, #0ea5e9, #0284c7);
-            color: white;
-        }
+        .copy-btn { background: linear-gradient(92deg, #4f46e5, #6366f1); color: white; }
+        .copy-en-btn { background: linear-gradient(92deg, #0ea5e9, #0284c7); color: white; }
 
         #premiumPopup {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.55);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(4px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55); display: none;
+            align-items: center; justify-content: center;
+            z-index: 9999; backdrop-filter: blur(4px);
         }
 
         .popup-box {
-            background: var(--card-bg);
-            padding: 32px;
-            width: 92%;
-            max-width: 440px;
-            border-radius: 22px;
-            text-align: center;
-            box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+            background: var(--card-bg); padding: 32px; width: 92%; max-width: 440px;
+            border-radius: 22px; text-align: center; box-shadow: 0 18px 40px rgba(0,0,0,0.25);
         }
 
         .popup-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
@@ -383,8 +221,8 @@
             <div class="hero-pill">🔴 Live prototype · Voice Interview Coach</div>
             <h1 class="hero-title">Speak naturally. Get a stronger interview answer.</h1>
             <p class="hero-sub">
-                Record your answer. ReadyBrainAI rewrites it into a clear, confident,
-                professional reply — in your language AND English.
+                Record your answer in any language. ReadyBrainAI rewrites it in your language
+                AND in English — so you know exactly what to say to your interviewer.
             </p>
         </section>
 
@@ -418,43 +256,6 @@
                 </select>
             </div>
 
-            <!-- QUICK PRESETS -->
-            <div class="preset-label">⚡ Quick mode</div>
-            <div class="preset-row">
-                <button class="preset-btn" id="preset-my" onclick="setPreset('my', 'my', this)">🇲🇲 Burmese</button>
-                <button class="preset-btn" id="preset-es" onclick="setPreset('es', 'es', this)">🇪🇸 Spanish</button>
-                <button class="preset-btn" id="preset-auto" onclick="setPreset('auto', 'same', this)">🌐 Auto</button>
-            </div>
-
-            <div class="divider"></div>
-
-            <label>Answer output language</label>
-            <select id="outputLanguage" class="select-box">
-                <option value="same">Same as input</option>
-                <optgroup label="🇲🇲 Burmese">
-                    <option value="my">Burmese (မြန်မာ)</option>
-                </optgroup>
-                <optgroup label="🌏 Asian">
-                    <option value="zh">Chinese (中文)</option>
-                    <option value="ja">Japanese (日本語)</option>
-                    <option value="ko">Korean (한국어)</option>
-                    <option value="th">Thai (ภาษาไทย)</option>
-                    <option value="vi">Vietnamese (Tiếng Việt)</option>
-                    <option value="id">Indonesian (Bahasa)</option>
-                    <option value="ms">Malay (Bahasa Melayu)</option>
-                    <option value="tl">Filipino (Tagalog)</option>
-                    <option value="hi">Hindi (हिन्दी)</option>
-                    <option value="bn">Bengali (বাংলা)</option>
-                </optgroup>
-                <optgroup label="🌎 Latino">
-                    <option value="es">Spanish (Español)</option>
-                    <option value="pt">Portuguese (Português)</option>
-                </optgroup>
-                <optgroup label="🌍 Other">
-                    <option value="en">English</option>
-                </optgroup>
-            </select>
-
             <div class="button-row">
                 <button id="startBtn" onclick="limitedStart()">Start Recording</button>
                 <button id="stopBtn" onclick="stopListening()">Stop Recording</button>
@@ -463,18 +264,19 @@
             <p id="status" class="status-line">Idle</p>
 
             <h3>Your Response:</h3>
+            <p id="detectedLang" style="font-size:12px; color:var(--text-muted); margin-bottom:6px;"></p>
             <div id="question" class="output-box"></div>
 
             <h3>Improved Answer:</h3>
             <div class="answer-dual">
-                <!-- Native language answer -->
-                <div class="answer-block" id="nativeAnswerBlock">
-                    <div class="answer-block-label native" id="nativeLabel">🌏 Your language</div>
+                <!-- Native language -->
+                <div class="answer-block">
+                    <div class="answer-block-label native">🌏 Your language</div>
                     <div class="answer-block-content" id="answer"></div>
                 </div>
-                <!-- English answer (shown only when different from native) -->
+                <!-- English — always shown -->
                 <div class="answer-block" id="englishAnswerBlock" style="display:none;">
-                    <div class="answer-block-label english">🇺🇸 English (say this to your interviewer)</div>
+                    <div class="answer-block-label english">🇺🇸 English — say this to your interviewer</div>
                     <div class="answer-block-content" id="answerEnglish"></div>
                 </div>
             </div>
@@ -482,8 +284,8 @@
             <div class="ad-box">📢 Advertisement placeholder</div>
 
             <div class="action-buttons">
-                <button class="copy-btn" onclick="copyAnswer()">Copy (your language)</button>
-                <button class="copy-en-btn" id="copyEnBtn" onclick="copyEnglish()" style="display:none;">Copy English</button>
+                <button class="copy-btn" onclick="copyAnswer()">📋 Copy your language</button>
+                <button class="copy-en-btn" id="copyEnBtn" onclick="copyEnglish()" style="display:none;">📋 Copy English</button>
             </div>
         </section>
     </main>
@@ -527,7 +329,6 @@ async function syncFounderStatus() {
     } catch (err) {
         console.warn("Could not sync founder status");
     }
-
     if (isFounderFrontend()) {
         document.getElementById("founderBadge").style.display = "inline-flex";
         document.getElementById("adminBtn").style.display = "inline-flex";
@@ -546,54 +347,6 @@ syncFounderStatus();
         localStorage.setItem("rb_founder_mode", "1");
     }
 })();
-
-/* Preset buttons */
-function setPreset(inputLang, outputLang, btn) {
-    document.getElementById("languageSelect").value = inputLang;
-    document.getElementById("outputLanguage").value = outputLang;
-    document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-}
-
-/* Copy English answer */
-function copyEnglish() {
-    const text = document.getElementById("answerEnglish").innerText;
-    if (text) navigator.clipboard.writeText(text);
-}
-
-/* Show/hide English answer box based on response */
-function handleDualAnswer(data) {
-    const answerEl = document.getElementById("answer");
-    const answerEnEl = document.getElementById("answerEnglish");
-    const englishBlock = document.getElementById("englishAnswerBlock");
-    const copyEnBtn = document.getElementById("copyEnBtn");
-    const nativeLabel = document.getElementById("nativeLabel");
-
-    answerEl.innerText = data.answer || "";
-
-    // Update native label with detected language
-    const langNames = {
-        my: "🇲🇲 Burmese", zh: "🇨🇳 Chinese", ja: "🇯🇵 Japanese",
-        ko: "🇰🇷 Korean", th: "🇹🇭 Thai", vi: "🇻🇳 Vietnamese",
-        id: "🇮🇩 Indonesian", ms: "🇲🇾 Malay", tl: "🇵🇭 Filipino",
-        hi: "🇮🇳 Hindi", bn: "🇧🇩 Bengali", es: "🇪🇸 Spanish",
-        pt: "🇧🇷 Portuguese", en: "🇺🇸 English"
-    };
-    const lang = data.output_language || data.detected_language;
-    nativeLabel.innerText = langNames[lang] || "🌏 Your language";
-
-    if (data.answer_english) {
-        answerEnEl.innerText = data.answer_english;
-        englishBlock.style.display = "block";
-        copyEnBtn.style.display = "inline-block";
-    } else {
-        englishBlock.style.display = "none";
-        copyEnBtn.style.display = "none";
-    }
-}
-
-// Override interview.js response handler
-window._handleInterviewResponse = handleDualAnswer;
 
 /* Free Limit */
 const DAILY_LIMIT = 9999;
