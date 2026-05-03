@@ -66,6 +66,14 @@ def privacy():
 def health():
     return "ok", 200
 
+@app.route("/manifest.json")
+def manifest():
+    return send_from_directory(app.static_folder, "manifest.json")
+
+@app.route("/sw.js")
+def service_worker():
+    return send_from_directory(app.static_folder, "sw.js", mimetype="application/javascript")
+
 @app.route("/ads.txt")
 def ads_txt():
     return send_from_directory(app.static_folder, "ads.txt")
