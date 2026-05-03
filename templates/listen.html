@@ -8,7 +8,6 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7757881269834722"
     crossorigin="anonymous"></script>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -43,10 +42,7 @@
             transition: 0.3s ease;
         }
 
-        .page {
-            max-width: 1080px;
-            margin: 0 auto;
-        }
+        .page { max-width: 1080px; margin: 0 auto; }
 
         .nav {
             display: flex;
@@ -123,9 +119,7 @@
         }
 
         @media (max-width: 900px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
+            .layout { grid-template-columns: 1fr; }
         }
 
         .hero-title {
@@ -168,6 +162,45 @@
             border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.45);
             color: var(--text-main);
+        }
+
+        /* ── PRESET BUTTONS ── */
+        .preset-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .preset-btn {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1.5px solid rgba(148,163,184,0.45);
+            background: var(--surface);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: auto;
+        }
+
+        .preset-btn:hover {
+            border-color: #4f46e5;
+            color: #4f46e5;
+            background: rgba(79,70,229,0.06);
+        }
+
+        .preset-btn.active {
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: white;
+            border-color: transparent;
+        }
+
+        .preset-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
         }
 
         .button-row {
@@ -255,18 +288,8 @@
             box-shadow: 0 18px 40px rgba(0,0,0,0.25);
         }
 
-        .popup-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .popup-msg {
-            font-size: 15px;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
+        .popup-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .popup-msg { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
 
         .popup-btn {
             padding: 14px;
@@ -303,6 +326,12 @@
             cursor: pointer;
             display: none;
         }
+
+        .divider {
+            height: 1px;
+            background: rgba(148,163,184,0.2);
+            margin: 14px 0;
+        }
     </style>
 </head>
 
@@ -316,7 +345,6 @@
             <div>ReadyBrainAI</div>
             <div id="founderBadge">FOUNDER</div>
         </div>
-
         <div class="nav-buttons">
             <a href="/" class="back-btn">← Back</a>
             <button id="adminBtn" onclick="window.location='/admin'">Admin Panel</button>
@@ -338,7 +366,6 @@
         <section class="card">
             <div class="card-header">
                 <h2>🎤 Answer Refinement</h2>
-
                 <!-- INPUT LANGUAGE -->
                 <select id="languageSelect" class="select-box">
                     <option value="auto">🌐 Auto Detect</option>
@@ -366,6 +393,22 @@
                     </optgroup>
                 </select>
             </div>
+
+            <!-- QUICK PRESETS -->
+            <div class="preset-label">⚡ Quick mode</div>
+            <div class="preset-row">
+                <button class="preset-btn" id="preset-my-en" onclick="setPreset('my', 'en', this)">
+                    🇲🇲 → 🇺🇸 Burmese to English
+                </button>
+                <button class="preset-btn" id="preset-es-en" onclick="setPreset('es', 'en', this)">
+                    🇪🇸 → 🇺🇸 Spanish to English
+                </button>
+                <button class="preset-btn" id="preset-auto-en" onclick="setPreset('auto', 'en', this)">
+                    🌐 → 🇺🇸 Any to English
+                </button>
+            </div>
+
+            <div class="divider"></div>
 
             <!-- OUTPUT LANGUAGE -->
             <label>Answer output language</label>
@@ -408,14 +451,11 @@
             <h3>Improved Answer:</h3>
             <div id="answer" class="output-box"></div>
 
-            <div class="ad-box">
-                📢 Advertisement placeholder
-            </div>
+            <div class="ad-box">📢 Advertisement placeholder</div>
 
             <div class="action-buttons">
                 <button class="copy-btn" onclick="copyAnswer()">Copy</button>
             </div>
-
         </section>
     </main>
 </div>
@@ -479,6 +519,17 @@ syncFounderStatus();
         localStorage.setItem("rb_founder_mode", "1");
     }
 })();
+
+/* ── PRESET BUTTONS ── */
+function setPreset(inputLang, outputLang, btn) {
+    // Set dropdowns
+    document.getElementById("languageSelect").value = inputLang;
+    document.getElementById("outputLanguage").value = outputLang;
+
+    // Highlight active button
+    document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+}
 
 /* Free Limit — 9999 = no limit during testing */
 const DAILY_LIMIT = 9999;
