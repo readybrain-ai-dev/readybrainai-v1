@@ -5,356 +5,464 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReadyBrainAI Premium</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --bg-main: radial-gradient(circle at top right, #e6eeff, #f8faff 60%);
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --card-bg: #ffffff;
-            --card-border: #e2e8f0;
-            --surface: #f1f5f9;
-            --shadow-main: 0 12px 36px rgba(15,23,42,0.05);
-            --accent: #4f46e5;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body.dark-mode {
-            --bg-main: radial-gradient(circle at top right, #020617, #0f172a 60%);
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --card-bg: #0f172a;
-            --card-border: #1e293b;
-            --surface: #1e293b;
-            --shadow-main: 0 18px 50px rgba(0,0,0,0.55);
-            --accent: #818cf8;
+        :root {
+            --black: #08090a;
+            --white: #f8f9fa;
+            --green: #00e87a;
+            --green-dark: #00c064;
+            --gray: #1a1c1e;
+            --gray-mid: #2e3034;
+            --gray-light: #6b7280;
+            --text: #e8eaed;
         }
 
         body {
-            margin: 0;
-            padding: 40px 16px;
-            font-family: "Inter", sans-serif;
-            background: var(--bg-main);
-            color: var(--text-main);
-            transition: 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0;
         }
 
-        .page {
-            max-width: 1120px;
-            margin: 0 auto;
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
         }
 
-        /* NAV */
-        .nav {
+        /* ── NAVBAR ── */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(16px);
+            background: rgba(8,9,10,0.85);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 28px;
         }
 
         .brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: 600;
-            font-size: 18px;
+            text-decoration: none;
         }
 
         .brand-logo {
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 15px;
-            box-shadow: 0 8px 22px rgba(79,70,229,0.4);
         }
 
-        .nav-buttons {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--white);
         }
 
         .back-btn {
-            text-decoration: none;
-            font-size: 15px;
-            color: var(--accent);
-            font-weight: 500;
-        }
-
-        .theme-toggle {
-            width: 32px;
-            height: 32px;
+            padding: 7px 16px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.45);
-            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: transparent;
+            color: var(--gray-light);
             font-size: 13px;
-            background: rgba(255,255,255,0.4);
-            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
         }
 
-        /* HERO */
-        .hero-title {
-            font-size: 38px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-align: center;
-            background: linear-gradient(to right, #4f46e5, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .back-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+
+        /* ── PAGE ── */
+        .page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 64px 24px;
+            position: relative;
+            z-index: 1;
         }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,232,122,0.1);
+            border: 1px solid rgba(0,232,122,0.25);
+            color: var(--green);
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--white);
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .hero-title .accent { color: var(--green); }
 
         .hero-sub {
             font-size: 16px;
-            color: var(--text-muted);
-            max-width: 680px;
+            color: var(--gray-light);
+            max-width: 520px;
             margin: 0 auto;
-            text-align: center;
-            line-height: 1.6;
+            line-height: 1.65;
         }
 
-        .limited-offer {
-            text-align: center;
-            margin-top: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #f97316;
-        }
-
-        /* PRICING GRID */
+        /* ── PRICING GRID ── */
         .pricing-grid {
-            margin-top: 40px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 22px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .pricing-grid { grid-template-columns: 1fr; }
         }
 
         .pricing-card {
-            background: var(--card-bg);
-            padding: 30px;
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
             border-radius: 24px;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-main);
+            padding: 32px 28px;
             text-align: center;
-            transition: 0.2s ease;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
         .pricing-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 18px 50px rgba(0,0,0,0.08);
+            border-color: rgba(0,232,122,0.3);
         }
 
-        .best {
-            border: 2px solid #4f46e5;
+        .pricing-card.featured {
+            border: 2px solid var(--green);
+            background: linear-gradient(160deg, #1a1c1e, #1e2420);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 11px;
+            padding: 4px 16px;
+            border-radius: 999px;
+            white-space: nowrap;
         }
 
         .card-title {
-            font-size: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 6px;
+            color: var(--white);
+            margin-bottom: 20px;
         }
 
         .price {
-            font-size: 44px;
+            font-family: 'Syne', sans-serif;
+            font-size: 52px;
             font-weight: 800;
-            margin: 6px 0 14px;
-            background: linear-gradient(92deg, #4f46e5, #6366f1, #22c55e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--white);
+            line-height: 1;
+            margin-bottom: 4px;
         }
 
-        .price-note {
+        .price span {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gray-light);
+        }
+
+        .price-period {
+            font-size: 13px;
+            color: var(--gray-light);
+            margin-bottom: 6px;
+        }
+
+        .price-save {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--green);
+            background: rgba(0,232,122,0.1);
+            border: 1px solid rgba(0,232,122,0.2);
+            padding: 3px 10px;
+            border-radius: 999px;
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+
+        .price-save.hidden { visibility: hidden; }
+
+        .features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .features li {
             font-size: 14px;
-            color: #f97316;
-            margin-bottom: 16px;
+            color: var(--gray-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .feature {
-            font-size: 15px;
-            margin: 6px 0;
-            color: var(--text-main);
+        .features li::before {
+            content: '✓';
+            color: var(--green);
+            font-weight: 700;
+            flex-shrink: 0;
         }
 
         .upgrade-btn {
             width: 100%;
             padding: 14px;
-            margin-top: 18px;
             border: none;
-            border-radius: 999px;
-            background: linear-gradient(92deg, #4f46e5, #3b82f6);
-            color: white;
+            border-radius: 14px;
+            font-family: 'Syne', sans-serif;
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
+        .btn-featured {
+            background: var(--green);
+            color: var(--black);
+        }
+
+        .btn-featured:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+        .btn-normal {
+            background: var(--gray-mid);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .btn-normal:hover { background: #3a3d42; }
+
+        /* ── BOTTOM ── */
         .bottom-note {
             text-align: center;
-            margin-top: 26px;
-            color: var(--text-muted);
+            margin-top: 32px;
+            color: var(--gray-light);
             font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        /* SUCCESS POPUP */
+        .bottom-note span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── POPUP ── */
         #successPopup {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
             z-index: 9999;
+            backdrop-filter: blur(8px);
         }
 
         .popup-box {
-            background: var(--card-bg);
-            padding: 32px;
-            border-radius: 20px;
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
+            padding: 36px;
+            border-radius: 22px;
             text-align: center;
             width: 90%;
-            max-width: 360px;
-            box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+            max-width: 380px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+        }
+
+        .popup-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
         }
 
         .popup-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 10px;
         }
 
         .popup-msg {
-            font-size: 15px;
-            margin-bottom: 18px;
-            color: var(--text-muted);
+            font-size: 14px;
+            color: var(--gray-light);
+            margin-bottom: 24px;
+            line-height: 1.5;
         }
 
         .popup-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border-radius: 999px;
-            background: linear-gradient(92deg, #4f46e5, #3b82f6);
-            color: white;
+            background: var(--green);
+            color: var(--black);
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
+            border: none;
+            font-family: 'Syne', sans-serif;
         }
-
     </style>
 </head>
 
 <body>
 
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/" class="brand">
+        <div class="brand-logo">RB</div>
+        <span class="brand-name">ReadyBrainAI</span>
+    </a>
+    <a href="/listen" class="back-btn">← Back</a>
+</nav>
+
+<!-- PAGE -->
 <div class="page">
 
-    <!-- NAV -->
-    <header class="nav">
-        <div class="brand">
-            <div class="brand-logo">RB</div>
-            <div>ReadyBrainAI</div>
-        </div>
-
-        <div class="nav-buttons">
-            <a href="/" class="back-btn">← Back</a>
-            <button id="themeToggle" class="theme-toggle">🌙</button>
-        </div>
-    </header>
-
     <!-- HERO -->
-    <h1 class="hero-title">Choose Your Premium Plan</h1>
-    <p class="hero-sub">
-        Unlock unlimited rewriting, advanced coaching, faster answers, and full access to your AI interview coach.
-    </p>
-    <p class="limited-offer">🔥 Limited-time launch pricing — secure your plan now</p>
+    <div class="hero">
+        <div class="hero-badge">⚡ Premium Access</div>
+        <h1 class="hero-title">Unlimited practice.<br><span class="accent">No limits, no ads.</span></h1>
+        <p class="hero-sub">
+            Get unlimited voice sessions, no ad breaks, and the best AI interview coaching — at a price made for students.
+        </p>
+    </div>
 
-    <!-- PRICING GRID -->
-    <section class="pricing-grid">
+    <!-- PRICING -->
+    <div class="pricing-grid">
 
-        <!-- LIFETIME -->
-        <div class="pricing-card best">
-            <div class="card-title">Lifetime Access</div>
-            <div class="price">$10</div>
-            <div class="price-note">One-time payment • No renewal</div>
-
-            <div class="feature">✔ Unlimited voice answers</div>
-            <div class="feature">✔ Advanced clarity rewriting</div>
-            <div class="feature">✔ Professional tone improvement</div>
-            <div class="feature">✔ Interview coaching tips</div>
-            <div class="feature">✔ Early access to new features</div>
-
-            <button class="upgrade-btn" onclick="activatePremium()">Unlock Lifetime</button>
+        <!-- MONTHLY -->
+        <div class="pricing-card">
+            <div class="card-title">Monthly</div>
+            <div class="price"><span>$</span>3</div>
+            <div class="price-period">per month</div>
+            <div class="price-save hidden">—</div>
+            <ul class="features">
+                <li>Unlimited voice sessions</li>
+                <li>No ad breaks</li>
+                <li>Convert to English anytime</li>
+                <li>All 14 languages</li>
+                <li>Cancel anytime</li>
+            </ul>
+            <button class="upgrade-btn btn-normal" onclick="activatePremium()">Get Monthly</button>
         </div>
 
-        <!-- 6 MONTHS -->
-        <div class="pricing-card">
+        <!-- 6 MONTHS — FEATURED -->
+        <div class="pricing-card featured">
+            <div class="featured-badge">🔥 Most Popular</div>
             <div class="card-title">6 Months</div>
-            <div class="price">$35</div>
-            <div class="price-note">Save 30% • One-time payment</div>
-
-            <div class="feature">✔ Unlimited rewriting</div>
-            <div class="feature">✔ Voice + text answers</div>
-            <div class="feature">✔ AI coaching</div>
-            <div class="feature">✔ Priority support</div>
-
-            <button class="upgrade-btn" onclick="activatePremium()">Get 6 Months</button>
+            <div class="price"><span>$</span>15</div>
+            <div class="price-period">$2.50/month</div>
+            <div class="price-save">Save $3 vs monthly</div>
+            <ul class="features">
+                <li>Unlimited voice sessions</li>
+                <li>No ad breaks</li>
+                <li>Convert to English anytime</li>
+                <li>All 14 languages</li>
+                <li>Priority support</li>
+            </ul>
+            <button class="upgrade-btn btn-featured" onclick="activatePremium()">Get 6 Months</button>
         </div>
 
-        <!-- 12 MONTHS -->
+        <!-- 1 YEAR -->
         <div class="pricing-card">
-            <div class="card-title">12 Months</div>
-            <div class="price">$50</div>
-            <div class="price-note">Best for long-term users</div>
-
-            <div class="feature">✔ Unlimited rewriting</div>
-            <div class="feature">✔ Voice + text answers</div>
-            <div class="feature">✔ Interview prep tools</div>
-            <div class="feature">✔ Priority support</div>
-
-            <button class="upgrade-btn" onclick="activatePremium()">Get 12 Months</button>
+            <div class="card-title">1 Year</div>
+            <div class="price"><span>$</span>25</div>
+            <div class="price-period">$2.08/month</div>
+            <div class="price-save">Save $11 vs monthly</div>
+            <ul class="features">
+                <li>Unlimited voice sessions</li>
+                <li>No ad breaks</li>
+                <li>Convert to English anytime</li>
+                <li>All 14 languages</li>
+                <li>Priority support</li>
+            </ul>
+            <button class="upgrade-btn btn-normal" onclick="activatePremium()">Get 1 Year</button>
         </div>
 
-    </section>
+    </div>
 
-    <p class="bottom-note">Apple Pay • PayPal — secure, fast checkout</p>
+    <!-- BOTTOM NOTE -->
+    <div class="bottom-note">
+        <span>🔒 Secure checkout</span>
+        <span>💳 Apple Pay • PayPal • Credit Card</span>
+        <span>🌍 Works worldwide</span>
+    </div>
 
 </div>
 
 <!-- SUCCESS POPUP -->
 <div id="successPopup">
     <div class="popup-box">
+        <div class="popup-icon">🎉</div>
         <div class="popup-title">Premium Activated!</div>
-        <div class="popup-msg">You now have unlimited access to ReadyBrainAI.</div>
-        <button class="popup-btn" onclick="window.location='/listen'">Continue</button>
+        <div class="popup-msg">You now have unlimited access to ReadyBrainAI. No more ad breaks — just pure interview practice.</div>
+        <button class="popup-btn" onclick="window.location='/listen'">Start Practicing</button>
     </div>
 </div>
 
 <script>
-    // Theme toggle saved state
-    const saved = localStorage.getItem("rb-dark");
-    if (saved === "true") document.body.classList.add("dark-mode");
-
-    document.getElementById("themeToggle").addEventListener("click", () => {
-        document.body.classList.toggle("dark-mode");
-        localStorage.setItem("rb-dark", document.body.classList.contains("dark-mode"));
-    });
-
-    // ⭐ PREMIUM ACTIVATE FUNCTION
-    async function activatePremium() {
-        const res = await fetch("/activate_premium", {
-            method: "POST"
-        });
-
-        const data = await res.json();
-
-        if (data.status === "ok") {
-            document.getElementById("successPopup").style.display = "flex";
-        }
+async function activatePremium() {
+    const res = await fetch("/activate_premium", { method: "POST" });
+    const data = await res.json();
+    if (data.status === "ok") {
+        document.getElementById("successPopup").style.display = "flex";
     }
+}
 </script>
 
 </body>
