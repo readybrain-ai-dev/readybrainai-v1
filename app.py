@@ -45,16 +45,27 @@ def allow_admin_for_founder():
 
 
 # ============================
-# LANGUAGE MAP
+# LANGUAGE MAP (Burmese + Asian + Latino focus)
 # ============================
 LANGUAGE_NAMES = {
-    "en": "English",
+    # Burmese (priority)
     "my": "Burmese",
+    # Asian
+    "zh": "Chinese",
     "ja": "Japanese",
     "ko": "Korean",
-    "zh": "Chinese",
-    "es": "Spanish",
+    "th": "Thai",
+    "vi": "Vietnamese",
+    "id": "Indonesian",
+    "ms": "Malay",
+    "tl": "Filipino",
     "hi": "Hindi",
+    "bn": "Bengali",
+    # Latino
+    "es": "Spanish",
+    "pt": "Portuguese",
+    # English
+    "en": "English",
 }
 
 
@@ -190,6 +201,7 @@ def interview_listen():
         spoken_text = (result.text or "").strip()
         detected_lang = getattr(result, "language", None) or input_lang or "unknown"
 
+        # Extra retry for Burmese if very short
         if len(spoken_text) < 2 and input_lang == "my":
             result = transcribe("my")
             spoken_text = (result.text or "").strip()
@@ -245,7 +257,6 @@ Rules:
 - Output ONLY the final answer
 """
 
-        # ✅ FIXED: correct OpenAI chat completions call
         ai = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": rewrite_prompt}]
@@ -303,7 +314,6 @@ Output ONLY the final answer.
 """
 
     try:
-        # ✅ FIXED: correct OpenAI chat completions call
         result = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}]
@@ -336,7 +346,6 @@ Output ONLY the improved answer.
 """
 
     try:
-        # ✅ FIXED: correct OpenAI chat completions call
         result = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}]
