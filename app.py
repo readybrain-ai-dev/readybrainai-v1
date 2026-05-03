@@ -15,14 +15,14 @@ client = OpenAI(api_key=API_KEY)
 
 app = Flask(__name__)
 
-# Needed for usage tracking later
-app.secret_key = "RB_SECRET_KEY_123456"
+# Load secret key from .env for security
+app.secret_key = os.getenv("SECRET_KEY", "fallback-secret-change-this")
 
 
 # ============================
 # 🔥 FOUNDER & PREMIUM KEYS
 # ============================
-FOUNDER_KEY = "READYBRAIN-UCSD-A18565216"
+FOUNDER_KEY = os.getenv("FOUNDER_KEY", "READYBRAIN-UCSD-A18565216")
 PREMIUM_COOKIE = "rb_premium_mode"
 
 
@@ -39,7 +39,6 @@ def user_is_premium():
 # ============================
 @app.before_request
 def allow_admin_for_founder():
-    # Founder override keeps admin UNLOCKED for you
     if request.endpoint == "admin_page":
         if session.get("founder_override") is True:
             session["founder_mode"] = True
@@ -73,7 +72,6 @@ def landing():
 
 @app.route("/listen")
 def listen_page():
-    # Founder mode via URL
     founder_key = request.args.get("founderKey")
     if founder_key == FOUNDER_KEY:
         session["founder_mode"] = True
@@ -118,14 +116,13 @@ def activate_premium():
 def interview_listen():
     print("\n===== 🎤 /interview_listen START =====")
 
-    # Founder & premium bypass
     if user_is_founder():
         print("🔥 Founder detected → unlimited")
     elif user_is_premium():
         print("🌟 Premium user → unlimited")
     else:
         uses = session.get("uses", 0)
-        if uses >= 5:     # <<<<<< CHANGED FROM 3 TO 5
+        if uses >= 5:
             return jsonify({
                 "error": "limit_reached",
                 "redirect": "/premium"
@@ -155,7 +152,8 @@ def interview_listen():
             input_path = temp.name
 
         wav_path = input_path.replace(f".{ext}", ".wav")
-        subprocess.run(
+
+        ffmpeg_result = subprocess.run(
             [
                 "ffmpeg", "-y",
                 "-i", input_path,
@@ -165,9 +163,16 @@ def interview_listen():
                 wav_path
             ],
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True
+            stderr=subprocess.PIPE
         )
+
+        if ffmpeg_result.returncode != 0:
+            print("❌ ffmpeg error:", ffmpeg_result.stderr.decode())
+            return jsonify({
+                "question": "(error)",
+                "answer": "Audio processing failed. Please try again.",
+                "detected_language": None
+            }), 500
 
         def transcribe(language_hint=None):
             with open(wav_path, "rb") as f:
@@ -185,7 +190,6 @@ def interview_listen():
         spoken_text = (result.text or "").strip()
         detected_lang = getattr(result, "language", None) or input_lang or "unknown"
 
-        # Extra retry for Burmese (MY) if very short
         if len(spoken_text) < 2 and input_lang == "my":
             result = transcribe("my")
             spoken_text = (result.text or "").strip()
@@ -193,7 +197,6 @@ def interview_listen():
 
         clean_text = spoken_text.strip()
 
-        # 🔴 Silence / unclear handling
         if not clean_text or len(clean_text) < 4:
             return jsonify({
                 "question": "(unclear)",
@@ -201,7 +204,6 @@ def interview_listen():
                 "detected_language": detected_lang
             })
 
-        # Whisper no_speech_prob check
         segments = getattr(result, "segments", None)
         if segments:
             max_no_speech = max(
@@ -217,7 +219,6 @@ def interview_listen():
                     "detected_language": detected_lang
                 })
 
-        # Decide final output language
         if output_lang == "same":
             if detected_lang != "unknown":
                 final_lang = detected_lang
@@ -244,12 +245,13 @@ Rules:
 - Output ONLY the final answer
 """
 
-        ai = client.responses.create(
+        # ✅ FIXED: correct OpenAI chat completions call
+        ai = client.chat.completions.create(
             model="gpt-4o-mini",
-            input=rewrite_prompt
+            messages=[{"role": "user", "content": rewrite_prompt}]
         )
 
-        ai_output = ai.output_text.strip()
+        ai_output = ai.choices[0].message.content.strip()
 
         return jsonify({
             "question": spoken_text,
@@ -257,6 +259,14 @@ Rules:
             "detected_language": detected_lang,
             "output_language": final_lang
         })
+
+    except Exception as e:
+        print("❌ interview_listen error:", str(e))
+        return jsonify({
+            "question": "(error)",
+            "answer": "Something went wrong. Please try again.",
+            "detected_language": None
+        }), 500
 
     finally:
         for p in (input_path, wav_path):
@@ -293,13 +303,15 @@ Output ONLY the final answer.
 """
 
     try:
-        result = client.responses.create(
+        # ✅ FIXED: correct OpenAI chat completions call
+        result = client.chat.completions.create(
             model="gpt-4o-mini",
-            input=prompt
+            messages=[{"role": "user", "content": prompt}]
         )
-        return jsonify({"answer": result.output_text.strip()})
-    except:
-        return jsonify({"answer": "Error generating answer."})
+        return jsonify({"answer": result.choices[0].message.content.strip()})
+    except Exception as e:
+        print("❌ interview_answer error:", str(e))
+        return jsonify({"answer": "Error generating answer. Please try again."})
 
 
 # ============================
@@ -324,13 +336,15 @@ Output ONLY the improved answer.
 """
 
     try:
-        result = client.responses.create(
+        # ✅ FIXED: correct OpenAI chat completions call
+        result = client.chat.completions.create(
             model="gpt-4o-mini",
-            input=prompt
+            messages=[{"role": "user", "content": prompt}]
         )
-        return jsonify({"answer": result.output_text.strip()})
-    except:
-        return jsonify({"answer": "Error regenerating answer."})
+        return jsonify({"answer": result.choices[0].message.content.strip()})
+    except Exception as e:
+        print("❌ interview_regen error:", str(e))
+        return jsonify({"answer": "Error regenerating answer. Please try again."})
 
 
 # ============================
@@ -387,14 +401,14 @@ def admin_clear_session():
 
 
 # ============================
-# ⭐ SWITCH BETWEEN USER + FOUNDER (with REDIRECT)
+# ⭐ SWITCH BETWEEN USER + FOUNDER
 # ============================
 @app.route("/admin_switch_to_user", methods=["POST"])
 def admin_switch_to_user():
     session.clear()
-    session["founder_override"] = True   # keeps admin unlocked (if you go back)
-    print("🔁 Switched to USER MODE (admin still unlocked via override)")
-    return redirect("/listen")            # redirect to user page
+    session["founder_override"] = True
+    print("🔁 Switched to USER MODE")
+    return redirect("/listen")
 
 
 @app.route("/admin_switch_to_founder", methods=["POST"])
@@ -402,8 +416,8 @@ def admin_switch_to_founder():
     session.clear()
     session["founder_mode"] = True
     session["founder_override"] = True
-    print("🔥 Switched to FOUNDER MODE (unlimited)")
-    return redirect("/admin")             # redirect back to admin
+    print("🔥 Switched to FOUNDER MODE")
+    return redirect("/admin")
 
 
 # ============================
