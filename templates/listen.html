@@ -524,8 +524,8 @@ syncFounderStatus();
     }
 })();
 
-/* Free Limit */
-const DAILY_LIMIT = 5;
+/* Free Limit — set to 9999 to disable during testing */
+const DAILY_LIMIT = 9999;
 
 function getTodayKey() {
     const d = new Date();
