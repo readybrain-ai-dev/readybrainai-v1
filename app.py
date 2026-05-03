@@ -48,9 +48,7 @@ def allow_admin_for_founder():
 # LANGUAGE MAP (Burmese + Asian + Latino focus)
 # ============================
 LANGUAGE_NAMES = {
-    # Burmese (priority)
     "my": "Burmese",
-    # Asian
     "zh": "Chinese",
     "ja": "Japanese",
     "ko": "Korean",
@@ -61,11 +59,14 @@ LANGUAGE_NAMES = {
     "tl": "Filipino",
     "hi": "Hindi",
     "bn": "Bengali",
-    # Latino
     "es": "Spanish",
     "pt": "Portuguese",
-    # English
     "en": "English",
+}
+
+# Whisper does NOT support all languages — fallback to auto for unsupported ones
+WHISPER_SUPPORTED = {
+    "zh", "ja", "ko", "th", "vi", "id", "ms", "hi", "bn", "es", "pt", "en", "tl"
 }
 
 
@@ -195,17 +196,18 @@ def interview_listen():
                     language=language_hint
                 )
 
-        lang_hint = None if input_lang == "auto" else input_lang
+        # ✅ FIX: only pass language hint if Whisper supports it
+        # Burmese (my) is NOT supported by Whisper — use auto-detect instead
+        if input_lang == "auto" or input_lang not in WHISPER_SUPPORTED:
+            lang_hint = None
+            print(f"ℹ️ Language '{input_lang}' → using auto-detect")
+        else:
+            lang_hint = input_lang
+
         result = transcribe(lang_hint)
 
         spoken_text = (result.text or "").strip()
         detected_lang = getattr(result, "language", None) or input_lang or "unknown"
-
-        # Extra retry for Burmese if very short
-        if len(spoken_text) < 2 and input_lang == "my":
-            result = transcribe("my")
-            spoken_text = (result.text or "").strip()
-            detected_lang = getattr(result, "language", None) or "my"
 
         clean_text = spoken_text.strip()
 
@@ -231,6 +233,7 @@ def interview_listen():
                     "detected_language": detected_lang
                 })
 
+        # Decide output language
         if output_lang == "same":
             if detected_lang != "unknown":
                 final_lang = detected_lang
@@ -238,6 +241,10 @@ def interview_listen():
                 final_lang = input_lang if input_lang != "auto" else "en"
         else:
             final_lang = output_lang
+
+        # If user picked Burmese as output, keep it as Burmese for GPT rewrite
+        if input_lang == "my" and output_lang == "same":
+            final_lang = "my"
 
         final_lang_name = lang_to_name(final_lang)
 
