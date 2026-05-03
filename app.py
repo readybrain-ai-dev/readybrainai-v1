@@ -15,7 +15,6 @@ client = OpenAI(api_key=API_KEY)
 
 app = Flask(__name__)
 
-# Load secret key from .env for security
 app.secret_key = os.getenv("SECRET_KEY", "fallback-secret-change-this")
 
 
@@ -35,7 +34,7 @@ def user_is_premium():
 
 
 # ============================
-# ⭐ FIX: Founder can ALWAYS open /admin
+# ⭐ Founder can ALWAYS open /admin
 # ============================
 @app.before_request
 def allow_admin_for_founder():
@@ -45,7 +44,7 @@ def allow_admin_for_founder():
 
 
 # ============================
-# LANGUAGE MAP (Burmese + Asian + Latino focus)
+# LANGUAGE MAP
 # ============================
 LANGUAGE_NAMES = {
     "my": "Burmese",
@@ -89,7 +88,6 @@ def listen_page():
         session["founder_mode"] = True
         session["founder_override"] = True
         print("🔥 Founder mode ENABLED")
-
     return render_template("listen.html")
 
 
@@ -103,21 +101,14 @@ def health():
     return "ok", 200
 
 
-# ============================
-# ⭐ ADS.TXT (FOR ADSENSE)
-# ============================
 @app.route("/ads.txt")
 def ads_txt():
     return send_from_directory(app.static_folder, "ads.txt")
 
 
-# ============================
-# ⭐ PREMIUM ACTIVATION
-# ============================
 @app.route("/activate_premium", methods=["POST"])
 def activate_premium():
     session["premium_mode"] = True
-    print("🌟 Premium mode activated")
     return jsonify({"status": "ok"})
 
 
@@ -134,11 +125,8 @@ def interview_listen():
         print("🌟 Premium user → unlimited")
     else:
         uses = session.get("uses", 0)
-        if uses >= 9999:  # effectively no limit for now
-            return jsonify({
-                "error": "limit_reached",
-                "redirect": "/premium"
-            })
+        if uses >= 9999:
+            return jsonify({"error": "limit_reached", "redirect": "/premium"})
         session["uses"] = uses + 1
 
     input_lang = request.form.get("language", "auto")
@@ -148,6 +136,7 @@ def interview_listen():
         return jsonify({
             "question": "(no audio)",
             "answer": "No audio detected.",
+            "answer_english": None,
             "detected_language": None
         }), 400
 
@@ -166,14 +155,7 @@ def interview_listen():
         wav_path = input_path.replace(f".{ext}", ".wav")
 
         ffmpeg_result = subprocess.run(
-            [
-                "ffmpeg", "-y",
-                "-i", input_path,
-                "-ar", "16000",
-                "-ac", "1",
-                "-c:a", "pcm_s16le",
-                wav_path
-            ],
+            ["ffmpeg", "-y", "-i", input_path, "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", wav_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -183,6 +165,7 @@ def interview_listen():
             return jsonify({
                 "question": "(error)",
                 "answer": "Audio processing failed. Please try again.",
+                "answer_english": None,
                 "detected_language": None
             }), 500
 
@@ -196,11 +179,9 @@ def interview_listen():
                     language=language_hint
                 )
 
-        # ✅ FIX: only pass language hint if Whisper supports it
-        # Burmese (my) is NOT supported by Whisper — use auto-detect instead
+        # Only pass language hint if Whisper supports it
         if input_lang == "auto" or input_lang not in WHISPER_SUPPORTED:
             lang_hint = None
-            print(f"ℹ️ Language '{input_lang}' → using auto-detect")
         else:
             lang_hint = input_lang
 
@@ -215,21 +196,21 @@ def interview_listen():
             return jsonify({
                 "question": "(unclear)",
                 "answer": "Unclear. Please try again.",
+                "answer_english": None,
                 "detected_language": detected_lang
             })
 
         segments = getattr(result, "segments", None)
         if segments:
             max_no_speech = max(
-                seg.get("no_speech_prob", 0.0)
-                if isinstance(seg, dict)
-                else getattr(seg, "no_speech_prob", 0.0)
+                seg.get("no_speech_prob", 0.0) if isinstance(seg, dict) else getattr(seg, "no_speech_prob", 0.0)
                 for seg in segments
             )
             if max_no_speech > 0.8:
                 return jsonify({
                     "question": "(unclear)",
                     "answer": "Unclear. Please try again.",
+                    "answer_english": None,
                     "detected_language": detected_lang
                 })
 
@@ -242,12 +223,12 @@ def interview_listen():
         else:
             final_lang = output_lang
 
-        # If user picked Burmese as output, keep it as Burmese for GPT rewrite
         if input_lang == "my" and output_lang == "same":
             final_lang = "my"
 
         final_lang_name = lang_to_name(final_lang)
 
+        # ✅ Generate answer in user's language
         rewrite_prompt = f"""
 You are ReadyBrain AI.
 
@@ -268,12 +249,35 @@ Rules:
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": rewrite_prompt}]
         )
-
         ai_output = ai.choices[0].message.content.strip()
+
+        # ✅ Always generate English version too
+        answer_english = None
+        if final_lang != "en":
+            english_prompt = f"""
+You are ReadyBrain AI.
+
+Rewrite the following into a short, confident 2–3 sentence interview answer in English.
+
+Original text:
+\"\"\"{spoken_text}\"\"\"
+
+Rules:
+- Keep original meaning
+- No new ideas
+- Simple and confident English
+- Output ONLY the final answer in English
+"""
+            ai_en = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": english_prompt}]
+            )
+            answer_english = ai_en.choices[0].message.content.strip()
 
         return jsonify({
             "question": spoken_text,
             "answer": ai_output,
+            "answer_english": answer_english,
             "detected_language": detected_lang,
             "output_language": final_lang
         })
@@ -283,6 +287,7 @@ Rules:
         return jsonify({
             "question": "(error)",
             "answer": "Something went wrong. Please try again.",
+            "answer_english": None,
             "detected_language": None
         }), 500
 
@@ -310,13 +315,10 @@ def interview_answer():
 
     prompt = f"""
 You are ReadyBrain AI.
-
 Write a short 2–3 sentence interview answer in clear, confident language.
-
 Question: "{question}"
 Job role: "{job_role}"
 Background: "{background}"
-
 Output ONLY the final answer.
 """
 
@@ -332,7 +334,7 @@ Output ONLY the final answer.
 
 
 # ============================
-# REGENERATE ANSWER
+# REGENERATE
 # ============================
 @app.route("/interview_regen", methods=["POST"])
 def interview_regen():
@@ -344,11 +346,9 @@ def interview_regen():
 
     prompt = f"""
 You are ReadyBrain AI.
-
 Rewrite this in 2–3 confident, clean sentences.
 Keep the same meaning.
 Output ONLY the improved answer.
-
 \"\"\"{text}\"\"\"
 """
 
@@ -364,7 +364,7 @@ Output ONLY the improved answer.
 
 
 # ============================
-# 🔥 ADMIN / FOUNDER PANEL ROUTES
+# ADMIN ROUTES
 # ============================
 @app.route("/admin")
 def admin_page():
@@ -416,14 +416,10 @@ def admin_clear_session():
     return "ok"
 
 
-# ============================
-# ⭐ SWITCH BETWEEN USER + FOUNDER
-# ============================
 @app.route("/admin_switch_to_user", methods=["POST"])
 def admin_switch_to_user():
     session.clear()
     session["founder_override"] = True
-    print("🔁 Switched to USER MODE")
     return redirect("/listen")
 
 
@@ -432,7 +428,6 @@ def admin_switch_to_founder():
     session.clear()
     session["founder_mode"] = True
     session["founder_override"] = True
-    print("🔥 Switched to FOUNDER MODE")
     return redirect("/admin")
 
 
