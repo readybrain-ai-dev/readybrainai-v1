@@ -125,30 +125,61 @@
             font-size: 14px; white-space: pre-line;
         }
 
-        /* ── DUAL ANSWER ── */
-        .answer-dual { display: flex; flex-direction: column; gap: 10px; }
-
-        .answer-block {
-            border-radius: 14px; overflow: hidden;
-            border: 1px solid rgba(148,163,184,0.45);
+        .answer-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
         }
 
-        .answer-block-label {
-            font-size: 11px; font-weight: 600; padding: 7px 14px;
-            letter-spacing: 0.06em; text-transform: uppercase;
+        .copy-btn {
+            background: linear-gradient(92deg, #4f46e5, #6366f1);
+            color: white;
+            width: auto;
+            padding: 10px 20px;
         }
 
-        .answer-block-label.native {
-            background: linear-gradient(92deg, #4f46e5, #6366f1); color: white;
+        #convertEnBtn {
+            background: linear-gradient(92deg, #0ea5e9, #0284c7);
+            color: white;
+            width: auto;
+            padding: 10px 20px;
+            display: none;
         }
 
-        .answer-block-label.english {
-            background: linear-gradient(92deg, #0ea5e9, #0284c7); color: white;
+        /* English answer box */
+        #englishBox {
+            display: none;
+            margin-top: 12px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(14,165,233,0.3);
         }
 
-        .answer-block-content {
-            background: var(--surface); padding: 14px 16px;
-            font-size: 14px; white-space: pre-line; min-height: 60px;
+        .english-label {
+            background: linear-gradient(92deg, #0ea5e9, #0284c7);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 7px 14px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .english-content {
+            background: var(--surface);
+            padding: 14px 16px;
+            font-size: 14px;
+            white-space: pre-line;
+            min-height: 60px;
+        }
+
+        .copy-en-btn {
+            background: linear-gradient(92deg, #0ea5e9, #0284c7);
+            color: white;
+            width: auto;
+            padding: 10px 20px;
+            margin-top: 8px;
         }
 
         .ad-box {
@@ -156,11 +187,6 @@
             border-radius: 14px; border: 1px dashed rgba(148,163,184,0.5);
             text-align: center; font-size: 14px; color: var(--text-muted);
         }
-
-        .action-buttons { display: flex; gap: 8px; }
-
-        .copy-btn { background: linear-gradient(92deg, #4f46e5, #6366f1); color: white; }
-        .copy-en-btn { background: linear-gradient(92deg, #0ea5e9, #0284c7); color: white; }
 
         #premiumPopup {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -221,8 +247,8 @@
             <div class="hero-pill">🔴 Live prototype · Voice Interview Coach</div>
             <h1 class="hero-title">Speak naturally. Get a stronger interview answer.</h1>
             <p class="hero-sub">
-                Record your answer in any language. ReadyBrainAI rewrites it in your language
-                AND in English — so you know exactly what to say to your interviewer.
+                Record your answer in any language. ReadyBrainAI rewrites it clearly —
+                then convert to English to say it to your interviewer.
             </p>
         </section>
 
@@ -268,25 +294,24 @@
             <div id="question" class="output-box"></div>
 
             <h3>Improved Answer:</h3>
-            <div class="answer-dual">
-                <!-- Native language -->
-                <div class="answer-block">
-                    <div class="answer-block-label native">🌏 Your language</div>
-                    <div class="answer-block-content" id="answer"></div>
-                </div>
-                <!-- English — always shown -->
-                <div class="answer-block" id="englishAnswerBlock" style="display:none;">
-                    <div class="answer-block-label english">🇺🇸 English — say this to your interviewer</div>
-                    <div class="answer-block-content" id="answerEnglish"></div>
-                </div>
+            <div id="answer" class="output-box"></div>
+
+            <!-- Action buttons -->
+            <div class="answer-actions">
+                <button class="copy-btn" onclick="copyAnswer()">📋 Copy</button>
+                <button id="convertEnBtn" onclick="convertToEnglish()">🇺🇸 Convert to English</button>
+            </div>
+
+            <!-- English answer box (hidden until convert is clicked) -->
+            <div id="englishBox">
+                <div class="english-label">🇺🇸 English — say this to your interviewer</div>
+                <div class="english-content" id="answerEnglish"></div>
+            </div>
+            <div id="copyEnWrapper" style="display:none;">
+                <button class="copy-en-btn" onclick="copyEnglish()">📋 Copy English</button>
             </div>
 
             <div class="ad-box">📢 Advertisement placeholder</div>
-
-            <div class="action-buttons">
-                <button class="copy-btn" onclick="copyAnswer()">📋 Copy your language</button>
-                <button class="copy-en-btn" id="copyEnBtn" onclick="copyEnglish()" style="display:none;">📋 Copy English</button>
-            </div>
         </section>
     </main>
 </div>
@@ -367,6 +392,17 @@ function limitedStart() {
 
 function openPopup() { document.getElementById("premiumPopup").style.display = "flex"; }
 function closePopup() { document.getElementById("premiumPopup").style.display = "none"; }
+
+/* Show copy English button when English box appears */
+const observer = new MutationObserver(() => {
+    const box = document.getElementById("englishBox");
+    const wrapper = document.getElementById("copyEnWrapper");
+    if (box && wrapper) {
+        wrapper.style.display = box.style.display === "block" ? "block" : "none";
+    }
+});
+const englishBox = document.getElementById("englishBox");
+if (englishBox) observer.observe(englishBox, { attributes: true, attributeFilter: ["style"] });
 </script>
 
 </body>

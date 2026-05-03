@@ -5,9 +5,6 @@ from flask import Flask, request, jsonify, render_template, session, redirect, s
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# ============================
-# INIT
-# ============================
 load_dotenv()
 
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -16,9 +13,6 @@ client = OpenAI(api_key=API_KEY)
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "fallback-secret-change-this")
 
-# ============================
-# 🔥 FOUNDER & PREMIUM KEYS
-# ============================
 FOUNDER_KEY = os.getenv("FOUNDER_KEY", "READYBRAIN-UCSD-A18565216")
 
 def user_is_founder():
@@ -33,24 +27,11 @@ def allow_admin_for_founder():
         if session.get("founder_override") is True:
             session["founder_mode"] = True
 
-# ============================
-# LANGUAGE MAP
-# ============================
 LANGUAGE_NAMES = {
-    "my": "Burmese",
-    "zh": "Chinese",
-    "ja": "Japanese",
-    "ko": "Korean",
-    "th": "Thai",
-    "vi": "Vietnamese",
-    "id": "Indonesian",
-    "ms": "Malay",
-    "tl": "Filipino",
-    "hi": "Hindi",
-    "bn": "Bengali",
-    "es": "Spanish",
-    "pt": "Portuguese",
-    "en": "English",
+    "my": "Burmese", "zh": "Chinese", "ja": "Japanese", "ko": "Korean",
+    "th": "Thai", "vi": "Vietnamese", "id": "Indonesian", "ms": "Malay",
+    "tl": "Filipino", "hi": "Hindi", "bn": "Bengali", "es": "Spanish",
+    "pt": "Portuguese", "en": "English",
 }
 
 WHISPER_SUPPORTED = {
@@ -60,9 +41,6 @@ WHISPER_SUPPORTED = {
 def lang_to_name(code):
     return LANGUAGE_NAMES.get(code, code)
 
-# ============================
-# ROUTES
-# ============================
 @app.route("/")
 def landing():
     return render_template("index.html")
@@ -116,7 +94,6 @@ def interview_listen():
         return jsonify({
             "question": "(no audio)",
             "answer": "No audio detected.",
-            "answer_english": None,
             "detected_language": None
         }), 400
 
@@ -144,21 +121,17 @@ def interview_listen():
             return jsonify({
                 "question": "(error)",
                 "answer": "Audio processing failed. Please try again.",
-                "answer_english": None,
                 "detected_language": None
             }), 500
 
         def transcribe(language_hint=None):
             with open(wav_path, "rb") as f:
                 return client.audio.transcriptions.create(
-                    model="whisper-1",
-                    file=f,
-                    response_format="verbose_json",
-                    temperature=0,
+                    model="whisper-1", file=f,
+                    response_format="verbose_json", temperature=0,
                     language=language_hint
                 )
 
-        # Only pass language hint if Whisper supports it
         if input_lang == "auto" or input_lang not in WHISPER_SUPPORTED:
             lang_hint = None
             print(f"ℹ️ Language '{input_lang}' → using auto-detect")
@@ -173,7 +146,6 @@ def interview_listen():
             return jsonify({
                 "question": "(unclear)",
                 "answer": "Unclear. Please try again.",
-                "answer_english": None,
                 "detected_language": detected_lang
             })
 
@@ -187,11 +159,10 @@ def interview_listen():
                 return jsonify({
                     "question": "(unclear)",
                     "answer": "Unclear. Please try again.",
-                    "answer_english": None,
                     "detected_language": detected_lang
                 })
 
-        # Decide output language based on input selection
+        # Decide output language
         if input_lang == "my":
             final_lang = "my"
         elif input_lang != "auto" and input_lang in LANGUAGE_NAMES:
@@ -201,7 +172,6 @@ def interview_listen():
 
         final_lang_name = lang_to_name(final_lang)
 
-        # ✅ Generate answer in user's language
         rewrite_prompt = f"""
 You are ReadyBrain AI.
 Rewrite the following into a short, confident 2–3 sentence interview answer.
@@ -222,35 +192,9 @@ Rules:
         )
         ai_output = ai.choices[0].message.content.strip()
 
-        # ✅ ALWAYS generate English version (unless already English)
-        answer_english = None
-        if final_lang != "en":
-            english_prompt = f"""
-You are ReadyBrain AI.
-Rewrite the following into a short, confident 2–3 sentence interview answer in English.
-
-Original text:
-\"\"\"{spoken_text}\"\"\"
-
-Rules:
-- Keep original meaning
-- No new ideas
-- Simple, confident English
-- Output ONLY the final answer in English
-"""
-            ai_en = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": english_prompt}]
-            )
-            answer_english = ai_en.choices[0].message.content.strip()
-            print(f"✅ English answer generated")
-        else:
-            print(f"ℹ️ Output is already English, skipping English translation")
-
         return jsonify({
             "question": spoken_text,
             "answer": ai_output,
-            "answer_english": answer_english,
             "detected_language": detected_lang,
             "output_language": final_lang
         })
@@ -260,7 +204,6 @@ Rules:
         return jsonify({
             "question": "(error)",
             "answer": "Something went wrong. Please try again.",
-            "answer_english": None,
             "detected_language": None
         }), 500
 
@@ -273,21 +216,34 @@ Rules:
                     pass
 
 # ============================
-# REGENERATE
+# REGENERATE / TRANSLATE TO ENGLISH
 # ============================
 @app.route("/interview_regen", methods=["POST"])
 def interview_regen():
     data = request.get_json() or {}
     text = data.get("text", "").strip()
+    translate_to_english = data.get("translate_to_english", False)
+
     if not text:
         return jsonify({"answer": "(no text)"}), 400
-    prompt = f"""
+
+    if translate_to_english:
+        prompt = f"""
 You are ReadyBrain AI.
-Rewrite this in 2–3 confident, clean sentences.
-Keep the same meaning.
-Output ONLY the improved answer.
+Translate and rewrite the following into a short, confident 2–3 sentence interview answer in English.
+Keep the same meaning. Output ONLY the final answer in English.
+
 \"\"\"{text}\"\"\"
 """
+    else:
+        prompt = f"""
+You are ReadyBrain AI.
+Rewrite this in 2–3 confident, clean sentences. Keep the same meaning.
+Output ONLY the improved answer.
+
+\"\"\"{text}\"\"\"
+"""
+
     try:
         result = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -296,7 +252,7 @@ Output ONLY the improved answer.
         return jsonify({"answer": result.choices[0].message.content.strip()})
     except Exception as e:
         print("❌ interview_regen error:", str(e))
-        return jsonify({"answer": "Error regenerating answer. Please try again."})
+        return jsonify({"answer": "Error. Please try again."})
 
 # ============================
 # ADMIN ROUTES
