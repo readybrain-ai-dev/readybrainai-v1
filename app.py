@@ -162,7 +162,6 @@ def interview_listen():
                     "detected_language": detected_lang
                 })
 
-        # Decide output language
         if input_lang == "my":
             final_lang = "my"
         elif input_lang != "auto" and input_lang in LANGUAGE_NAMES:
@@ -172,21 +171,25 @@ def interview_listen():
 
         final_lang_name = lang_to_name(final_lang)
 
-        rewrite_prompt = f"""
-You are ReadyBrain AI, an expert interview coach.
+        rewrite_prompt = f"""You are ReadyBrain AI, an expert interview coach helping non-native English speakers ace their job interviews.
 
-The user spoke the following text. Rewrite it into a short, confident 2-3 sentence interview answer.
-Write the FINAL version in {final_lang_name}.
+The user just spoke the following text during interview practice. This could be:
+- Their answer to an interview question
+- A brain teaser or problem they were asked
+- A scenario or question they need to respond to
+- Anything they said out loud
 
-Original text:
+Your job: Write the BEST possible 2-3 sentence interview-style response to whatever they said, written in {final_lang_name}.
+
+If it's a question or brain teaser, write a confident answer to it.
+If it's already an answer, make it cleaner and more confident.
+Always sound professional, thoughtful, and ready for a real interview.
+
+What the user said:
 \"\"\"{spoken_text}\"\"\"
 
-Rules:
-- Keep the original meaning and the user's personal story
-- Remove filler words and rambling
-- Sound confident, clear, and professional
-- Output ONLY the final answer, nothing else
-"""
+Output ONLY the final response in {final_lang_name}. Nothing else."""
+
         ai = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": rewrite_prompt}]
@@ -217,7 +220,7 @@ Rules:
                     pass
 
 # ============================
-# REGENERATE / TRANSLATE TO ENGLISH
+# REGENERATE / CONVERT TO ENGLISH
 # ============================
 @app.route("/interview_regen", methods=["POST"])
 def interview_regen():
@@ -229,33 +232,32 @@ def interview_regen():
         return jsonify({"answer": "(no text)"}), 400
 
     if translate_to_english:
-        # ✅ This rewrites as a BEST English interview answer, not just a translation
-        prompt = f"""
-You are ReadyBrain AI, an expert interview coach.
+        prompt = f"""You are ReadyBrain AI, an expert interview coach helping non-native English speakers ace their job interviews.
 
-The following is an interview answer. Your job is to rewrite it as the BEST possible 
-confident, professional 2-3 sentence interview answer in English.
+The user said the following during interview practice. This could be a question, brain teaser, scenario, or their own answer.
 
-This will be said out loud to a real interviewer, so make it:
-- Sound completely natural in English
-- Clear, confident, and impressive
-- Free of filler words
+Your job: Write the BEST possible 2-3 sentence interview-style response in English.
+
+If it's a question or brain teaser, give a smart, confident answer to it.
+If it's already an answer, rewrite it to sound more professional and impressive.
+
+The response will be spoken out loud to a real interviewer, so make it:
+- Natural and fluent English
+- Confident and clear
 - Professional but not robotic
+- Free of filler words
 
-Original answer:
+What the user said:
 \"\"\"{text}\"\"\"
 
-Output ONLY the final English answer. Nothing else.
-"""
+Output ONLY the final English response. Nothing else."""
     else:
-        prompt = f"""
-You are ReadyBrain AI, an expert interview coach.
-Rewrite this into a better 2-3 sentence interview answer.
-Keep the same meaning but make it clearer and more confident.
+        prompt = f"""You are ReadyBrain AI, an expert interview coach.
+Rewrite the following into a better 2-3 sentence interview answer.
+Make it clearer, more confident, and more professional.
 Output ONLY the improved answer.
 
-\"\"\"{text}\"\"\"
-"""
+\"\"\"{text}\"\"\""""
 
     try:
         result = client.chat.completions.create(
