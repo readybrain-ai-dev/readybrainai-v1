@@ -2,6 +2,7 @@ let mediaRecorder;
 let audioChunks = [];
 let currentMimeType = null;
 let lastAnswer = "";
+let lastQuestion = ""; // ✅ store original spoken text
 
 // =====================================================
 // CHOOSE THE BEST MIME TYPE (CROSS-PLATFORM SUPPORT)
@@ -34,20 +35,19 @@ function resetUI() {
     document.getElementById("question").innerText = "";
     document.getElementById("answer").innerText = "";
     lastAnswer = "";
+    lastQuestion = "";
 
-    // Hide English box
     const englishBox = document.getElementById("englishBox");
     const englishEl = document.getElementById("answerEnglish");
     const copyEnWrapper = document.getElementById("copyEnWrapper");
     const convertBtn = document.getElementById("convertEnBtn");
+    const detectedEl = document.getElementById("detectedLang");
 
     if (englishBox) englishBox.style.display = "none";
     if (englishEl) englishEl.innerText = "";
     if (copyEnWrapper) copyEnWrapper.style.display = "none";
     if (convertBtn) convertBtn.style.display = "none";
-
-    const oldTag = document.getElementById("detectedLang");
-    if (oldTag) oldTag.remove();
+    if (detectedEl) detectedEl.innerText = "";
 }
 
 // =====================================================
@@ -170,23 +170,20 @@ async function stopListening() {
 
         qBox.innerText = data.question ?? "(unclear)";
         aBox.innerText = data.answer ?? "(unclear)";
+
+        // ✅ Store BOTH original spoken text AND the answer
+        lastQuestion = data.question ?? "";
         lastAnswer = data.answer ?? "";
+
         status.innerText = "Idle";
 
-        // Detected language tag
-        if (data.detected_language) {
-            const oldTag = document.getElementById("detectedLang");
-            if (oldTag) oldTag.remove();
-            const tag = document.createElement("div");
-            tag.id = "detectedLang";
-            tag.style.fontSize = "12px";
-            tag.style.color = "#64748b";
-            tag.style.marginTop = "4px";
-            tag.innerText = "Detected language: " + data.detected_language;
-            qBox.parentNode.insertBefore(tag, qBox);
+        // Detected language
+        const detectedEl = document.getElementById("detectedLang");
+        if (detectedEl && data.detected_language) {
+            detectedEl.innerText = "Detected language: " + data.detected_language;
         }
 
-        // Always show Convert to English button after recording
+        // Show Convert to English button
         const convertBtn = document.getElementById("convertEnBtn");
         if (convertBtn && lastAnswer) {
             convertBtn.style.display = "inline-block";
@@ -198,23 +195,26 @@ async function stopListening() {
 
 // =====================================================
 // CONVERT TO ENGLISH
+// ✅ Uses original spoken text, not the translated answer
 // =====================================================
 async function convertToEnglish() {
-    if (!lastAnswer) return;
+    // Use original spoken text so GPT rewrites from scratch in English
+    const textToConvert = lastQuestion || lastAnswer;
+    if (!textToConvert) return;
 
     const convertBtn = document.getElementById("convertEnBtn");
     const englishBox = document.getElementById("englishBox");
     const englishEl = document.getElementById("answerEnglish");
     const copyEnWrapper = document.getElementById("copyEnWrapper");
 
-    convertBtn.innerText = "Translating...";
+    convertBtn.innerText = "Generating…";
     convertBtn.disabled = true;
 
     try {
         const response = await fetch("/interview_regen", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: lastAnswer, translate_to_english: true })
+            body: JSON.stringify({ text: textToConvert, translate_to_english: true })
         });
         const data = await response.json();
 
@@ -224,7 +224,7 @@ async function convertToEnglish() {
             if (copyEnWrapper) copyEnWrapper.style.display = "block";
         }
     } catch (e) {
-        englishEl.innerText = "Could not translate. Please try again.";
+        englishEl.innerText = "Could not generate. Please try again.";
         englishBox.style.display = "block";
     }
 
@@ -233,7 +233,7 @@ async function convertToEnglish() {
 }
 
 // =====================================================
-// COPY ANSWER
+// COPY FUNCTIONS
 // =====================================================
 function copyAnswer() {
     const ans = document.getElementById("answer").innerText.trim();
@@ -271,38 +271,5 @@ async function regenerateAnswer() {
         lastAnswer = data.answer || "";
     } catch {
         aBox.innerText = "(server error)";
-    }
-}
-
-// =====================================================
-// TEXT MODE GENERATION
-// =====================================================
-async function generateTextAnswer() {
-    const question = document.getElementById("textQuestion").value.trim();
-    const jobRole  = document.getElementById("textJobRole").value.trim();
-    const bg       = document.getElementById("textBackground").value.trim();
-    const statusEl = document.getElementById("textStatus");
-    const aBox     = document.getElementById("answer");
-
-    if (!question) {
-        statusEl.innerText = "Please type the interview question first.";
-        return;
-    }
-
-    statusEl.innerText = "⏳ Generating…";
-
-    try {
-        const res = await fetch("/interview_answer", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ question, job_role: jobRole, background: bg })
-        });
-
-        const data = await res.json();
-        aBox.innerText = data.answer || "(no answer)";
-        lastAnswer = data.answer || "";
-        statusEl.innerText = "Done.";
-    } catch (err) {
-        statusEl.innerText = "Error: could not generate answer.";
     }
 }
