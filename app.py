@@ -22,9 +22,9 @@ FOUNDER_KEY = os.getenv("FOUNDER_KEY", "READYBRAIN-UCSD-A18565216")
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 STRIPE_PRICES = {
-    "monthly": "price_1TTGu6LiH4Sln8Xj2Hdvt2u6",
-    "6months": "price_1TTGv7LiH4Sln8XjIG1Aut4Y",
-    "yearly":  "price_1TTGvrLiH4Sln8XjjZdhgNFh",
+    "monthly": "price_1TTHWVLCJYMjF6nvi9e50Mgs",
+    "6months": "price_1TTHWRLCJYMjF6nvryqK3Ycw",
+    "yearly":  "price_1TTHWULCJYMjF6nvUm6TlXwG",
 }
 
 def user_is_founder():
