@@ -62,6 +62,10 @@ def premium_page():
 def privacy():
     return render_template("privacy.html")
 
+@app.route("/tos")
+def tos():
+    return render_template("tos.html")
+
 @app.route("/health")
 def health():
     return "ok", 200

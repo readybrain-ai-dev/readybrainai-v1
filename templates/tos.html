@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms of Service – ReadyBrainAI</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TK2BLDJQPN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TK2BLDJQPN');
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #08090a;
+            --white: #f8f9fa;
+            --green: #00e87a;
+            --gray: #1a1c1e;
+            --gray-mid: #2e3034;
+            --gray-light: #6b7280;
+            --text: #e8eaed;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(16px);
+            background: rgba(8,9,10,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-logo {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--white);
+        }
+
+        .back-btn {
+            padding: 7px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: transparent;
+            color: var(--gray-light);
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 60px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .page-title .accent { color: var(--green); }
+
+        .updated {
+            font-size: 13px;
+            color: var(--gray-light);
+            margin-bottom: 48px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--gray-mid);
+        }
+
+        .section p {
+            font-size: 15px;
+            color: var(--gray-light);
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+        .section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .section ul li {
+            font-size: 15px;
+            color: var(--gray-light);
+            line-height: 1.65;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .section ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .contact-box {
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 16px;
+        }
+
+        .contact-box p { margin: 0; }
+        .contact-box a { color: var(--green); text-decoration: none; }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-mid);
+            text-align: center;
+            font-size: 13px;
+            color: var(--gray-light);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/" class="brand">
+        <div class="brand-logo">RB</div>
+        <span class="brand-name">ReadyBrainAI</span>
+    </a>
+    <a href="/" class="back-btn">← Back</a>
+</nav>
+
+<div class="page">
+
+    <h1 class="page-title">Terms of <span class="accent">Service</span></h1>
+    <p class="updated">Last updated: May 3, 2026</p>
+
+    <div class="section">
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using ReadyBrainAI ("the Service") at readybrainai.com, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
+    </div>
+
+    <div class="section">
+        <h2>2. Description of Service</h2>
+        <p>ReadyBrainAI is an AI-powered interview coaching tool that helps users practice and improve their interview answers. The Service allows users to:</p>
+        <ul>
+            <li>Record voice answers in multiple languages</li>
+            <li>Receive AI-generated improved interview responses</li>
+            <li>Convert answers to English for interview preparation</li>
+            <li>Access free and premium tiers of service</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. Use of the Service</h2>
+        <p>You agree to use ReadyBrainAI only for lawful purposes and in accordance with these Terms. You agree NOT to:</p>
+        <ul>
+            <li>Use the Service for any illegal or unauthorized purpose</li>
+            <li>Attempt to bypass usage limits or access restrictions</li>
+            <li>Use automated tools to abuse the Service</li>
+            <li>Share or resell access to the Service</li>
+            <li>Upload harmful, offensive, or inappropriate content</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Free and Premium Access</h2>
+        <p>ReadyBrainAI offers a free tier with limited daily usage. After reaching the free limit, users may be shown advertisements before continuing. Premium plans are available that remove ads and provide unlimited access.</p>
+        <p>Premium subscriptions are billed at the rates shown on our pricing page. All payments are final unless otherwise required by law.</p>
+    </div>
+
+    <div class="section">
+        <h2>5. Voice Data and AI Processing</h2>
+        <p>When you use the voice recording feature, your audio is sent to OpenAI's Whisper API for transcription and GPT-4o-mini for answer generation. By using this feature, you consent to this processing. Audio files are not permanently stored and are deleted immediately after processing.</p>
+    </div>
+
+    <div class="section">
+        <h2>6. Intellectual Property</h2>
+        <p>The ReadyBrainAI name, logo, and all related content are the property of the founder. The AI-generated responses produced by the Service may be used freely by users for personal interview preparation purposes.</p>
+    </div>
+
+    <div class="section">
+        <h2>7. Disclaimer of Warranties</h2>
+        <p>ReadyBrainAI is provided "as is" without any warranties of any kind. We do not guarantee that the Service will be available at all times, error-free, or that the AI responses will be accurate or suitable for your specific situation. The Service is intended as a practice tool, not professional career advice.</p>
+    </div>
+
+    <div class="section">
+        <h2>8. Limitation of Liability</h2>
+        <p>To the fullest extent permitted by law, ReadyBrainAI and its founder shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service, including but not limited to lost job opportunities or interview outcomes.</p>
+    </div>
+
+    <div class="section">
+        <h2>9. Advertising</h2>
+        <p>ReadyBrainAI displays advertisements through Google AdSense and Adsterra to support the free tier of service. By using the free tier, you consent to viewing these advertisements. Premium users are not shown advertisements.</p>
+    </div>
+
+    <div class="section">
+        <h2>10. Changes to Terms</h2>
+        <p>We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting. Your continued use of the Service after changes constitutes acceptance of the new Terms.</p>
+    </div>
+
+    <div class="section">
+        <h2>11. Contact</h2>
+        <p>If you have any questions about these Terms of Service, please contact us:</p>
+        <div class="contact-box">
+            <p>
+                <strong style="color: var(--white);">ReadyBrainAI</strong><br><br>
+                Website: <a href="https://readybrainai.com">readybrainai.com</a><br>
+                Email: <a href="mailto:luis.wainn@gmail.com">luis.wainn@gmail.com</a><br>
+                Founder: Aung Myo Win
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 ReadyBrainAI. Built by a CS major at UCSD.
+    </div>
+
+</div>
+
+</body>
+</html>
