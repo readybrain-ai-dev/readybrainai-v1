@@ -2,6 +2,7 @@ import os
 import tempfile
 import subprocess
 import stripe
+import psycopg2
 from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory, url_for
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -27,11 +28,89 @@ STRIPE_PRICES = {
     "yearly":  "price_1TTHWULCJYMjF6nvUm6TlXwG",
 }
 
+# ============================
+# 🗄️ DATABASE
+# ============================
+def get_db():
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        return None
+    try:
+        conn = psycopg2.connect(db_url)
+        return conn
+    except Exception as e:
+        print("❌ DB connection error:", str(e))
+        return None
+
+def init_db():
+    conn = get_db()
+    if not conn:
+        return
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                stripe_customer_id TEXT,
+                is_premium BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        """)
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("✅ Database initialized")
+    except Exception as e:
+        print("❌ DB init error:", str(e))
+
+def set_user_premium(email, stripe_customer_id=None):
+    conn = get_db()
+    if not conn:
+        return
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO users (email, stripe_customer_id, is_premium)
+            VALUES (%s, %s, TRUE)
+            ON CONFLICT (email) DO UPDATE
+            SET is_premium = TRUE, stripe_customer_id = COALESCE(%s, users.stripe_customer_id)
+        """, (email, stripe_customer_id, stripe_customer_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print("❌ DB set premium error:", str(e))
+
+def check_user_premium(email):
+    conn = get_db()
+    if not conn:
+        return False
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT is_premium FROM users WHERE email = %s", (email,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        return row and row[0]
+    except Exception as e:
+        print("❌ DB check premium error:", str(e))
+        return False
+
+# Initialize DB on startup
+with app.app_context():
+    init_db()
+
 def user_is_founder():
     return session.get("founder_mode") is True
 
 def user_is_premium():
-    return session.get("premium_mode") is True
+    if session.get("premium_mode") is True:
+        return True
+    email = session.get("user_email")
+    if email:
+        return check_user_premium(email)
+    return False
 
 @app.before_request
 def allow_admin_for_founder():
@@ -124,7 +203,20 @@ def create_checkout_session():
 
 @app.route("/payment-success")
 def payment_success():
-    session["premium_mode"] = True
+    session_id = request.args.get("session_id")
+    if session_id:
+        try:
+            checkout_session = stripe.checkout.Session.retrieve(session_id)
+            customer_email = checkout_session.customer_details.email
+            customer_id = checkout_session.customer
+            if customer_email:
+                session["premium_mode"] = True
+                session["user_email"] = customer_email
+                set_user_premium(customer_email, customer_id)
+                print(f"✅ Premium activated for {customer_email}")
+        except Exception as e:
+            print("❌ Stripe session error:", str(e))
+            session["premium_mode"] = True
     return render_template("success.html")
 
 @app.route("/payment-cancel")
