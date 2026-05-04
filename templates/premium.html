@@ -359,12 +359,13 @@
 
     <!-- ALREADY PREMIUM LOGIN -->
     <div class="login-box">
-        <p><strong>Already a premium member?</strong> Enter your email to restore access.</p>
+        <p><strong>Already a premium member?</strong> Enter your email to restore access or manage your subscription.</p>
         <div class="login-row">
             <input type="email" class="login-input" id="loginEmail" placeholder="your@email.com" />
             <button class="login-btn" onclick="restoreAccess()">Restore Access</button>
         </div>
         <p class="login-msg" id="loginMsg"></p>
+        <button onclick="manageSubscription()" style="margin-top: 12px; width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--gray-mid); background: transparent; color: var(--gray-light); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif;">⚙️ Manage / Cancel Subscription</button>
     </div>
 
     <!-- PRICING -->
@@ -451,6 +452,38 @@ async function checkout(plan) {
     } catch (err) {
         alert("Something went wrong. Please try again.");
         buttons.forEach(btn => btn.disabled = false);
+    }
+}
+
+async function manageSubscription() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const msg = document.getElementById("loginMsg");
+
+    if (!email) {
+        msg.style.color = "#ef4444";
+        msg.textContent = "Enter your email first to manage subscription.";
+        return;
+    }
+
+    msg.style.color = "var(--gray-light)";
+    msg.textContent = "Opening portal...";
+
+    try {
+        const res = await fetch("/manage-subscription", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            msg.style.color = "#ef4444";
+            msg.textContent = "No subscription found for this email.";
+        }
+    } catch (err) {
+        msg.style.color = "#ef4444";
+        msg.textContent = "Something went wrong. Try again.";
     }
 }
 
