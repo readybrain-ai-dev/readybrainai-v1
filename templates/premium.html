@@ -48,7 +48,6 @@
             opacity: 0.4;
         }
 
-        /* ── NAVBAR ── */
         .navbar {
             position: sticky;
             top: 0;
@@ -102,7 +101,6 @@
 
         .back-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
 
-        /* ── PAGE ── */
         .page {
             max-width: 1000px;
             margin: 0 auto;
@@ -111,7 +109,6 @@
             z-index: 1;
         }
 
-        /* ── HERO ── */
         .hero {
             text-align: center;
             margin-bottom: 56px;
@@ -151,7 +148,6 @@
             line-height: 1.65;
         }
 
-        /* ── PRICING GRID ── */
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -276,12 +272,17 @@
             transition: all 0.2s;
         }
 
+        .upgrade-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .btn-featured {
             background: var(--green);
             color: var(--black);
         }
 
-        .btn-featured:hover { background: var(--green-dark); transform: translateY(-1px); }
+        .btn-featured:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
 
         .btn-normal {
             background: var(--gray-mid);
@@ -289,9 +290,8 @@
             border: 1px solid rgba(255,255,255,0.08);
         }
 
-        .btn-normal:hover { background: #3a3d42; }
+        .btn-normal:hover:not(:disabled) { background: #3a3d42; }
 
-        /* ── BOTTOM ── */
         .bottom-note {
             text-align: center;
             margin-top: 32px;
@@ -308,62 +308,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        /* ── POPUP ── */
-        #successPopup {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(8px);
-        }
-
-        .popup-box {
-            background: var(--gray);
-            border: 1px solid var(--gray-mid);
-            padding: 36px;
-            border-radius: 22px;
-            text-align: center;
-            width: 90%;
-            max-width: 380px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-        }
-
-        .popup-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .popup-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--white);
-            margin-bottom: 10px;
-        }
-
-        .popup-msg {
-            font-size: 14px;
-            color: var(--gray-light);
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
-        .popup-btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 999px;
-            background: var(--green);
-            color: var(--black);
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            font-family: 'Syne', sans-serif;
         }
     </style>
 </head>
@@ -407,7 +351,7 @@
                 <li>All 14 languages</li>
                 <li>Cancel anytime</li>
             </ul>
-            <button class="upgrade-btn btn-normal" onclick="activatePremium()">Get Monthly</button>
+            <button class="upgrade-btn btn-normal" onclick="checkout('monthly')">Get Monthly</button>
         </div>
 
         <!-- 6 MONTHS — FEATURED -->
@@ -424,7 +368,7 @@
                 <li>All 14 languages</li>
                 <li>Priority support</li>
             </ul>
-            <button class="upgrade-btn btn-featured" onclick="activatePremium()">Get 6 Months</button>
+            <button class="upgrade-btn btn-featured" onclick="checkout('6months')">Get 6 Months</button>
         </div>
 
         <!-- 1 YEAR -->
@@ -440,7 +384,7 @@
                 <li>All 14 languages</li>
                 <li>Priority support</li>
             </ul>
-            <button class="upgrade-btn btn-normal" onclick="activatePremium()">Get 1 Year</button>
+            <button class="upgrade-btn btn-normal" onclick="checkout('yearly')">Get 1 Year</button>
         </div>
 
     </div>
@@ -454,22 +398,27 @@
 
 </div>
 
-<!-- SUCCESS POPUP -->
-<div id="successPopup">
-    <div class="popup-box">
-        <div class="popup-icon">🎉</div>
-        <div class="popup-title">Premium Activated!</div>
-        <div class="popup-msg">You now have unlimited access to ReadyBrainAI. No more ad breaks — just pure interview practice.</div>
-        <button class="popup-btn" onclick="window.location='/listen'">Start Practicing</button>
-    </div>
-</div>
-
 <script>
-async function activatePremium() {
-    const res = await fetch("/activate_premium", { method: "POST" });
-    const data = await res.json();
-    if (data.status === "ok") {
-        document.getElementById("successPopup").style.display = "flex";
+async function checkout(plan) {
+    const buttons = document.querySelectorAll('.upgrade-btn');
+    buttons.forEach(btn => btn.disabled = true);
+
+    try {
+        const res = await fetch("/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ plan })
+        });
+        const data = await res.json();
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            alert("Something went wrong. Please try again.");
+            buttons.forEach(btn => btn.disabled = false);
+        }
+    } catch (err) {
+        alert("Something went wrong. Please try again.");
+        buttons.forEach(btn => btn.disabled = false);
     }
 }
 </script>

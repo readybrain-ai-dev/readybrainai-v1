@@ -1,7 +1,8 @@
 import os
 import tempfile
 import subprocess
-from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory
+import stripe
+from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory, url_for
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -14,6 +15,17 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "fallback-secret-change-this")
 
 FOUNDER_KEY = os.getenv("FOUNDER_KEY", "READYBRAIN-UCSD-A18565216")
+
+# ============================
+# 💳 STRIPE CONFIG
+# ============================
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
+STRIPE_PRICES = {
+    "monthly": "price_1TTGu6LiH4Sln8Xj2Hdvt2u6",
+    "6months": "price_1TTGv7LiH4Sln8XjIG1Aut4Y",
+    "yearly":  "price_1TTGvrLiH4Sln8XjjZdhgNFh",
+}
 
 def user_is_founder():
     return session.get("founder_mode") is True
@@ -56,7 +68,8 @@ def listen_page():
 
 @app.route("/premium")
 def premium_page():
-    return render_template("premium.html")
+    pub_key = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
+    return render_template("premium.html", stripe_pub_key=pub_key)
 
 @app.route("/privacy")
 def privacy():
@@ -86,6 +99,37 @@ def ads_txt():
 def activate_premium():
     session["premium_mode"] = True
     return jsonify({"status": "ok"})
+
+# ============================
+# 💳 STRIPE CHECKOUT
+# ============================
+@app.route("/create-checkout-session", methods=["POST"])
+def create_checkout_session():
+    data = request.get_json() or {}
+    plan = data.get("plan", "monthly")
+    price_id = STRIPE_PRICES.get(plan, STRIPE_PRICES["monthly"])
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{"price": price_id, "quantity": 1}],
+            mode="subscription",
+            success_url=url_for("payment_success", _external=True) + "?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=url_for("premium_page", _external=True),
+        )
+        return jsonify({"url": checkout_session.url})
+    except Exception as e:
+        print("❌ Stripe error:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/payment-success")
+def payment_success():
+    session["premium_mode"] = True
+    return render_template("success.html")
+
+@app.route("/payment-cancel")
+def payment_cancel():
+    return redirect("/premium")
 
 # ============================
 # 🎤 MAIN INTERVIEW LISTENER
