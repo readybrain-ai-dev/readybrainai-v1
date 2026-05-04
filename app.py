@@ -172,6 +172,18 @@ def activate_premium():
     session["premium_mode"] = True
     return jsonify({"status": "ok"})
 
+@app.route("/restore-premium", methods=["POST"])
+def restore_premium():
+    data = request.get_json() or {}
+    email = data.get("email", "").strip().lower()
+    if not email:
+        return jsonify({"premium": False})
+    is_premium = check_user_premium(email)
+    if is_premium:
+        session["premium_mode"] = True
+        session["user_email"] = email
+    return jsonify({"premium": is_premium})
+
 # ============================
 # 💳 STRIPE CHECKOUT
 # ============================

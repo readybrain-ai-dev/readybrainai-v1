@@ -61,12 +61,7 @@
             justify-content: space-between;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 
         .brand-logo {
             width: 34px; height: 34px;
@@ -148,6 +143,67 @@
             line-height: 1.65;
         }
 
+        /* ── LOGIN BOX ── */
+        .login-box {
+            background: var(--gray);
+            border: 1px solid var(--gray-mid);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 480px;
+            margin: 0 auto 48px;
+            text-align: center;
+        }
+
+        .login-box p {
+            font-size: 14px;
+            color: var(--gray-light);
+            margin-bottom: 16px;
+        }
+
+        .login-box strong {
+            color: var(--white);
+        }
+
+        .login-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .login-input {
+            flex: 1;
+            padding: 11px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--gray-mid);
+            background: var(--black);
+            color: var(--white);
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+        }
+
+        .login-input:focus { border-color: var(--green); }
+
+        .login-btn {
+            padding: 11px 20px;
+            border-radius: 10px;
+            border: none;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .login-btn:hover { background: var(--green-dark); }
+
+        .login-msg {
+            font-size: 13px;
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -156,6 +212,7 @@
 
         @media (max-width: 700px) {
             .pricing-grid { grid-template-columns: 1fr; }
+            .login-row { flex-direction: column; }
         }
 
         .pricing-card {
@@ -168,10 +225,7 @@
             transition: transform 0.2s, border-color 0.2s;
         }
 
-        .pricing-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(0,232,122,0.3);
-        }
+        .pricing-card:hover { transform: translateY(-4px); border-color: rgba(0,232,122,0.3); }
 
         .pricing-card.featured {
             border: 2px solid var(--green);
@@ -210,17 +264,8 @@
             margin-bottom: 4px;
         }
 
-        .price span {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--gray-light);
-        }
-
-        .price-period {
-            font-size: 13px;
-            color: var(--gray-light);
-            margin-bottom: 6px;
-        }
+        .price span { font-size: 24px; font-weight: 600; color: var(--gray-light); }
+        .price-period { font-size: 13px; color: var(--gray-light); margin-bottom: 6px; }
 
         .price-save {
             font-size: 12px;
@@ -253,12 +298,7 @@
             gap: 8px;
         }
 
-        .features li::before {
-            content: '✓';
-            color: var(--green);
-            font-weight: 700;
-            flex-shrink: 0;
-        }
+        .features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
 
         .upgrade-btn {
             width: 100%;
@@ -272,24 +312,10 @@
             transition: all 0.2s;
         }
 
-        .upgrade-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-featured {
-            background: var(--green);
-            color: var(--black);
-        }
-
+        .upgrade-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-featured { background: var(--green); color: var(--black); }
         .btn-featured:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
-
-        .btn-normal {
-            background: var(--gray-mid);
-            color: var(--text);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
+        .btn-normal { background: var(--gray-mid); color: var(--text); border: 1px solid rgba(255,255,255,0.08); }
         .btn-normal:hover:not(:disabled) { background: #3a3d42; }
 
         .bottom-note {
@@ -304,11 +330,7 @@
             flex-wrap: wrap;
         }
 
-        .bottom-note span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .bottom-note span { display: flex; align-items: center; gap: 6px; }
     </style>
 </head>
 
@@ -333,6 +355,16 @@
         <p class="hero-sub">
             Get unlimited voice sessions, no ad breaks, and the best AI interview coaching — at a price made for students.
         </p>
+    </div>
+
+    <!-- ALREADY PREMIUM LOGIN -->
+    <div class="login-box">
+        <p><strong>Already a premium member?</strong> Enter your email to restore access.</p>
+        <div class="login-row">
+            <input type="email" class="login-input" id="loginEmail" placeholder="your@email.com" />
+            <button class="login-btn" onclick="restoreAccess()">Restore Access</button>
+        </div>
+        <p class="login-msg" id="loginMsg"></p>
     </div>
 
     <!-- PRICING -->
@@ -419,6 +451,40 @@ async function checkout(plan) {
     } catch (err) {
         alert("Something went wrong. Please try again.");
         buttons.forEach(btn => btn.disabled = false);
+    }
+}
+
+async function restoreAccess() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const msg = document.getElementById("loginMsg");
+
+    if (!email) {
+        msg.style.color = "#ef4444";
+        msg.textContent = "Please enter your email.";
+        return;
+    }
+
+    msg.style.color = "var(--gray-light)";
+    msg.textContent = "Checking...";
+
+    try {
+        const res = await fetch("/restore-premium", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.premium) {
+            msg.style.color = "var(--green)";
+            msg.textContent = "✅ Premium restored! Redirecting...";
+            setTimeout(() => window.location.href = "/listen", 1500);
+        } else {
+            msg.style.color = "#ef4444";
+            msg.textContent = "No premium account found for this email.";
+        }
+    } catch (err) {
+        msg.style.color = "#ef4444";
+        msg.textContent = "Something went wrong. Try again.";
     }
 }
 </script>
