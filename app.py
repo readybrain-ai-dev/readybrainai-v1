@@ -2,7 +2,7 @@ import os
 import tempfile
 import subprocess
 import stripe
-import psycopg2
+import psycopg
 from flask import Flask, request, jsonify, render_template, session, redirect, send_from_directory, url_for
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -36,7 +36,7 @@ def get_db():
     if not db_url:
         return None
     try:
-        conn = psycopg2.connect(db_url)
+        conn = psycopg.connect(db_url)
         return conn
     except Exception as e:
         print("❌ DB connection error:", str(e))
@@ -47,8 +47,7 @@ def init_db():
     if not conn:
         return
     try:
-        cur = conn.cursor()
-        cur.execute("""
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 email TEXT UNIQUE NOT NULL,
@@ -58,7 +57,6 @@ def init_db():
             )
         """)
         conn.commit()
-        cur.close()
         conn.close()
         print("✅ Database initialized")
     except Exception as e:
@@ -69,15 +67,13 @@ def set_user_premium(email, stripe_customer_id=None):
     if not conn:
         return
     try:
-        cur = conn.cursor()
-        cur.execute("""
+        conn.execute("""
             INSERT INTO users (email, stripe_customer_id, is_premium)
             VALUES (%s, %s, TRUE)
             ON CONFLICT (email) DO UPDATE
             SET is_premium = TRUE, stripe_customer_id = COALESCE(%s, users.stripe_customer_id)
         """, (email, stripe_customer_id, stripe_customer_id))
         conn.commit()
-        cur.close()
         conn.close()
     except Exception as e:
         print("❌ DB set premium error:", str(e))
@@ -87,10 +83,7 @@ def check_user_premium(email):
     if not conn:
         return False
     try:
-        cur = conn.cursor()
-        cur.execute("SELECT is_premium FROM users WHERE email = %s", (email,))
-        row = cur.fetchone()
-        cur.close()
+        row = conn.execute("SELECT is_premium FROM users WHERE email = %s", (email,)).fetchone()
         conn.close()
         return row and row[0]
     except Exception as e:
