@@ -554,7 +554,9 @@
     <div class="card">
         <div class="card-top">
             <div class="card-title">🎤 Answer Refinement</div>
-            <select id="languageSelect" class="lang-select">
+            <div style="text-align: right;">
+                <div style="font-size: 10px; color: var(--gray-light); margin-bottom: 4px;">Answer language</div>
+                <select id="languageSelect" class="lang-select">
                 <option value="auto">🌐 Auto Detect</option>
                 <optgroup label="🇲🇲 Burmese">
                     <option value="my">Burmese (မြန်မာ)</option>
@@ -579,6 +581,7 @@
                     <option value="en">English</option>
                 </optgroup>
             </select>
+            </div>
         </div>
 
         <button class="record-btn" id="startBtn" onclick="limitedStart()">🎙 Start Recording</button>
