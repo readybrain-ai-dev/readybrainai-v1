@@ -229,6 +229,29 @@ def payment_cancel():
     return redirect("/premium")
 
 # ============================
+# 🔧 MANAGE SUBSCRIPTION
+# ============================
+@app.route("/manage-subscription", methods=["POST"])
+def manage_subscription():
+    data = request.get_json() or {}
+    email = data.get("email") or session.get("user_email")
+    if not email:
+        return jsonify({"error": "No email"}), 400
+    try:
+        customers = stripe.Customer.list(email=email, limit=1)
+        if not customers.data:
+            return jsonify({"error": "No customer found"}), 404
+        customer_id = customers.data[0].id
+        portal = stripe.billing_portal.Session.create(
+            customer=customer_id,
+            return_url="https://readybrainai.com/premium"
+        )
+        return jsonify({"url": portal.url})
+    except Exception as e:
+        print("❌ Portal error:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+# ============================
 # 🔔 STRIPE WEBHOOK
 # ============================
 @app.route("/stripe-webhook", methods=["POST"])

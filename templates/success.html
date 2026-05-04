@@ -41,7 +41,7 @@
             margin-bottom: 32px;
         }
         .btn {
-            display: inline-block;
+            display: block;
             padding: 14px 32px;
             background: #00e87a;
             color: #08090a;
@@ -51,8 +51,26 @@
             border-radius: 999px;
             text-decoration: none;
             transition: background 0.2s;
+            margin-bottom: 12px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
         }
         .btn:hover { background: #00c064; }
+        .btn-secondary {
+            display: block;
+            padding: 14px 32px;
+            background: transparent;
+            color: #6b7280;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            border-radius: 999px;
+            border: 1px solid #2e3034;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: #6b7280; color: #e8eaed; }
     </style>
 </head>
 <body>
@@ -61,6 +79,27 @@
         <div class="title">You're Premium!</div>
         <p class="msg">Your payment was successful. You now have unlimited access to ReadyBrainAI — no ads, no limits. Go ace that interview!</p>
         <a href="/listen" class="btn">Start Practicing →</a>
+        <button class="btn-secondary" onclick="manageSubscription()">Manage Subscription</button>
     </div>
+
+    <script>
+    async function manageSubscription() {
+        try {
+            const res = await fetch("/manage-subscription", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({})
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert("Could not open subscription portal. Please try again.");
+            }
+        } catch (err) {
+            alert("Something went wrong. Please try again.");
+        }
+    }
+    </script>
 </body>
 </html>
