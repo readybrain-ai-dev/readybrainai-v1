@@ -229,6 +229,48 @@ def payment_cancel():
     return redirect("/premium")
 
 # ============================
+# 🔔 STRIPE WEBHOOK
+# ============================
+@app.route("/stripe-webhook", methods=["POST"])
+def stripe_webhook():
+    payload = request.get_data()
+    sig_header = request.headers.get("Stripe-Signature")
+    webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+    except Exception as e:
+        print("❌ Webhook error:", str(e))
+        return jsonify({"error": str(e)}), 400
+
+    event_type = event["type"]
+    print(f"📩 Webhook received: {event_type}")
+
+    if event_type in ["customer.subscription.deleted", "customer.subscription.updated"]:
+        subscription = event["data"]["object"]
+        status = subscription.get("status")
+        customer_id = subscription.get("customer")
+
+        if status in ["canceled", "unpaid", "past_due"]:
+            try:
+                customer = stripe.Customer.retrieve(customer_id)
+                email = customer.get("email")
+                if email:
+                    conn = get_db()
+                    if conn:
+                        conn.execute(
+                            "UPDATE users SET is_premium = FALSE WHERE email = %s",
+                            (email,)
+                        )
+                        conn.commit()
+                        conn.close()
+                        print(f"❌ Premium removed for {email}")
+            except Exception as e:
+                print("❌ Webhook DB error:", str(e))
+
+    return jsonify({"status": "ok"})
+
+# ============================
 # 🎤 MAIN INTERVIEW LISTENER
 # ============================
 @app.route("/interview_listen", methods=["POST"])
