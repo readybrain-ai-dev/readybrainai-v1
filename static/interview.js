@@ -2,10 +2,64 @@ let mediaRecorder;
 let audioChunks = [];
 let currentMimeType = null;
 let lastAnswer = "";
-let lastQuestion = ""; // ✅ store original spoken text
+let lastQuestion = "";
 
 // =====================================================
-// CHOOSE THE BEST MIME TYPE (CROSS-PLATFORM SUPPORT)
+// REAL-TIME TRANSCRIPTION (Web Speech API)
+// =====================================================
+let recognition = null;
+let liveTranscript = "";
+
+function startLiveTranscription() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        console.warn("Web Speech API not supported on this browser.");
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+
+    const qBox = document.getElementById("question");
+
+    recognition.onresult = (event) => {
+        let interim = "";
+        let final = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                final += transcript;
+            } else {
+                interim += transcript;
+            }
+        }
+
+        if (final) liveTranscript += final;
+
+        // Show live text with interim in gray
+        qBox.innerHTML = `<span style="color:#e8eaed">${liveTranscript}</span><span style="color:#6b7280">${interim}</span>`;
+    };
+
+    recognition.onerror = (e) => {
+        console.warn("Speech recognition error:", e.error);
+    };
+
+    recognition.start();
+    console.log("🎤 Live transcription started");
+}
+
+function stopLiveTranscription() {
+    if (recognition) {
+        recognition.stop();
+        recognition = null;
+    }
+}
+
+// =====================================================
+// CHOOSE THE BEST MIME TYPE
 // =====================================================
 function chooseMimeType() {
     const mimeTypes = [
@@ -29,13 +83,14 @@ function chooseMimeType() {
 }
 
 // =====================================================
-// RESET UI BEFORE NEW RECORDING
+// RESET UI
 // =====================================================
 function resetUI() {
     document.getElementById("question").innerText = "";
     document.getElementById("answer").innerText = "";
     lastAnswer = "";
     lastQuestion = "";
+    liveTranscript = "";
 
     const englishBox = document.getElementById("englishBox");
     const englishEl = document.getElementById("answerEnglish");
@@ -72,6 +127,9 @@ async function startListening() {
         status.innerText = "❌ Microphone blocked.";
         return;
     }
+
+    // Start live transcription
+    startLiveTranscription();
 
     currentMimeType = chooseMimeType();
     let options = {};
@@ -111,6 +169,9 @@ async function stopListening() {
     stopBtn.style.display  = "none";
     startBtn.style.display = "inline-block";
     status.innerText = "⏳ Processing… Please wait";
+
+    // Stop live transcription
+    stopLiveTranscription();
 
     if (!mediaRecorder || mediaRecorder.state === "inactive") {
         status.innerText = "Idle";
@@ -171,19 +232,16 @@ async function stopListening() {
         qBox.innerText = data.question ?? "(unclear)";
         aBox.innerText = data.answer ?? "(unclear)";
 
-        // ✅ Store BOTH original spoken text AND the answer
         lastQuestion = data.question ?? "";
         lastAnswer = data.answer ?? "";
 
         status.innerText = "Idle";
 
-        // Detected language
         const detectedEl = document.getElementById("detectedLang");
         if (detectedEl && data.detected_language) {
             detectedEl.innerText = "Detected language: " + data.detected_language;
         }
 
-        // Show Convert to English button
         const convertBtn = document.getElementById("convertEnBtn");
         if (convertBtn && lastAnswer) {
             convertBtn.style.display = "inline-block";
@@ -195,10 +253,8 @@ async function stopListening() {
 
 // =====================================================
 // CONVERT TO ENGLISH
-// ✅ Uses original spoken text, not the translated answer
 // =====================================================
 async function convertToEnglish() {
-    // Use original spoken text so GPT rewrites from scratch in English
     const textToConvert = lastQuestion || lastAnswer;
     if (!textToConvert) return;
 
