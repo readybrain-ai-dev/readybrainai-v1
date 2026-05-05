@@ -15,6 +15,9 @@ let continuousMode = false;
 let autoRestartTimer = null;
 const SILENCE_DELAY = 3000;   // 3s silence = auto submit
 const AUTO_RESTART_DELAY = 6000; // 6s after answer = auto restart
+const MAX_RECORD_TIME = 30000; // 30s max recording time
+
+let maxRecordTimer = null;
 
 // =====================================================
 // TOGGLE CONTINUOUS MODE
@@ -220,6 +223,14 @@ async function startListening() {
     startLiveTranscription();
     startSilenceDetection(stream);
 
+    // Auto-stop after 30 seconds max
+    maxRecordTimer = setTimeout(() => {
+        if (isRecording) {
+            document.getElementById("status").innerText = "🔄 Auto-processing...";
+            stopListening();
+        }
+    }, MAX_RECORD_TIME);
+
     currentMimeType = chooseMimeType();
     let options = {};
     if (currentMimeType) options.mimeType = currentMimeType;
@@ -263,6 +274,7 @@ async function stopListening() {
 
     stopLiveTranscription();
     stopSilenceDetection();
+    if (maxRecordTimer) { clearTimeout(maxRecordTimer); maxRecordTimer = null; }
 
     if (!mediaRecorder || mediaRecorder.state === "inactive") {
         status.innerText = "Idle";
