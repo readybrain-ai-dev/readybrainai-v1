@@ -5,14 +5,42 @@ let lastAnswer = "";
 let lastQuestion = "";
 
 // =====================================================
-// REAL-TIME TRANSCRIPTION + AUTO-SUBMIT AFTER SILENCE
+// MODES & STATE
 // =====================================================
 let recognition = null;
 let liveTranscript = "";
 let silenceTimer = null;
 let isRecording = false;
-const SILENCE_DELAY = 2000; // 2 seconds of silence = auto submit
+let continuousMode = false;
+let autoRestartTimer = null;
+const SILENCE_DELAY = 2000;   // 2s silence = auto submit
+const AUTO_RESTART_DELAY = 4000; // 4s after answer = auto restart
 
+// =====================================================
+// TOGGLE CONTINUOUS MODE
+// =====================================================
+function toggleContinuousMode() {
+    continuousMode = !continuousMode;
+    const btn = document.getElementById("continuousBtn");
+    if (continuousMode) {
+        btn.innerText = "🔄 Continuous: ON";
+        btn.style.background = "var(--green)";
+        btn.style.color = "var(--black)";
+        if (!isRecording) startListening();
+    } else {
+        btn.innerText = "🔄 Continuous: OFF";
+        btn.style.background = "var(--gray-mid)";
+        btn.style.color = "var(--text)";
+        if (autoRestartTimer) {
+            clearTimeout(autoRestartTimer);
+            autoRestartTimer = null;
+        }
+    }
+}
+
+// =====================================================
+// REAL-TIME TRANSCRIPTION (Web Speech API)
+// =====================================================
 function startLiveTranscription() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -44,7 +72,6 @@ function startLiveTranscription() {
 
         qBox.innerHTML = `<span style="color:#e8eaed">${liveTranscript}</span><span style="color:#6b7280">${interimTranscript}</span>`;
 
-        // Reset silence timer on every new speech
         if (silenceTimer) clearTimeout(silenceTimer);
         silenceTimer = setTimeout(() => {
             if (isRecording && liveTranscript.trim()) {
@@ -55,7 +82,6 @@ function startLiveTranscription() {
     };
 
     recognition.onspeechend = () => {
-        // Speech ended — start silence timer
         if (silenceTimer) clearTimeout(silenceTimer);
         silenceTimer = setTimeout(() => {
             if (isRecording && liveTranscript.trim()) {
@@ -73,48 +99,30 @@ function startLiveTranscription() {
     };
 
     recognition.onend = () => {
-        // Restart recognition if still recording
         if (isRecording) {
             try { recognition.start(); } catch(e) {}
         }
     };
 
     recognition.start();
-    console.log("🎤 Live transcription started");
 }
 
 function stopLiveTranscription() {
-    if (silenceTimer) {
-        clearTimeout(silenceTimer);
-        silenceTimer = null;
-    }
-    if (recognition) {
-        recognition.stop();
-        recognition = null;
-    }
+    if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+    if (recognition) { recognition.stop(); recognition = null; }
 }
 
 // =====================================================
-// CHOOSE THE BEST MIME TYPE
+// CHOOSE MIME TYPE
 // =====================================================
 function chooseMimeType() {
     const mimeTypes = [
-        "audio/webm;codecs=opus",
-        "audio/webm",
-        "audio/ogg",
-        "audio/mp4",
-        "audio/mpeg",
-        "audio/wav"
+        "audio/webm;codecs=opus", "audio/webm", "audio/ogg",
+        "audio/mp4", "audio/mpeg", "audio/wav"
     ];
-
     for (const t of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(t)) {
-            console.log("Using MIME:", t);
-            return t;
-        }
+        if (MediaRecorder.isTypeSupported(t)) return t;
     }
-
-    console.warn("⚠ No supported MIME type found. Using empty fallback.");
     return "";
 }
 
@@ -155,7 +163,9 @@ async function startListening() {
 
     startBtn.style.display = "none";
     stopBtn.style.display  = "inline-block";
-    status.innerText = "🎙 Listening… Speak clearly — auto-submits after silence";
+    status.innerText = continuousMode
+        ? "🎙 Listening… (continuous mode — auto-submits after silence)"
+        : "🎙 Listening… Speak clearly — auto-submits after silence";
 
     let stream;
     try {
@@ -179,7 +189,7 @@ async function startListening() {
             mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/ogg" });
             currentMimeType = "audio/ogg";
         } catch (err2) {
-            status.innerText = "❌ Recording not supported on this device.";
+            status.innerText = "❌ Recording not supported.";
             isRecording = false;
             return;
         }
@@ -190,7 +200,6 @@ async function startListening() {
     };
 
     mediaRecorder.start();
-    console.log("🎧 Recording started");
 }
 
 // =====================================================
@@ -234,6 +243,7 @@ async function stopListening() {
             status.innerText = "❌ No clear voice detected.";
             if (!qBox.innerText.trim()) qBox.innerText = "(unclear)";
             aBox.innerText = "Unclear. Please try again.";
+            scheduleAutoRestart(status);
             return;
         }
 
@@ -250,15 +260,13 @@ async function stopListening() {
 
         let data;
         try {
-            const res = await fetch("/interview_listen", {
-                method: "POST",
-                body: formData
-            });
+            const res = await fetch("/interview_listen", { method: "POST", body: formData });
             data = await res.json();
         } catch (err) {
             status.innerText = "Idle";
             qBox.innerText = "(server error)";
             aBox.innerText = "Could not connect to server.";
+            scheduleAutoRestart(status);
             return;
         }
 
@@ -279,15 +287,21 @@ async function stopListening() {
             lastQuestion = liveTranscript.trim();
         }
 
-        if (answer && answer !== "Unclear. Please try again.") {
-            aBox.innerText = answer;
-            lastAnswer = answer;
+        const showAnswer = (ans) => {
+            aBox.innerText = ans;
+            lastAnswer = ans;
             const convertBtn = document.getElementById("convertEnBtn");
-            if (convertBtn && lastAnswer) {
+            if (convertBtn) {
                 convertBtn.style.display = "inline-block";
                 convertBtn.innerText = "🇺🇸 Convert to English";
                 convertBtn.disabled = false;
             }
+            status.innerText = "Idle";
+            scheduleAutoRestart(status);
+        };
+
+        if (answer && answer !== "Unclear. Please try again.") {
+            showAnswer(answer);
         } else if (lastQuestion) {
             aBox.innerText = "⏳ Getting answer…";
             fetch("/interview_regen", {
@@ -295,28 +309,42 @@ async function stopListening() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: lastQuestion })
             }).then(r => r.json()).then(d => {
-                if (d.answer) {
-                    aBox.innerText = d.answer;
-                    lastAnswer = d.answer;
-                    const convertBtn = document.getElementById("convertEnBtn");
-                    if (convertBtn) {
-                        convertBtn.style.display = "inline-block";
-                        convertBtn.innerText = "🇺🇸 Convert to English";
-                        convertBtn.disabled = false;
-                    }
-                }
+                if (d.answer) showAnswer(d.answer);
+                else { aBox.innerText = "Could not get answer."; scheduleAutoRestart(status); }
             }).catch(() => {
-                aBox.innerText = "Could not get answer. Please try again.";
+                aBox.innerText = "Could not get answer.";
+                scheduleAutoRestart(status);
             });
+        } else {
+            status.innerText = "Idle";
+            scheduleAutoRestart(status);
         }
-
-        status.innerText = "Idle";
 
         const detectedEl = document.getElementById("detectedLang");
         if (detectedEl && data.detected_language) {
             detectedEl.innerText = "Detected language: " + data.detected_language;
         }
     };
+}
+
+// =====================================================
+// AUTO RESTART IN CONTINUOUS MODE
+// =====================================================
+function scheduleAutoRestart(status) {
+    if (!continuousMode) return;
+    if (autoRestartTimer) clearTimeout(autoRestartTimer);
+
+    let countdown = AUTO_RESTART_DELAY / 1000;
+    const interval = setInterval(() => {
+        countdown--;
+        if (status) status.innerText = `🔄 Next question in ${countdown}s…`;
+        if (countdown <= 0) clearInterval(interval);
+    }, 1000);
+
+    autoRestartTimer = setTimeout(() => {
+        clearInterval(interval);
+        if (continuousMode) startListening();
+    }, AUTO_RESTART_DELAY);
 }
 
 // =====================================================
@@ -341,7 +369,6 @@ async function convertToEnglish() {
             body: JSON.stringify({ text: textToConvert, translate_to_english: true })
         });
         const data = await response.json();
-
         if (data.answer) {
             englishEl.innerText = data.answer;
             englishBox.style.display = "block";
@@ -376,14 +403,8 @@ function copyEnglish() {
 async function regenerateAnswer() {
     const spoken = document.getElementById("question").innerText.trim();
     const aBox = document.getElementById("answer");
-
-    if (!spoken) {
-        aBox.innerText = "(no text to regenerate)";
-        return;
-    }
-
+    if (!spoken) { aBox.innerText = "(no text to regenerate)"; return; }
     aBox.innerText = "⏳ Regenerating…";
-
     try {
         const res = await fetch("/interview_regen", {
             method: "POST",
