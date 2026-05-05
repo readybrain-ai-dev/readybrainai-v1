@@ -13,8 +13,8 @@ let silenceTimer = null;
 let isRecording = false;
 let continuousMode = false;
 let autoRestartTimer = null;
-const SILENCE_DELAY = 2000;   // 2s silence = auto submit
-const AUTO_RESTART_DELAY = 4000; // 4s after answer = auto restart
+const SILENCE_DELAY = 3000;   // 3s silence = auto submit
+const AUTO_RESTART_DELAY = 6000; // 6s after answer = auto restart
 
 // =====================================================
 // TOGGLE CONTINUOUS MODE
@@ -130,21 +130,19 @@ function chooseMimeType() {
 // RESET UI
 // =====================================================
 function resetUI() {
-    document.getElementById("question").innerText = "";
-    document.getElementById("answer").innerText = "";
+    document.getElementById("question").innerHTML = '<span class="output-placeholder">Your words will appear here as you speak…</span>';
+    document.getElementById("answer").innerHTML = '<span class="output-placeholder">AI-improved answer will appear here…</span>';
     lastAnswer = "";
     lastQuestion = "";
     liveTranscript = "";
 
     const englishBox = document.getElementById("englishBox");
     const englishEl = document.getElementById("answerEnglish");
-    const copyEnWrapper = document.getElementById("copyEnWrapper");
     const convertBtn = document.getElementById("convertEnBtn");
     const detectedEl = document.getElementById("detectedLang");
 
     if (englishBox) englishBox.style.display = "none";
     if (englishEl) englishEl.innerText = "";
-    if (copyEnWrapper) copyEnWrapper.style.display = "none";
     if (convertBtn) convertBtn.style.display = "none";
     if (detectedEl) detectedEl.innerText = "";
 }
@@ -162,7 +160,7 @@ async function startListening() {
     const status   = document.getElementById("status");
 
     startBtn.style.display = "none";
-    stopBtn.style.display  = "inline-block";
+    stopBtn.style.display  = "flex";
     status.innerText = continuousMode
         ? "🎙 Listening… (continuous mode — auto-submits after silence)"
         : "🎙 Listening… Speak clearly — auto-submits after silence";
