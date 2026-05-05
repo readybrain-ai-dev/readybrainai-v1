@@ -107,9 +107,52 @@ function startLiveTranscription() {
     recognition.start();
 }
 
-function stopLiveTranscription() {
-    if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
-    if (recognition) { recognition.stop(); recognition = null; }
+// =====================================================
+// SILENCE DETECTION VIA AUDIO LEVELS
+// =====================================================
+let audioContext = null;
+let analyser = null;
+let silenceCheckInterval = null;
+
+function startSilenceDetection(stream) {
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 512;
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        let silenceStart = null;
+
+        silenceCheckInterval = setInterval(() => {
+            if (!isRecording) return;
+            analyser.getByteFrequencyData(dataArray);
+            const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+            if (avg < 5) {
+                // Silence detected
+                if (!silenceStart) silenceStart = Date.now();
+                const silenceDuration = Date.now() - silenceStart;
+                if (silenceDuration >= SILENCE_DELAY && liveTranscript.trim()) {
+                    document.getElementById("status").innerText = "🔄 Auto-processing...";
+                    stopListening();
+                }
+            } else {
+                // Sound detected — reset silence timer
+                silenceStart = null;
+                if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+            }
+        }, 200);
+    } catch(e) {
+        console.warn("Audio context error:", e);
+    }
+}
+
+function stopSilenceDetection() {
+    if (silenceCheckInterval) { clearInterval(silenceCheckInterval); silenceCheckInterval = null; }
+    if (audioContext) { audioContext.close(); audioContext = null; }
+    analyser = null;
 }
 
 // =====================================================
@@ -175,6 +218,7 @@ async function startListening() {
     }
 
     startLiveTranscription();
+    startSilenceDetection(stream);
 
     currentMimeType = chooseMimeType();
     let options = {};
@@ -214,10 +258,11 @@ async function stopListening() {
     const aBox     = document.getElementById("answer");
 
     stopBtn.style.display  = "none";
-    startBtn.style.display = "inline-block";
+    startBtn.style.display = "flex";
     status.innerText = "⏳ Processing… Please wait";
 
     stopLiveTranscription();
+    stopSilenceDetection();
 
     if (!mediaRecorder || mediaRecorder.state === "inactive") {
         status.innerText = "Idle";
