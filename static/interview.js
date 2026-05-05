@@ -5,10 +5,13 @@ let lastAnswer = "";
 let lastQuestion = "";
 
 // =====================================================
-// REAL-TIME TRANSCRIPTION (Web Speech API)
+// REAL-TIME TRANSCRIPTION + AUTO-SUBMIT AFTER SILENCE
 // =====================================================
 let recognition = null;
 let liveTranscript = "";
+let silenceTimer = null;
+let isRecording = false;
+const SILENCE_DELAY = 2000; // 2 seconds of silence = auto submit
 
 function startLiveTranscription() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -23,6 +26,7 @@ function startLiveTranscription() {
     recognition.lang = "en-US";
 
     const qBox = document.getElementById("question");
+    const status = document.getElementById("status");
 
     recognition.onresult = (event) => {
         let interimTranscript = "";
@@ -39,10 +43,40 @@ function startLiveTranscription() {
         }
 
         qBox.innerHTML = `<span style="color:#e8eaed">${liveTranscript}</span><span style="color:#6b7280">${interimTranscript}</span>`;
+
+        // Reset silence timer on every new speech
+        if (silenceTimer) clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => {
+            if (isRecording && liveTranscript.trim()) {
+                status.innerText = "🔄 Auto-processing...";
+                stopListening();
+            }
+        }, SILENCE_DELAY);
+    };
+
+    recognition.onspeechend = () => {
+        // Speech ended — start silence timer
+        if (silenceTimer) clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => {
+            if (isRecording && liveTranscript.trim()) {
+                status.innerText = "🔄 Auto-processing...";
+                stopListening();
+            }
+        }, SILENCE_DELAY);
     };
 
     recognition.onerror = (e) => {
         console.warn("Speech recognition error:", e.error);
+        if (e.error === "no-speech" && isRecording && liveTranscript.trim()) {
+            stopListening();
+        }
+    };
+
+    recognition.onend = () => {
+        // Restart recognition if still recording
+        if (isRecording) {
+            try { recognition.start(); } catch(e) {}
+        }
     };
 
     recognition.start();
@@ -50,6 +84,10 @@ function startLiveTranscription() {
 }
 
 function stopLiveTranscription() {
+    if (silenceTimer) {
+        clearTimeout(silenceTimer);
+        silenceTimer = null;
+    }
     if (recognition) {
         recognition.stop();
         recognition = null;
@@ -109,6 +147,7 @@ function resetUI() {
 async function startListening() {
     resetUI();
     audioChunks = [];
+    isRecording = true;
 
     const startBtn = document.getElementById("startBtn");
     const stopBtn  = document.getElementById("stopBtn");
@@ -116,17 +155,17 @@ async function startListening() {
 
     startBtn.style.display = "none";
     stopBtn.style.display  = "inline-block";
-    status.innerText = "🎙 Listening… Speak clearly";
+    status.innerText = "🎙 Listening… Speak clearly — auto-submits after silence";
 
     let stream;
     try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
         status.innerText = "❌ Microphone blocked.";
+        isRecording = false;
         return;
     }
 
-    // Start live transcription
     startLiveTranscription();
 
     currentMimeType = chooseMimeType();
@@ -136,12 +175,12 @@ async function startListening() {
     try {
         mediaRecorder = new MediaRecorder(stream, options);
     } catch (err) {
-        console.warn("Main MIME failed. Trying ogg…");
         try {
             mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/ogg" });
             currentMimeType = "audio/ogg";
         } catch (err2) {
             status.innerText = "❌ Recording not supported on this device.";
+            isRecording = false;
             return;
         }
     }
@@ -158,6 +197,9 @@ async function startListening() {
 // STOP LISTENING
 // =====================================================
 async function stopListening() {
+    if (!isRecording) return;
+    isRecording = false;
+
     const startBtn = document.getElementById("startBtn");
     const stopBtn  = document.getElementById("stopBtn");
     const status   = document.getElementById("status");
@@ -168,7 +210,6 @@ async function stopListening() {
     startBtn.style.display = "inline-block";
     status.innerText = "⏳ Processing… Please wait";
 
-    // Stop live transcription
     stopLiveTranscription();
 
     if (!mediaRecorder || mediaRecorder.state === "inactive") {
@@ -191,9 +232,7 @@ async function stopListening() {
 
         if (blob.size < 800) {
             status.innerText = "❌ No clear voice detected.";
-            if (!qBox.innerText.trim()) {
-                qBox.innerText = "(unclear)";
-            }
+            if (!qBox.innerText.trim()) qBox.innerText = "(unclear)";
             aBox.innerText = "Unclear. Please try again.";
             return;
         }
@@ -232,21 +271,17 @@ async function stopListening() {
         const question = data.question ?? "";
         const answer = data.answer ?? "";
 
-        // Only update question box if Whisper got something useful
         if (question && question !== "(unclear)") {
             qBox.innerText = question;
             lastQuestion = question;
         } else if (liveTranscript.trim()) {
-            // Keep live transcript text
             qBox.innerText = liveTranscript.trim();
             lastQuestion = liveTranscript.trim();
         }
 
-        // If Whisper failed but we have live transcript, use it to get AI answer
         if (answer && answer !== "Unclear. Please try again.") {
             aBox.innerText = answer;
             lastAnswer = answer;
-
             const convertBtn = document.getElementById("convertEnBtn");
             if (convertBtn && lastAnswer) {
                 convertBtn.style.display = "inline-block";
@@ -254,7 +289,6 @@ async function stopListening() {
                 convertBtn.disabled = false;
             }
         } else if (lastQuestion) {
-            // Whisper failed — use live transcript to get AI answer
             aBox.innerText = "⏳ Getting answer…";
             fetch("/interview_regen", {
                 method: "POST",
@@ -281,13 +315,6 @@ async function stopListening() {
         const detectedEl = document.getElementById("detectedLang");
         if (detectedEl && data.detected_language) {
             detectedEl.innerText = "Detected language: " + data.detected_language;
-        }
-
-        const convertBtn = document.getElementById("convertEnBtn");
-        if (convertBtn && lastAnswer) {
-            convertBtn.style.display = "inline-block";
-            convertBtn.innerText = "🇺🇸 Convert to English";
-            convertBtn.disabled = false;
         }
     };
 }
