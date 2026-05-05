@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ReadyBrain AI – Your AI Interview Coach</title>
+    <title>ReadyBrainAI – AI Interview Coach</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Speak naturally. Get confident interview answers instantly. Supports 14 languages.">
 
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/static/icon-192.png">
@@ -12,7 +13,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ReadyBrainAI">
 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TK2BLDJQPN"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -21,8 +21,7 @@
       gtag('config', 'G-TK2BLDJQPN');
     </script>
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4928496080957248"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4928496080957248" crossorigin="anonymous"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -34,8 +33,9 @@
             --white: #f8f9fa;
             --green: #00e87a;
             --green-dark: #00c064;
-            --gray: #1a1c1e;
-            --gray-mid: #2e3034;
+            --gray: #111314;
+            --gray-card: #161819;
+            --gray-mid: #2a2d31;
             --gray-light: #6b7280;
             --text: #e8eaed;
         }
@@ -49,6 +49,7 @@
             overflow-x: hidden;
         }
 
+        /* NOISE */
         body::before {
             content: '';
             position: fixed;
@@ -59,7 +60,7 @@
             opacity: 0.4;
         }
 
-        .container {
+        .wrap {
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 24px;
@@ -67,17 +68,18 @@
             z-index: 1;
         }
 
+        /* ── NAVBAR ── */
         .navbar {
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 18px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            backdrop-filter: blur(16px);
-            background: rgba(8,9,10,0.8);
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            background: rgba(8,9,10,0.9);
         }
 
-        .nav-content {
+        .nav-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -91,13 +93,13 @@
         }
 
         .logo-mark {
-            width: 36px; height: 36px;
+            width: 34px; height: 34px;
             border-radius: 10px;
             background: var(--green);
             color: var(--black);
             font-family: 'Syne', sans-serif;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 13px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -106,79 +108,85 @@
         .logo-text {
             font-family: 'Syne', sans-serif;
             font-weight: 700;
-            font-size: 17px;
+            font-size: 16px;
             color: var(--white);
         }
 
-        .nav-links {
+        .nav-right {
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 20px;
         }
 
-        .nav-links a {
+        .nav-link {
             color: var(--gray-light);
             text-decoration: none;
             font-size: 14px;
             transition: color 0.2s;
         }
 
-        .nav-links a:hover { color: var(--white); }
-        .nav-links .nav-cta { color: var(--green); font-weight: 500; }
+        .nav-link:hover { color: var(--white); }
 
-        .nav-links .nav-cta-filled {
-            background: var(--green);
-            color: var(--black);
+        .nav-btn {
             padding: 8px 18px;
             border-radius: 999px;
-            font-weight: 600;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
             font-size: 13px;
+            text-decoration: none;
+            transition: background 0.2s;
         }
 
-        .nav-links .nav-cta-filled:hover { background: var(--green-dark); color: var(--black); }
+        .nav-btn:hover { background: var(--green-dark); }
 
-        @media (max-width: 768px) { .nav-links { display: none; } }
+        @media (max-width: 600px) {
+            .nav-link { display: none; }
+        }
 
+        /* ── HERO ── */
         .hero {
-            padding: 100px 0 80px;
+            padding: 110px 0 90px;
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .hero::after {
+        /* Green glow behind hero */
+        .hero::before {
             content: '';
             position: absolute;
-            top: -200px; right: -200px;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(0,232,122,0.12) 0%, transparent 70%);
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(ellipse, rgba(0,232,122,0.1) 0%, transparent 70%);
             pointer-events: none;
         }
-
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        @media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; } }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(0,232,122,0.1);
-            border: 1px solid rgba(0,232,122,0.25);
+            gap: 7px;
+            background: rgba(0,232,122,0.08);
+            border: 1px solid rgba(0,232,122,0.2);
             color: var(--green);
-            padding: 6px 14px;
+            padding: 6px 16px;
             border-radius: 999px;
             font-size: 12px;
             font-weight: 500;
-            margin-bottom: 24px;
-            animation: fadeUp 0.6s ease both;
+            margin-bottom: 28px;
+            animation: fadeUp 0.5s ease both;
         }
 
-        .hero-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+        .live-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -187,252 +195,321 @@
 
         .hero-title {
             font-family: 'Syne', sans-serif;
-            font-size: clamp(36px, 5vw, 58px);
+            font-size: clamp(40px, 6vw, 72px);
             font-weight: 800;
-            line-height: 1.08;
-            letter-spacing: -0.02em;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
             color: var(--white);
-            margin-bottom: 20px;
-            animation: fadeUp 0.6s 0.1s ease both;
+            margin-bottom: 24px;
+            animation: fadeUp 0.5s 0.1s ease both;
         }
 
         .hero-title .accent { color: var(--green); }
 
-        .hero-subtitle {
-            font-size: 17px;
+        .hero-sub {
+            font-size: clamp(16px, 2vw, 19px);
             color: var(--gray-light);
             line-height: 1.65;
-            margin-bottom: 36px;
-            animation: fadeUp 0.6s 0.2s ease both;
+            max-width: 560px;
+            margin: 0 auto 40px;
+            animation: fadeUp 0.5s 0.2s ease both;
         }
 
         .hero-actions {
             display: flex;
-            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
             flex-wrap: wrap;
-            margin-bottom: 28px;
-            animation: fadeUp 0.6s 0.3s ease both;
+            margin-bottom: 48px;
+            animation: fadeUp 0.5s 0.3s ease both;
         }
 
-        .btn {
+        .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 13px 24px;
+            padding: 15px 32px;
             border-radius: 999px;
-            font-size: 15px;
-            font-weight: 600;
+            background: var(--green);
+            color: var(--black);
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
             text-decoration: none;
-            cursor: pointer;
-            border: none;
+            transition: all 0.2s;
+            box-shadow: 0 0 40px rgba(0,232,122,0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 0 60px rgba(0,232,122,0.4);
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid var(--gray-mid);
             transition: all 0.2s;
         }
 
-        .btn-primary { background: var(--green); color: var(--black); }
-        .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+        .btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--white);
-            border: 1px solid rgba(255,255,255,0.18);
-        }
-
-        .btn-secondary:hover { background: rgba(255,255,255,0.06); transform: translateY(-1px); }
-
-        .trust-row {
+        .hero-langs {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
             gap: 8px;
-            animation: fadeUp 0.6s 0.4s ease both;
+            flex-wrap: wrap;
+            animation: fadeUp 0.5s 0.4s ease both;
         }
 
-        .trust-pill {
+        .lang-pill {
             font-size: 12px;
             color: var(--gray-light);
-            background: var(--gray);
+            background: var(--gray-card);
             border: 1px solid var(--gray-mid);
             padding: 5px 12px;
             border-radius: 999px;
         }
 
-        .hero-card {
-            background: var(--gray);
+        /* ── DEMO CARD ── */
+        .demo-section {
+            padding: 0 0 90px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .demo-card {
+            background: var(--gray-card);
             border: 1px solid var(--gray-mid);
-            border-radius: 20px;
-            padding: 28px;
-            animation: fadeUp 0.6s 0.2s ease both;
+            border-radius: 28px;
+            padding: 36px;
+            max-width: 760px;
+            margin: 0 auto;
+            animation: fadeUp 0.5s 0.5s ease both;
         }
 
-        .hero-card-label {
-            font-size: 12px;
-            color: var(--gray-light);
+        .demo-label {
+            font-size: 11px;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 18px;
+            letter-spacing: 0.1em;
+            color: var(--gray-light);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .hero-conversation { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+        .demo-label::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
 
-        .bubble {
+        .chat { display: flex; flex-direction: column; gap: 14px; }
+
+        .msg {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .msg-avatar {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .msg-avatar.interviewer { background: var(--gray-mid); }
+        .msg-avatar.ai { background: var(--green); color: var(--black); font-weight: 800; font-family: 'Syne', sans-serif; }
+
+        .msg-bubble {
             padding: 12px 16px;
             border-radius: 14px;
             font-size: 14px;
-            line-height: 1.5;
-            max-width: 90%;
+            line-height: 1.6;
+            max-width: 85%;
         }
 
-        .bubble-interviewer { background: var(--gray-mid); color: var(--gray-light); align-self: flex-start; }
-        .bubble-user { background: rgba(255,255,255,0.06); color: var(--text); align-self: flex-end; }
-        .bubble-ai { background: rgba(0,232,122,0.1); border: 1px solid rgba(0,232,122,0.2); color: var(--text); align-self: flex-start; }
-
-        .hero-card-footer { display: flex; flex-wrap: wrap; gap: 8px; }
-
-        .pill {
-            font-size: 12px;
-            padding: 5px 12px;
-            border-radius: 999px;
-            background: var(--gray-mid);
-            color: var(--gray-light);
-            border: 1px solid rgba(255,255,255,0.06);
+        .msg-bubble.interviewer { background: var(--gray-mid); color: var(--gray-light); }
+        .msg-bubble.user { background: rgba(255,255,255,0.05); color: var(--text); margin-left: auto; }
+        .msg-bubble.ai {
+            background: rgba(0,232,122,0.08);
+            border: 1px solid rgba(0,232,122,0.2);
+            color: var(--text);
         }
 
-        .section { padding: 90px 0; position: relative; z-index: 1; }
+        .msg-bubble.ai strong {
+            display: block;
+            color: var(--green);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
 
-        .section-alt {
-            background: var(--gray);
-            border-top: 1px solid var(--gray-mid);
-            border-bottom: 1px solid var(--gray-mid);
+        /* ── HOW IT WORKS ── */
+        .section {
+            padding: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 52px;
         }
 
         .section-title {
             font-family: 'Syne', sans-serif;
-            font-size: clamp(26px, 3vw, 38px);
+            font-size: clamp(26px, 3.5vw, 40px);
             font-weight: 800;
             color: var(--white);
             letter-spacing: -0.02em;
             margin-bottom: 12px;
         }
 
-        .section-subtitle {
+        .section-sub {
             font-size: 16px;
             color: var(--gray-light);
+            max-width: 480px;
+            margin: 0 auto;
             line-height: 1.6;
-            margin-bottom: 48px;
-            max-width: 560px;
         }
 
-        .feature-grid {
+        .steps {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
 
-        .feature-card {
-            background: var(--gray);
+        @media (max-width: 700px) { .steps { grid-template-columns: 1fr; } }
+
+        .step-card {
+            background: var(--gray-card);
             border: 1px solid var(--gray-mid);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 28px;
             transition: border-color 0.2s, transform 0.2s;
         }
 
-        .feature-card:hover { border-color: rgba(0,232,122,0.3); transform: translateY(-3px); }
-        .feature-card h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
-        .feature-card p { font-size: 14px; color: var(--gray-light); line-height: 1.6; }
+        .step-card:hover { border-color: rgba(0,232,122,0.3); transform: translateY(-4px); }
 
-        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-
-        .step { position: relative; padding: 28px; border-radius: 16px; border: 1px solid var(--gray-mid); background: var(--black); }
-
-        .step-number {
+        .step-num {
             width: 36px; height: 36px;
             border-radius: 10px;
             background: var(--green);
             color: var(--black);
             font-family: 'Syne', sans-serif;
             font-weight: 800;
-            font-size: 16px;
+            font-size: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 16px;
         }
 
-        .step h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
-        .step p { font-size: 14px; color: var(--gray-light); line-height: 1.6; }
-
-        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        @media (max-width: 700px) { .two-column { grid-template-columns: 1fr; } }
-
-        .column-card { background: var(--gray); border: 1px solid var(--gray-mid); border-radius: 20px; padding: 32px; }
-        .column-card .section-title { font-size: 22px; margin-bottom: 16px; }
-
-        .checklist { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-
-        .checklist li {
-            font-size: 14px;
-            color: var(--gray-light);
-            padding-left: 22px;
-            position: relative;
-            line-height: 1.5;
+        .step-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 8px;
         }
 
-        .checklist li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+        .step-card p { font-size: 14px; color: var(--gray-light); line-height: 1.6; }
 
-        .founder-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; align-items: center; }
-        @media (max-width: 700px) { .founder-grid { grid-template-columns: 1fr; } }
+        /* ── FEATURES ── */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
 
-        .founder-card { background: var(--black); border: 1px solid var(--gray-mid); border-radius: 20px; padding: 32px; }
-        .founder-card p { font-size: 15px; color: var(--gray-light); line-height: 1.7; margin-bottom: 16px; }
-        .founder-sign { color: var(--green) !important; font-weight: 600; font-size: 14px !important; }
+        @media (max-width: 700px) { .features { grid-template-columns: 1fr; } }
 
-        .demo-card {
+        .feat {
+            background: var(--gray-card);
+            border: 1px solid var(--gray-mid);
+            border-radius: 18px;
+            padding: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: border-color 0.2s;
+        }
+
+        .feat:hover { border-color: rgba(0,232,122,0.25); }
+
+        .feat-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .feat h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 6px;
+        }
+
+        .feat p { font-size: 13px; color: var(--gray-light); line-height: 1.6; }
+
+        /* ── CTA ── */
+        .cta-section {
+            padding: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-card {
             background: linear-gradient(135deg, rgba(0,232,122,0.08), rgba(0,232,122,0.02));
             border: 1px solid rgba(0,232,122,0.2);
-            border-radius: 24px;
-            padding: 60px 40px;
+            border-radius: 28px;
+            padding: 72px 40px;
             text-align: center;
         }
 
-        .demo-card .section-subtitle { margin: 0 auto 36px; }
-        .btn-center { margin: 0 auto; display: inline-flex; }
-        .demo-note { margin-top: 20px; font-size: 13px; color: var(--gray-light); }
-
-        .waitlist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-        @media (max-width: 700px) { .waitlist-grid { grid-template-columns: 1fr; } }
-
-        .waitlist-card { background: var(--black); border: 1px solid var(--gray-mid); border-radius: 20px; padding: 32px; }
-        .waitlist-form { display: flex; flex-direction: column; gap: 14px; }
-        .waitlist-form label { font-size: 13px; color: var(--gray-light); margin-bottom: -6px; }
-
-        .waitlist-form input,
-        .waitlist-form select {
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1px solid var(--gray-mid);
-            background: var(--gray);
-            color: var(--white);
-            font-size: 14px;
-            font-family: 'DM Sans', sans-serif;
-            width: 100%;
-        }
-
-        .waitlist-form input:focus,
-        .waitlist-form select:focus { outline: none; border-color: var(--green); }
-
-        .full-width { width: 100%; justify-content: center; }
+        .cta-card .section-title { margin-bottom: 16px; }
+        .cta-card .section-sub { margin: 0 auto 36px; }
+        .cta-note { margin-top: 16px; font-size: 13px; color: var(--gray-light); }
 
         /* ── FOOTER ── */
-        .footer { padding: 40px 0; border-top: 1px solid var(--gray-mid); }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            text-align: center;
+        .footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--gray-mid);
+            position: relative;
+            z-index: 1;
         }
 
-        .footer-content p { font-size: 14px; color: var(--gray-light); }
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-copy { font-size: 13px; color: var(--gray-light); }
 
         .footer-links {
             display: flex;
@@ -448,44 +525,8 @@
 
         .footer-links a:hover { color: var(--green); }
 
-        .popup-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(6px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .popup-box {
-            background: var(--gray);
-            border: 1px solid var(--gray-mid);
-            padding: 36px;
-            max-width: 420px;
-            width: 90%;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-        }
-
-        .popup-box h3 { font-family: 'Syne', sans-serif; font-size: 22px; color: var(--white); margin-bottom: 10px; }
-        .popup-box p { font-size: 15px; color: var(--gray-light); margin-bottom: 24px; }
-
-        .popup-box button {
-            padding: 12px 28px;
-            background: var(--green);
-            border: none;
-            color: var(--black);
-            border-radius: 999px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -494,230 +535,201 @@
 
 <!-- NAVBAR -->
 <header class="navbar">
-    <div class="container nav-content">
+    <div class="wrap nav-inner">
         <a href="/" class="logo">
             <span class="logo-mark">RB</span>
-            <span class="logo-text">ReadyBrain AI</span>
+            <span class="logo-text">ReadyBrainAI</span>
         </a>
-        <nav class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How it works</a>
-            <a href="#students">For students</a>
-            <a href="#investors">For investors</a>
-            <a href="/premium" class="nav-cta">Premium</a>
-            <a href="#waitlist" class="nav-cta-filled btn">Join waitlist</a>
-        </nav>
+        <div class="nav-right">
+            <a href="/premium" class="nav-link">Premium</a>
+            <a href="/listen" class="nav-btn">🎙 Try Free</a>
+        </div>
     </div>
 </header>
 
-<!-- HERO -->
 <main>
-<section id="hero" class="hero">
-    <div class="container hero-grid">
-        <div class="hero-content">
-            <div class="hero-badge">Live prototype · Voice Interview Coach</div>
-            <h1 class="hero-title">
-                Your AI coach for<br>
-                <span class="accent">confident interviews.</span>
-            </h1>
-            <p class="hero-subtitle">
-                Speak naturally. ReadyBrain AI rewrites your answers into
-                <strong style="color:var(--white)">clear, short, and confident responses</strong> —
-                in your language, instantly.
-            </p>
-            <div class="hero-actions">
-                <a href="/listen" class="btn btn-primary">🎙 Try the voice coach</a>
-                <a href="#waitlist" class="btn btn-secondary">🔔 Join early access</a>
-            </div>
-            <div class="trust-row">
-                <div class="trust-pill">🌏 Asian & Latino students</div>
-                <div class="trust-pill">🎓 CS major at UCSD</div>
-                <div class="trust-pill">⚡ Powered by OpenAI</div>
-            </div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="wrap">
+        <div class="hero-badge">
+            <div class="live-dot"></div>
+            AI Interview Coach · Live
         </div>
 
-        <div class="hero-card">
-            <p class="hero-card-label">Live coaching example</p>
-            <div class="hero-conversation">
-                <div class="bubble bubble-interviewer">"Tell me about yourself."</div>
-                <div class="bubble bubble-user">"I'm a CS major at UCSD, working on an AI project while managing school and supporting myself."</div>
-                <div class="bubble bubble-ai">
-                    <strong style="color:var(--green); font-size:12px;">✦ ReadyBrain suggestion</strong><br><br>
-                    "I'm a CS major at UC San Diego focusing on software engineering. I'm building an AI interview coach to help students practice simple, confident answers."
+        <h1 class="hero-title">
+            Speak naturally.<br>
+            <span class="accent">Sound confident.</span>
+        </h1>
+
+        <p class="hero-sub">
+            ReadyBrainAI listens to your interview answers and instantly rewrites them into clear, professional responses — in your language.
+        </p>
+
+        <div class="hero-actions">
+            <a href="/listen" class="btn-primary">🎙 Try it free</a>
+            <a href="/premium" class="btn-ghost">⚡ Go Premium</a>
+        </div>
+
+        <div class="hero-langs">
+            <span class="lang-pill">🇲🇲 Burmese</span>
+            <span class="lang-pill">🇨🇳 Chinese</span>
+            <span class="lang-pill">🇯🇵 Japanese</span>
+            <span class="lang-pill">🇰🇷 Korean</span>
+            <span class="lang-pill">🇪🇸 Spanish</span>
+            <span class="lang-pill">🇮🇳 Hindi</span>
+            <span class="lang-pill">+ 8 more</span>
+        </div>
+    </div>
+</section>
+
+<!-- DEMO CARD -->
+<div class="demo-section">
+    <div class="wrap">
+        <div class="demo-card">
+            <div class="demo-label">Live example</div>
+            <div class="chat">
+                <div class="msg">
+                    <div class="msg-avatar interviewer">👤</div>
+                    <div class="msg-bubble interviewer">"Tell me about yourself."</div>
+                </div>
+                <div class="msg" style="flex-direction: row-reverse;">
+                    <div class="msg-bubble user">"Um, I'm a CS student and I like coding and I've done some projects and yeah I want to work here."</div>
+                </div>
+                <div class="msg">
+                    <div class="msg-avatar ai">RB</div>
+                    <div class="msg-bubble ai">
+                        <strong>✦ ReadyBrainAI improved answer</strong>
+                        "I'm a Computer Science student with hands-on experience building real projects. I'm passionate about software engineering and excited about the opportunity to contribute to your team."
+                    </div>
                 </div>
             </div>
-            <div class="hero-card-footer">
-                <div class="pill">Real-time feedback</div>
-                <div class="pill">Filler word detection</div>
-                <div class="pill">14 languages</div>
+        </div>
+    </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+    <div class="wrap">
+        <div class="section-header">
+            <h2 class="section-title">How it works</h2>
+            <p class="section-sub">From nervous to confident in 3 simple steps.</p>
+        </div>
+        <div class="steps">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <h3>Choose your language</h3>
+                <p>Pick from 14 languages — Burmese, Spanish, Chinese, Korean, and more.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <h3>Speak your answer</h3>
+                <p>Talk naturally. No script needed. The app listens and transcribes in real time.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <h3>Get a better version</h3>
+                <p>AI rewrites your answer into something clear, confident, and professional instantly.</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- FEATURES -->
-<section id="features" class="section section-alt">
-    <div class="container">
-        <h2 class="section-title">Why students use ReadyBrain AI</h2>
-        <p class="section-subtitle">Built for students who feel nervous, overthink, or struggle with English in interviews.</p>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <h3>🎧 Voice-based practice</h3>
-                <p>Speak naturally like in a real interview. ReadyBrain AI listens and gives instant feedback.</p>
+<section class="section" style="padding-top: 0;">
+    <div class="wrap">
+        <div class="section-header">
+            <h2 class="section-title">Everything you need</h2>
+            <p class="section-sub">Built for students who want to ace their interviews.</p>
+        </div>
+        <div class="features">
+            <div class="feat">
+                <div class="feat-icon">🎙</div>
+                <div>
+                    <h3>Real-time voice transcription</h3>
+                    <p>See your words appear on screen as you speak — no delay, no waiting.</p>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>🧠 Simple answer rewrites</h3>
-                <p>Get short, easy-to-remember answers that remove filler words and rambling.</p>
+            <div class="feat">
+                <div class="feat-icon">⚡</div>
+                <div>
+                    <h3>Instant AI answers</h3>
+                    <p>Get a professionally rewritten answer in 2-3 seconds after you stop speaking.</p>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>🌏 14 languages supported</h3>
-                <p>Speak in Burmese, Spanish, Chinese, Korean, and more. Get answers in any language you choose.</p>
+            <div class="feat">
+                <div class="feat-icon">🌏</div>
+                <div>
+                    <h3>14 languages supported</h3>
+                    <p>Get answers in your native language so you truly understand what to say.</p>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>🌍 For international & first-gen students</h3>
-                <p>Built by someone who understands the pressure and language challenges firsthand.</p>
+            <div class="feat">
+                <div class="feat-icon">🇺🇸</div>
+                <div>
+                    <h3>Convert to English</h3>
+                    <p>Got the answer in your language? Convert it back to English to say it confidently.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-icon">🔄</div>
+                <div>
+                    <h3>Auto-submit after silence</h3>
+                    <p>Stop talking and the app automatically processes your answer — no button needed.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-icon">📱</div>
+                <div>
+                    <h3>Works on any device</h3>
+                    <p>Use it on your phone, tablet, or laptop. No app download required.</p>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section id="how-it-works" class="section">
-    <div class="container">
-        <h2 class="section-title">How it works</h2>
-        <p class="section-subtitle">Go from "I don't know what to say" to "I feel prepared" in three steps.</p>
-        <div class="steps-grid">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Choose your language</h3>
-                <p>Select from 14 languages including Burmese, Spanish, Chinese, and more.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Answer out loud</h3>
-                <p>Speak naturally and comfortably — no script needed. Just talk.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Get a better version</h3>
-                <p>The AI rewrites it into a clear, confident answer in seconds.</p>
-            </div>
+<!-- FOUNDER -->
+<section class="section" style="padding-top: 0;">
+    <div class="wrap">
+        <div style="max-width: 640px; margin: 0 auto; text-align: center;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--green); color: var(--black); font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">A</div>
+            <p style="font-size: 17px; color: var(--text); line-height: 1.7; margin-bottom: 12px;">
+                "I built ReadyBrainAI because I know how stressful interviews are — especially when English isn't your first language and you can't afford a coach."
+            </p>
+            <p style="font-size: 14px; color: var(--gray-light);">— Aung, CS student & founder of ReadyBrainAI</p>
         </div>
     </div>
 </section>
 
-<!-- STUDENTS & INVESTORS -->
-<section class="section section-alt" id="students">
-    <div class="container two-column">
-        <div class="column-card">
-            <h2 class="section-title">For students & job seekers</h2>
-            <ul class="checklist">
-                <li>Practice interviews anytime, anywhere.</li>
-                <li>Get natural, human-sounding answers.</li>
-                <li>Perfect for internships, jobs, transfers, and scholarships.</li>
-                <li>Helps non-native English speakers sound confident.</li>
-            </ul>
-        </div>
-        <div class="column-card" id="investors">
-            <h2 class="section-title">For partners & investors</h2>
-            <p style="font-size:14px; color:var(--gray-light); margin-bottom:16px;">ReadyBrain AI is an early-stage prototype with real student usage.</p>
-            <ul class="checklist">
-                <li>Supports under-resourced students at scale.</li>
-                <li>UC/CSU campuses are the first target market.</li>
-                <li>Future roadmap: mobile app, premium tiers, campus partnerships.</li>
-            </ul>
+<!-- CTA -->
+<section class="cta-section">
+    <div class="wrap">
+        <div class="cta-card">
+            <h2 class="section-title">Ready to ace your interview?</h2>
+            <p class="section-sub">Free to try. No signup required. Works in seconds.</p>
+            <a href="/listen" class="btn-primary">🎙 Start practicing now</a>
+            <p class="cta-note">5 free sessions daily · No credit card needed</p>
         </div>
     </div>
 </section>
 
-<!-- FOUNDER STORY -->
-<section class="section">
-    <div class="container founder-grid">
-        <div>
-            <h2 class="section-title">Founder story</h2>
-            <p class="section-subtitle">Built by a UCSD CS major balancing school, work, financial stress, and a startup.</p>
-        </div>
-        <div class="founder-card">
-            <p>"Hi, I'm Aung Myo Win. I'm a CS major at UCSD working hard in school while supporting myself and building my future in software engineering."</p>
-            <p>"I created ReadyBrain AI because I know how stressful interviews can be — especially when English isn't your first language or coaching is too expensive. My goal is to help students like me feel confident and ready."</p>
-            <p class="founder-sign">— Aung, Founder of ReadyBrain AI</p>
-        </div>
-    </div>
-</section>
-
-<!-- DEMO -->
-<section id="demo" class="section section-alt">
-    <div class="container demo-card">
-        <h2 class="section-title">Try it right now</h2>
-        <p class="section-subtitle">Working voice prototype. No signup required. Speak and get your answer rewritten instantly.</p>
-        <a class="btn btn-primary btn-center" href="/listen">🎙 Launch the voice coach</a>
-        <p class="demo-note">Future versions will include mobile apps and full coaching features.</p>
-    </div>
-</section>
-
-<!-- WAITLIST -->
-<section id="waitlist" class="section">
-    <div class="container waitlist-grid">
-        <div>
-            <h2 class="section-title">Join the early access list</h2>
-            <p class="section-subtitle">Get early access, updates, and opportunities to shape the future of ReadyBrain AI.</p>
-            <ul class="checklist">
-                <li>Great for students preparing for interviews.</li>
-                <li>Helpful for UCSD/UC/CSU staff.</li>
-                <li>Open to investors and partners.</li>
-            </ul>
-        </div>
-        <div class="waitlist-card">
-            <form class="waitlist-form" onsubmit="openPopup(); return false;">
-                <label>Name</label>
-                <input type="text" placeholder="Your name">
-                <label>Email</label>
-                <input type="email" placeholder="you@example.com" required>
-                <label>I am a...</label>
-                <select>
-                    <option value="student">Student</option>
-                    <option value="cs">CS major</option>
-                    <option value="founder">Student founder</option>
-                    <option value="staff">University staff</option>
-                    <option value="investor">Investor</option>
-                </select>
-                <button type="submit" class="btn btn-primary full-width">🔔 Join waitlist</button>
-            </form>
-        </div>
-    </div>
-</section>
 </main>
 
 <!-- FOOTER -->
 <footer class="footer">
-    <div class="container footer-content">
-        <p>© 2026 ReadyBrain AI. Built by a CS major at UCSD.</p>
+    <div class="wrap footer-inner">
+        <p class="footer-copy">© 2026 ReadyBrainAI</p>
         <div class="footer-links">
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/tos">Terms of Service</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/tos">Terms</a>
             <a href="/premium">Premium</a>
             <a href="/listen">Try it</a>
         </div>
     </div>
 </footer>
 
-<!-- POPUP -->
-<div id="waitlistPopup" class="popup-overlay">
-    <div class="popup-box">
-        <h3>You're on the list! 🎉</h3>
-        <p>Thank you for signing up. We'll notify you when early access opens.</p>
-        <button onclick="closePopup()">OK</button>
-    </div>
-</div>
-
 <script>
-function openPopup() {
-    document.getElementById("waitlistPopup").style.display = "flex";
-}
-function closePopup() {
-    document.getElementById("waitlistPopup").style.display = "none";
-}
-
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
 }
