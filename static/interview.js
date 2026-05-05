@@ -25,22 +25,20 @@ function startLiveTranscription() {
     const qBox = document.getElementById("question");
 
     recognition.onresult = (event) => {
-        let interim = "";
-        let final = "";
+        let interimTranscript = "";
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
+        for (let i = 0; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-                final += transcript;
+                if (!liveTranscript.includes(transcript.trim())) {
+                    liveTranscript += transcript + " ";
+                }
             } else {
-                interim += transcript;
+                interimTranscript = transcript;
             }
         }
 
-        if (final) liveTranscript += final;
-
-        // Show live text with interim in gray
-        qBox.innerHTML = `<span style="color:#e8eaed">${liveTranscript}</span><span style="color:#6b7280">${interim}</span>`;
+        qBox.innerHTML = `<span style="color:#e8eaed">${liveTranscript}</span><span style="color:#6b7280">${interimTranscript}</span>`;
     };
 
     recognition.onerror = (e) => {
