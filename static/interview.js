@@ -191,7 +191,9 @@ async function stopListening() {
 
         if (blob.size < 800) {
             status.innerText = "❌ No clear voice detected.";
-            qBox.innerText = "(unclear)";
+            if (!qBox.innerText.trim()) {
+                qBox.innerText = "(unclear)";
+            }
             aBox.innerText = "Unclear. Please try again.";
             return;
         }
@@ -227,11 +229,52 @@ async function stopListening() {
             return;
         }
 
-        qBox.innerText = data.question ?? "(unclear)";
-        aBox.innerText = data.answer ?? "(unclear)";
+        const question = data.question ?? "";
+        const answer = data.answer ?? "";
 
-        lastQuestion = data.question ?? "";
-        lastAnswer = data.answer ?? "";
+        // Only update question box if Whisper got something useful
+        if (question && question !== "(unclear)") {
+            qBox.innerText = question;
+            lastQuestion = question;
+        } else if (liveTranscript.trim()) {
+            // Keep live transcript text
+            qBox.innerText = liveTranscript.trim();
+            lastQuestion = liveTranscript.trim();
+        }
+
+        // If Whisper failed but we have live transcript, use it to get AI answer
+        if (answer && answer !== "Unclear. Please try again.") {
+            aBox.innerText = answer;
+            lastAnswer = answer;
+
+            const convertBtn = document.getElementById("convertEnBtn");
+            if (convertBtn && lastAnswer) {
+                convertBtn.style.display = "inline-block";
+                convertBtn.innerText = "🇺🇸 Convert to English";
+                convertBtn.disabled = false;
+            }
+        } else if (lastQuestion) {
+            // Whisper failed — use live transcript to get AI answer
+            aBox.innerText = "⏳ Getting answer…";
+            fetch("/interview_regen", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: lastQuestion })
+            }).then(r => r.json()).then(d => {
+                if (d.answer) {
+                    aBox.innerText = d.answer;
+                    lastAnswer = d.answer;
+                    const convertBtn = document.getElementById("convertEnBtn");
+                    if (convertBtn) {
+                        convertBtn.style.display = "inline-block";
+                        convertBtn.innerText = "🇺🇸 Convert to English";
+                        convertBtn.disabled = false;
+                    }
+                }
+            }).catch(() => {
+                aBox.innerText = "Could not get answer. Please try again.";
+            });
+        }
 
         status.innerText = "Idle";
 
